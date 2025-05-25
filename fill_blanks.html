@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Duolingo Practice</title>
+    <script src="https://cdn.tailwindcss.com/"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7fafc; /* Light gray background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px; /* Add some padding */
+            color: #2d3748; /* Default text color */
+        }
+        .container {
+            background-color: #ffffff; /* White background */
+            padding: 40px;
+            border-radius: 12px; /* More rounded corners */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* Softer shadow */
+            text-align: center;
+            width: 100%; /* Make container responsive */
+            max-width: 600px; /* Increased max width for practice content */
+        }
+        h1 {
+            color: #2d3748; /* Dark gray text */
+            margin-bottom: 30px;
+            font-size: 2rem; /* Larger heading */
+            font-weight: 700; /* Bold font */
+        }
+        .difficulty-selection {
+            margin-bottom: 30px;
+        }
+        .difficulty-selection label {
+            margin-right: 20px;
+            font-size: 1.1rem;
+            color: #4a5568; /* Medium gray text */
+            cursor: pointer; /* Indicate it's clickable */
+        }
+        .difficulty-selection input[type="radio"] {
+            margin-right: 5px;
+            /* Custom radio button styling can be added here if needed */
+        }
+        button {
+            padding: 12px 24px;
+            border-radius: 8px; /* Rounded buttons */
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease; /* Smooth transition for color and press effect */
+            font-weight: 600; /* Semi-bold font */
+            display: inline-block; /* Ensure buttons are side-by-side by default */
+            margin: 5px; /* Add some margin around buttons */
+        }
+
+        /* Style for the Start button */
+        #startButton {
+            /* Increased padding for a larger button */
+            padding: 15px 30px;
+            font-size: 1.3rem; /* Slightly larger text */
+            /* Gradient background for a more attractive look */
+            background: linear-gradient(to right, #48bb78, #38a169); /* Green gradient */
+            color: white;
+            border: none;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* Add a subtle shadow */
+            margin-bottom: 15px; /* Add space below the start button before other buttons on small screens */
+            margin-right: 0; /* Remove right margin for stacking on small screens */
+            width: 100%; /* Make it full width by default for better mobile layout */
+            max-width: 300px; /* Limit max width on larger screens */
+        }
+        #startButton:hover {
+            background: linear-gradient(to right, #38a169, #2f855a); /* Darker gradient on hover */
+            transform: translateY(-2px); /* Lift button slightly on hover */
+        }
+         #startButton:active {
+            transform: translateY(0); /* Press down effect */
+            box-shadow: none; /* Remove shadow when pressed */
+        }
+
+        /* Style for other buttons */
+        #restartButton, #submitButton, #hintNextButton, #homeButton { /* Updated button IDs */
+             color: white;
+             border: none;
+        }
+        #restartButton {
+            background-color: #e53e3e; /* Red */
+        }
+        #restartButton:hover {
+            background-color: #c53030; /* Darker red */
+        }
+        #submitButton {
+            background-color: #3182ce; /* Blue */
+            padding: 15px 30px; /* Make submit button a bit bigger */
+            font-size: 1.2rem;
+        }
+         #submitButton:hover {
+            background-color: #2b6cb0; /* Darker blue */
+        }
+        /* Style for the new Hint & Next button */
+        #hintNextButton {
+            background-color: #dd6b20; /* Orange */
+        }
+        #hintNextButton:hover {
+            background-color: #c05621; /* Darker orange */
+        }
+         #homeButton {
+            background-color: #4a5568; /* Darker gray */
+        }
+        #homeButton:hover {
+            background-color: #2d3748; /* Even darker gray on hover */
+        }
+
+
+        /* Hover and Active effects for other buttons */
+        #restartButton:hover, #submitButton:hover, #hintNextButton:hover, #homeButton:hover { /* Updated button IDs */
+             transform: translateY(-2px); /* Lift button slightly on hover */
+        }
+         #restartButton:active, #submitButton:active, #hintNextButton:active, #homeButton:active { /* Updated button IDs */
+            transform: translateY(0); /* Press down effect */
+            box-shadow: none; /* Remove shadow when pressed */
+        }
+
+
+        /* Practice section styling */
+        #practiceSection {
+            display: none; /* Hidden by default */
+            text-align: left; /* Align text left for readability */
+        }
+        #practiceSection h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .sentence {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            line-height: 1.6; /* Improve readability */
+        }
+        .sentence span {
+            /* Style for sentence parts */
+        }
+        .blank-input {
+            display: inline-block; /* Allow input to be part of the sentence flow */
+            margin: 0 5px; /* Space around the input */
+            vertical-align: bottom; /* Align with the text baseline */
+        }
+        .blank-input input[type="text"] {
+            padding: 8px 12px;
+            border: 2px solid #cbd5e0; /* Light gray border */
+            border-radius: 4px;
+            font-size: 1.2rem;
+            outline: none; /* Remove default outline */
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            width: 150px; /* Default width, can be adjusted by JS if needed */
+        }
+         .blank-input input[type="text"]:focus {
+            border-color: #4c51bf; /* Blue border on focus */
+            box-shadow: 0 0 0 3px rgba(76, 81, 191, 0.2); /* Blue glow on focus */
+        }
+
+        .practice-buttons {
+            margin-top: 30px;
+            text-align: center; /* Center the buttons */
+        }
+
+        /* Message Box Styling */
+        .message-box {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            z-index: 1000;
+            text-align: center;
+            font-size: 1.5rem; /* Larger font for feedback */
+            font-weight: 700;
+            color: white;
+            opacity: 0; /* Start hidden */
+            transition: opacity 0.5s ease-in-out; /* Fade in/out */
+            /* Ensure it doesn't block clicks when hidden */
+            pointer-events: none;
+        }
+        .message-box.show {
+            opacity: 1; /* Show */
+            pointer-events: auto; /* Allow clicks when visible */
+        }
+        .message-box.correct {
+            background-color: #48bb78; /* Green */
+        }
+        .message-box.incorrect {
+            background-color: #e53e3e; /* Red */
+        }
+         /* New style for hint message box */
+        .message-box.hint {
+            background-color: #3182ce; /* Blue */
+        }
+
+
+        /* Responsive adjustments */
+        @media (min-width: 601px) {
+             /* On larger screens, arrange buttons side-by-side and center them */
+            .home-buttons, .practice-buttons {
+                display: flex;
+                justify-content: center;
+                gap: 15px; /* Space between buttons */
+            }
+             .home-buttons button, .practice-buttons button {
+                width: auto; /* Auto width on larger screens */
+                max-width: none; /* Remove max-width constraint */
+                margin-bottom: 0; /* Remove bottom margin */
+                margin-right: 0; /* Remove individual right margin */
+            }
+             /* Adjust spacing for practice buttons on larger screens */
+             .practice-buttons button {
+                 margin: 0 8px;
+             }
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            h1 {
+                font-size: 1.5rem;
+            }
+            .difficulty-selection label {
+                display: block; /* Stack labels on small screens */
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
+            .home-buttons button, .practice-buttons button {
+                width: 100%; /* Full width buttons on small screens */
+                margin-right: 0;
+                margin-bottom: 15px; /* Space between stacked buttons */
+            }
+             .home-buttons button:last-child, .practice-buttons button:last-child {
+                 margin-bottom: 0; /* No bottom margin for the last button */
+             }
+             .blank-input input[type="text"] {
+                 width: 80%; /* Make input wider on small screens */
+             }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="homeSection">
+            <h1>Duolingo Fill-in-the-Blanks Practice</h1>
+
+            <div class="difficulty-selection">
+                <label>
+                    <input type="radio" name="difficulty" value="easy" checked> Easy
+                </label>
+                <label>
+                    <input type="radio" name="difficulty" value="medium"> Medium
+                </label>
+                <label>
+                    <input type="radio" name="difficulty" value="hard"> Hard
+                </label>
+            </div>
+
+            <div class="home-buttons">
+                <button id="startButton">Start Practice</button>
+                <button id="restartButton">Restart</button>
+            </div>
+        </div>
+
+        <div id="practiceSection">
+            <h2>Practice</h2>
+            <div class="sentence">
+                <span id="sentenceBefore"></span>
+                <span class="blank-input"><input type="text" id="blankAnswer" autocomplete="off"></span>
+                <span id="sentenceAfter"></span>
+            </div>
+
+            <div class="practice-buttons">
+                <button id="submitButton">Submit</button>
+                <button id="hintNextButton">Hint & Next</button> <button id="homeButton">Go to Home</button>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="messageBox" class="message-box"></div>
+
+
+    <script>
+        // Duolingo Style Fill-in-the-Blanks Data
+        const allQuestions = {
+            easy: [
+                { before: "She ", blank: ["is"], after: " a student." },
+                { before: "They ", blank: ["play"], after: " soccer." },
+                { before: "I ", blank: ["like"], after: " reading." },
+                { before: "He ", blank: ["doesn't"], after: " eat meat." },
+                { before: "We ", blank: ["are"], after: " going." },
+                { before: "Can you ", blank: ["help"], after: " me?" },
+                { before: "It ", blank: ["is"], after: " raining." },
+                { before: "They ", blank: ["have"], after: " a dog." },
+                { before: "She ", blank: ["wants"], after: " to learn." },
+                { before: "We ", blank: ["watched"], after: " a movie." },
+                { before: "He ", blank: ["didn't"], after: " finish." },
+                { before: "The weather ", blank: ["is"], after: " beautiful." },
+                { before: "I ", blank: ["wake"], after: " up early." },
+                { before: "They ", blank: ["visited"], after: " friends." },
+                { before: "She ", blank: ["speaks"], after: " English." },
+                { before: "We ", blank: ["are"], after: " on vacation." },
+                { before: "He ", blank: ["has"], after: " a phone." },
+                { before: "The children ", blank: ["are"], after: " sleeping." },
+                { before: "I ", blank: ["need"], after: " milk." },
+                { before: "She ", blank: ["is"], after: " wearing blue." },
+                { before: "They ", blank: ["live"], after: " in a city." },
+                { before: "He ", blank: ["enjoys"], after: " games." },
+                { before: "We ", blank: ["are"], after: " at the cinema." },
+                { before: "I ", blank: ["think"], after: " it will snow." },
+                { before: "She ", blank: ["is"], after: " studying." },
+                { before: "He ", blank: ["helped"], after: " me." },
+                { before: "We ", blank: ["had"], after: " a good time." },
+                { before: "They ", blank: ["are"], after: " building." },
+                { before: "She ", blank: ["is"], after: " looking for a job." },
+                { before: "He ", blank: ["is"], after: " learning piano." },
+                { before: "She ", blank: ["is"], after: " practicing." },
+                { before: "They ", blank: ["are"], after: " cleaning." },
+                { before: "I ", blank: ["am"], after: " going." },
+                { before: "She ", blank: ["is"], after: " writing." },
+                { before: "He ", blank: ["is"], after: " listening." },
+                { before: "We ", blank: ["are"], after: " having lunch." },
+                { before: "They ", blank: ["are"], after: " watching TV." },
+                { before: "I ", blank: ["feel"], after: " tired." },
+                { before: "She ", blank: ["is"], after: " drinking tea." },
+                { before: "He ", blank: ["is"], after: " playing." },
+                { before: "She ", blank: ["is"], after: " talking." },
+                { before: "They ", blank: ["are"], after: " walking." },
+                { before: "I ", blank: ["am"], after: " reading." },
+                { before: "She ", blank: ["is"], after: " cooking." },
+                { before: "He ", blank: ["is"], after: " doing homework." },
+                { before: "We ", blank: ["are"], after: " listening to music." },
+                { before: "They ", blank: ["are"], after: " swimming." },
+                { before: "I ", blank: ["am"], after: " writing an email." },
+                { before: "She ", blank: ["is"], after: " drawing." },
+                { before: "He ", blank: ["is"], after: " running." },
+                { before: "She ", blank: ["is"], after: " singing." },
+                { before: "They ", blank: ["are"], after: " playing games." },
+                { before: "I ", blank: ["am"], after: " going to the gym." },
+                { before: "She ", blank: ["is"], after: " taking a photo." },
+                { before: "He ", blank: ["is"], after: " riding." },
+                { before: "We ", blank: ["are"], after: " having a picnic." },
+                { before: "They ", blank: ["are"], after: " visiting a museum." },
+                { before: "I ", blank: ["am"], after: " learning a language." },
+                { before: "She ", blank: ["is"], after: " teaching." },
+                { before: "He ", blank: ["is"], after: " helping." },
+                { before: "She ", blank: ["is"], after: " talking to her friend." },
+                { before: "They ", blank: ["are"], after: " eating pizza." },
+                { before: "I ", blank: ["am"], after: " going to the library." },
+                { before: "She ", blank: ["is"], after: " watching a movie." },
+                { before: "He ", blank: ["is"], after: " listening to a podcast." },
+                { before: "We ", blank: ["are"], after: " playing cards." },
+                { before: "They ", blank: ["are"], after: " hiking." },
+                { before: "I ", blank: ["am"], after: " writing a story." },
+                { before: "She ", blank: ["is"], after: " painting." },
+                { before: "He ", blank: ["is"], after: " walking his dog." },
+                { before: "She ", blank: ["is"], after: " doing yoga." },
+                { before: "They ", blank: ["are"], after: " having a barbecue." },
+                { before: "I ", blank: ["am"], after: " going shopping." },
+                { before: "She ", blank: ["is"], after: " taking a break." },
+                { before: "He ", blank: ["is"], after: " fixing his car." },
+                { before: "We ", blank: ["are"], after: " playing in the snow." },
+                { before: "They ", blank: ["are"], after: " visiting relatives." },
+                { before: "I ", blank: ["am"], after: " learning to swim." },
+                { before: "She ", blank: ["is"], after: " teaching math." },
+                { before: "He ", blank: ["is"], after: " helping his mother." },
+                { before: "She ", blank: ["is"], after: " talking to her teacher." },
+                { before: "They ", blank: ["are"], after: " eating ice cream." },
+                { before: "I ", blank: ["am"], after: " going to the park." },
+                { before: "She ", blank: ["is"], after: " watching a show." },
+                { before: "He ", blank: ["is"], after: " listening to an audiobook." },
+                { before: "We ", blank: ["are"], after: " playing video games." },
+                { before: "They ", blank: ["are"], after: " skiing." },
+                { before: "I ", blank: ["am"], after: " writing a poem." },
+                { before: "She ", blank: ["is"], after: " sculpting." },
+                { before: "He ", blank: ["is"], after: " walking his cat." },
+                { before: "She ", blank: ["is"], after: " doing pilates." },
+                { before: "They ", blank: ["are"], after: " having a picnic in the park." },
+                { before: "I ", blank: ["am"], after: " going window shopping." },
+                { before: "She ", blank: ["is"], after: " taking a nap." },
+                { before: "He ", blank: ["is"], after: " repairing his bicycle." },
+                { before: "We ", blank: ["are"], after: " playing in the rain." },
+                { before: "They ", blank: ["are"], after: " visiting friends." },
+                { before: "I ", blank: ["am"], after: " learning to surf." },
+                { before: "She ", blank: ["is"], after: " teaching science." },
+                { before: "He ", blank: ["is"], after: " helping his brother." },
+                { before: "She ", blank: ["is"], after: " talking to her parents." },
+                { before: "They ", blank: ["are"], after: " eating fruit." },
+                { before: "I ", blank: ["am"], after: " going to the beach." },
+                { before: "She ", blank: ["is"], after: " watching a documentary." },
+                { before: "He ", blank: ["is"], after: " listening to a lecture." },
+                { before: "We ", blank: ["are"], after: " playing chess." },
+                { before: "They ", blank: ["are"], after: " fishing." },
+                { before: "I ", blank: ["am"], after: " writing a script." },
+                { before: "She ", blank: ["is"], after: " sewing." },
+                { before: "He ", blank: ["is"], after: " walking his hamster." },
+                { before: "She ", blank: ["is"], after: " doing push-ups." },
+                { before: "They ", blank: ["are"], after: " having a potluck." },
+                { before: "I ", blank: ["am"], after: " going to the mall." },
+                { before: "She ", blank: ["is"], after: " taking a bath." },
+                { before: "He ", blank: ["is"], after: " painting a wall." },
+                { before: "We ", blank: ["are"], after: " playing in the leaves." },
+                { before: "They ", blank: ["are"], after: " visiting a historical site." },
+                { before: "I ", blank: ["am"], after: " learning to snowboard." },
+                { before: "She ", blank: ["is"], after: " teaching geography." }
+            ],
+            medium: [
+                { before: "They have ", blank: ["been living"], after: " in this city for five years now." },
+                { before: "The letter was ", blank: ["sent by"], after: " my grandmother last week." },
+                { before: "She had already ", blank: ["finished her"], after: " homework before dinner." },
+                { before: "If I were you, I ", blank: ["would take"], after: " that opportunity." },
+                { before: "He told me that he ", blank: ["had lost"], after: " his keys the previous day." },
+                 { before: "By this time tomorrow, I ", blank: ["will have completed"], after: " the project." },
+                 { before: "Despite the cold weather, they ", blank: ["decided to go"], after: " for a walk." },
+                 { before: "The new policy will ", blank: ["come into effect"], after: " next month." },
+                 { before: "She wishes she ", blank: ["had studied"], after: " harder for the test." },
+                 { before: "He is used to ", blank: ["waking up"], after: " early in the morning." },
+                 { before: "The meeting was ", blank: ["postponed due to"], after: " unforeseen circumstances." },
+                 { before: "I'm looking forward to ", blank: ["hearing from"], after: " you soon." },
+                 { before: "The book ", blank: ["is about"], after: " a journey through space." },
+                 { before: "She ", blank: ["has been working"], after: " here since 2019." },
+                 { before: "If it ", blank: ["rains"], after: ", we will stay inside." },
+                 { before: "He ", blank: ["used to play"], after: " soccer when he was younger." },
+                 { before: "The problem is ", blank: ["more complicated than"], after: " it seems." },
+                 { before: "She ", blank: ["apologized for"], after: " being late." },
+                 { before: "They ", blank: ["are planning to"], after: " open a new branch." },
+                 { before: "He ", blank: ["succeeded in"], after: " convincing them." },
+                 { before: "The results ", blank: ["are consistent with"], after: " our expectations." },
+                 { before: "She ", blank: ["is responsible for"], after: " managing the team." },
+                 { before: "They ", blank: ["have been discussing"], after: " the issue all morning." },
+                 { before: "He ", blank: ["is capable of"], after: " achieving great things." },
+                 { before: "The company ", blank: ["is committed to"], after: " innovation." },
+                 { before: "We ", blank: ["need to take"], after: " into account all the factors." },
+                 { before: "She ", blank: ["is interested in"], after: " learning new skills." },
+                 { before: "They ", blank: ["are preparing for"], after: " the upcoming presentation." },
+                 { before: "He ", blank: ["is known for"], after: " his sense of humor." },
+                 { before: "The project ", blank: ["is on track to"], after: " be completed on time." },
+                 { before: "The sudden noise ", blank: ["startled the"], after: " cat." },
+                 { before: "She ", blank: ["is fluent in"], after: " several languages." },
+                 { before: "They ", blank: ["are considering"], after: " moving to a new city." },
+                 { before: "He ", blank: ["is determined to"], after: " succeed." },
+                 { before: "The situation ", blank: ["calls for"], after: " immediate action." },
+                 { before: "She ", blank: ["is accustomed to"], after: " working long hours." },
+                 { before: "They ", blank: ["are collaborating on"], after: " a new research paper." },
+                 { before: "He ", blank: ["is confident in"], after: " his abilities." },
+                 { before: "The company ", blank: ["is expanding into"], after: " international markets." },
+                 { before: "We ", blank: ["need to address"], after: " the root cause of the problem." },
+                 { before: "She ", blank: ["is proficient in"], after: " using various software programs." },
+                 { before: "They ", blank: ["are actively involved in"], after: " community projects." },
+                 { before: "He ", blank: ["is passionate about"], after: " environmental conservation." },
+                 { before: "The research ", blank: ["provides insight into"], after: " the phenomenon." },
+                 { before: "She ", blank: ["is dedicated to"], after: " helping others." },
+                 { before: "They ", blank: ["striving for"], after: " excellence in their work." },
+                 { before: "He ", blank: ["is known for his"], after: " attention to detail." },
+                 { before: "The organization ", blank: ["is committed to"], after: " social responsibility." },
+                 { before: "We ", blank: ["need to be mindful of"], after: " the potential consequences." },
+                 { before: "She ", blank: ["is adept at"], after: " public speaking." },
+                 { before: "The team ", blank: ["is working diligently"], after: " to meet the deadline." },
+                 { before: "He ", blank: ["is capable of"], after: " adapting to new situations." },
+                 { before: "The company ", blank: ["is investing in"], after: " renewable energy sources." },
+                 { before: "She ", blank: ["is highly motivated"], after: " to achieve her goals." },
+                 { before: "They ", blank: ["are conducting research"], after: " on the effects of climate change." },
+                 { before: "He ", blank: ["is known for his"], after: " leadership qualities." },
+                 { before: "The project ", blank: ["is expected to"], after: " be completed next year." },
+                 { before: "She ", blank: ["is actively seeking"], after: " new opportunities." },
+                 { before: "They ", blank: ["are collaborating with"], after: " international partners." },
+                 { before: "He ", blank: ["is committed to"], after: " continuous learning." },
+                 { before: "The new system ", blank: ["is designed to"], after: " streamline the process." },
+                 { before: "She ", blank: ["is well-prepared"], after: " for the interview." },
+                 { before: "They ", blank: ["are working towards"], after: " a common goal." },
+                 { before: "He ", blank: ["is confident about"], after: " the outcome." },
+                 { before: "The company ", blank: ["is facing challenges"], after: " in the current market." },
+                 { before: "We ", blank: ["need to prioritize"], after: " our tasks." },
+                 { before: "She ", blank: ["is enthusiastic about"], after: " the new project." },
+                 { before: "They ", blank: ["are actively recruiting"], after: " new talent." },
+                 { before: "He ", blank: ["is known for his"], after: " problem-solving skills." },
+                 { before: "The organization ", blank: ["is dedicated to"], after: " providing quality education." },
+                 { before: "The report ", blank: ["sheds light on"], after: " the key findings." },
+                 { before: "She ", blank: ["is capable of"], after: " handling pressure." },
+                 { before: "They ", blank: ["are working in"], after: " conjunction with other departments." },
+                 { before: "He ", blank: ["is committed to"], after: " ethical practices." },
+                 { before: "The company ", blank: ["is striving to"], after: " improve customer satisfaction." },
+                 { before: "We ", blank: ["need to be aware"], after: " of the latest trends." },
+                 { before: "She ", blank: ["is passionate about"], after: " her work." },
+                 { before: "They ", blank: ["are actively promoting"], after: " diversity and inclusion." },
+                 { before: "He ", blank: ["is known for his"], after: " strong work ethic." },
+                 { before: "The organization ", blank: ["is dedicated to"], after: " environmental sustainability." },
+                 { before: "The research ", blank: ["underscores the importance"], after: " of collaboration." },
+                 { before: "She ", blank: ["is adept at"], after: " managing multiple projects." },
+                 { before: "They ", blank: ["are investing in"], after: " employee training." },
+                 { before: "He ", blank: ["is highly regarded"], after: " for his expertise." },
+                 { before: "The company ", blank: ["is undergoing a"], after: " period of growth." },
+                 { before: "We ", blank: ["need to take"], after: " into consideration all perspectives." },
+                 { before: "She ", blank: ["is interested in"], after: " pursuing further studies." },
+                 { before: "They ", blank: ["are preparing for"], after: " the annual conference." },
+                 { before: "He ", blank: ["is known for his"], after: " positive attitude." },
+                 { before: "The organization ", blank: ["is committed to"], after: " continuous improvement." }
+            ],
+            hard: [
+                { before: "The government is ", blank: ["implementing measures"], after: " to combat climate change effectively." },
+                { before: "She was ", blank: ["taken aback"], after: " by the sudden and unexpected change in his demeanor." },
+                { before: "The company is ", blank: ["on the brink"], after: " of a major technological breakthrough that could redefine the industry." },
+                { before: "He has a remarkable knack ", blank: ["for picking up"], after: " new languages with astonishing speed and fluency." },
+                { before: "The ongoing investigation aims to ", blank: ["shed light"], after: " on the mysterious disappearance of the ancient artifact." },
+                 { before: "They are ", blank: ["committed to ensuring"], after: " the utmost safety and well-being of all their employees." },
+                 { before: "The comprehensive report highlights the pressing ", blank: ["need for increased"], after: " investment in sustainable and renewable energy sources." },
+                 { before: "She was ", blank: ["instrumental in"], after: " the unprecedented success of the recent fundraising campaign." },
+                 { before: "The project's ultimate success will ", blank: ["hinge on"], after: " effective and seamless collaboration between all team members." },
+                 { before: "Despite facing numerous obstacles, he managed to ", blank: ["scrape through"], after: " the challenging exam with a narrow pass." },
+                 { before: "The introduction of this new technology is ", blank: ["set to revolutionize"], after: " the entire landscape of the telecommunications industry." },
+                 { before: "They are currently ", blank: ["grappling with"], after: " the intricate complexities of the newly introduced government regulations." },
+                 { before: "The controversial decision was ", blank: ["met with"], after: " widespread approval from a significant portion of the public." },
+                 { before: "She has an unfortunate tendency ", blank: ["to procrastinate"], after: " on important and time-sensitive tasks." },
+                 { before: "The esteemed committee ", blank: ["is comprised"], after: " of leading experts from various specialized fields." },
+                 { before: "He spoke ", blank: ["at length"], after: " about the significant challenges currently facing the company." },
+                 { before: "The company is ", blank: ["poised to become"], after: " a dominant leader in the competitive global market." },
+                 { before: "She ", blank: ["is adept at"], after: " handling difficult and sensitive situations with grace." },
+                 { before: "The detailed report provides a ", blank: ["comprehensive overview"], after: " of the current economic situation." },
+                 { before: "They are ", blank: ["working tirelessly"], after: " to meet the demanding deadline for the project." },
+                 { before: "The research findings ", blank: ["underscore the importance"], after: " of early intervention in addressing developmental issues." },
+                 { before: "He ", blank: ["is renowned for"], after: " his groundbreaking contributions to the field of theoretical physics." },
+                 { before: "The company ", blank: ["is undergoing a"], after: " period of significant and transformative change." },
+                 { before: "She ", blank: ["is highly regarded"], after: " for her exceptional leadership skills and vision." },
+                 { before: "The report delves ", blank: ["into the intricacies"], after: " of the complex global economic system." },
+                 { before: "They are ", blank: ["striving to achieve"], after: " a healthy balance between their work and personal lives." },
+                 { before: "He ", blank: ["is on the cusp"], after: " of a major scientific discovery that could change the world." },
+                 { before: "The new policy is ", blank: ["designed to mitigate"], after: " the negative environmental impacts of industrial activities." },
+                 { before: "She ", blank: ["is well-versed"], after: " in several programming languages, including Python and Java." },
+                 { before: "The organization is ", blank: ["committed to fostering"], after: " a culture of inclusivity and diversity." },
+                 { before: "The implications of the study ", blank: ["are far-reaching"], after: " and will impact future research." },
+                 { before: "He ", blank: ["is grappling with"], after: " the complex ethical dilemmas presented by artificial intelligence." },
+                 { before: "The company's remarkable success is a ", blank: ["testament to"], after: " their unwavering dedication and hard work." },
+                 { before: "She ", blank: ["is at the forefront"], after: " of cutting-edge research in this rapidly evolving field." },
+                 { before: "The report provides a ", blank: ["nuanced analysis"], after: " of the current political landscape and its potential shifts." },
+                 { before: "They are ", blank: ["endeavoring to improve"], after: " the overall quality of life for all citizens." },
+                 { before: "He ", blank: ["is acutely aware"], after: " of the significant challenges that lie ahead." },
+                 { before: "The success of the strategy is ", blank: ["contingent upon"], after: " the timely availability of necessary resources." },
+                 { before: "She ", blank: ["is an authority"], after: " on Renaissance art and its historical context." },
+                 { before: "The organization is ", blank: ["dedicated to promoting"], after: " global environmental sustainability initiatives." },
+                 { before: "The findings ", blank: ["corroborate the"], after: " initial hypothesis put forward by the researchers." },
+                 { before: "He ", blank: ["is susceptible to"], after: " colds and flu during the winter months." },
+                 { before: "The special committee will ", blank: ["convene to"], after: " thoroughly discuss the proposed changes." },
+                 { before: "She ", blank: ["is an advocate"], after: " for significant educational reform." },
+                 { before: "The report provides a ", blank: ["compelling argument"], after: " for immediate policy change." },
+                 { before: "They are ", blank: ["collaborating to address"], after: " the pressing global issue of poverty." },
+                 { before: "He ", blank: ["is on the verge"], after: " of completing his doctoral dissertation." },
+                 { before: "The new technology has the ", blank: ["potential to transform"], after: " the entire industry." },
+                 { before: "She ", blank: ["is highly skilled"], after: " in negotiation and conflict resolution." },
+                 { before: "The organization is ", blank: ["committed to upholding"], after: " the highest ethical standards in all its operations." },
+                 { before: "The recent research ", blank: ["sheds new light"], after: " on the mysterious origins of the universe." },
+                 { before: "He ", blank: ["is widely recognized"], after: " for his extensive philanthropic efforts." },
+                 { before: "The company is ", blank: ["at the cutting edge"], after: " of technological innovation." },
+                 { before: "She ", blank: ["is an expert"], after: " in international humanitarian law." },
+                 { before: "The report offers a ", blank: ["critical evaluation"], after: " of the current healthcare system." },
+                 { before: "They are ", blank: ["working in conjunction"], after: " with leading international experts." },
+                 { before: "He ", blank: ["is poised for"], after: " a significant career advancement." },
+                 { before: "The new policy is ", blank: ["designed to foster"], after: " sustainable economic growth." },
+                 { before: "She ", blank: ["is deeply invested"], after: " in her academic research." },
+                 { before: "The organization is ", blank: ["dedicated to advancing"], after: " human rights globally." },
+                 { before: "The implications are ", blank: ["profound and"], after: " potentially far-reaching." },
+                 { before: "He ", blank: ["is a leading"], after: " figure in the field of artificial intelligence research." },
+                 { before: "The company's strategy is ", blank: ["geared towards"], after: " achieving long-term sustainability." },
+                 { before: "She ", blank: ["is renowned for"], after: " her groundbreaking work in genetic engineering." },
+                 { before: "The report provides a ", blank: ["detailed examination"], after: " of the underlying causes of the problem." },
+                 { before: "They are ", blank: ["working tirelessly to"], after: " address the complex social issue." },
+                 { before: "He ", blank: ["is on the brink"], after: " of a major scientific breakthrough." },
+                 { before: "The technology has the ", blank: ["capacity to revolutionize"], after: " the healthcare industry." },
+                 { before: "She ", blank: ["is highly proficient"], after: " in advanced data analysis techniques." },
+                 { before: "The organization is ", blank: ["committed to promoting"], after: " global cooperation and understanding." },
+                 { before: "The findings are ", blank: ["consistent with"], after: " the results of previous studies." },
+                 { before: "He ", blank: ["is widely respected"], after: " for his integrity and ethical conduct." },
+                 { before: "The company is ", blank: ["at the forefront"], after: " of ethical business practices." },
+                 { before: "She ", blank: ["is an authority"], after: " on constitutional law." },
+                 { before: "The report offers a ", blank: ["critical assessment"], after: " of the current political climate." },
+                 { before: "They are ", blank: ["working in tandem"], after: " with leading international organizations." },
+                 { before: "He ", blank: ["is poised to make"], after: " a significant contribution to the field." },
+                 { before: "The new policy is ", blank: ["designed to enhance"], after: " public safety and security." },
+                 { before: "She ", blank: ["is deeply committed"], after: " to social justice and equality." },
+                 { before: "The organization is ", blank: ["dedicated to fostering"], after: " a culture of innovation and creativity." },
+                 { before: "The research provides a ", blank: ["nuanced understanding"], after: " of the complex social phenomenon." },
+                 { before: "He ", blank: ["is widely regarded"], after: " as a visionary leader in the tech industry." },
+                 { before: "The company is ", blank: ["at the vanguard"], after: " of sustainable development practices." },
+                 { before: "She ", blank: ["is an expert"], after: " on environmental policy and conservation." },
+                 { before: "The report offers a ", blank: ["comprehensive analysis"], after: " of the potential environmental impacts." },
+                 { before: "They are ", blank: ["working collaboratively"], after: " to find a sustainable solution." },
+                 { before: "He ", blank: ["is on the cusp"], after: " of a major paradigm shift in scientific thought." },
+                 { before: "The technology has the ", blank: ["potential to disrupt"], after: " established market structures." },
+                 { before: "She ", blank: ["is highly proficient"], after: " in quantitative analysis." },
+                 { before: "The organization is ", blank: ["committed to promoting"], after: " human dignity and respect." },
+                 { before: "The implications of the findings are ", blank: ["significant for"], after: " future research and policy." },
+                 { before: "He ", blank: ["is a key contributor"], after: " to the advancement of knowledge." },
+                 { before: "The company's mission is ", blank: ["to empower individuals"], after: " through education and opportunity." },
+                 { before: "She ", blank: ["is renowned for"], after: " her tireless advocacy work." },
+                 { before: "The report provides a ", blank: ["compelling case"], after: " for urgent action." },
+                 { before: "They are ", blank: ["working towards"], after: " a more equitable and just society." },
+                 { before: "He ", blank: ["is acutely aware"], after: " of the nuances of the complex situation." },
+                 { before: "The strategy is ", blank: ["predicated on"], after: " the assumption that resources will be readily available." },
+                 { before: "She ", blank: ["is an authority"], after: " on international relations and diplomacy." },
+                 { before: "The organization is ", blank: ["dedicated to fostering"], after: " global understanding and cooperation." },
+                 { before: "The research provides a ", blank: ["deeper insight"], after: " into the complexities of the issue." },
+                 { before: "He ", blank: ["is widely recognized"], after: " as a pioneer in his field." },
+                 { before: "The company is ", blank: ["at the forefront"], after: " of ethical innovation." },
+                 { before: "She ", blank: ["is an expert"], after: " on human rights law." },
+                 { before: "The report offers a ", blank: ["thorough examination"], after: " of the potential consequences." },
+                 { before: "They are ", blank: ["working collaboratively"], after: " to achieve sustainable development goals." },
+                 { before: "He ", blank: ["is on the verge"], after: " of a major breakthrough in medical research." },
+                 { before: "The technology has the ", blank: ["potential to revolutionize"], after: " the way we communicate." },
+                 { before: "She ", blank: ["is highly proficient"], after: " in qualitative analysis." },
+                 { before: "The organization is ", blank: ["committed to promoting"], after: " peace and security globally." },
+                 { before: "The findings are ", blank: ["consistent with"], after: " the established research objectives." },
+                 { before: "He ", blank: ["is widely respected"], after: " for his significant contributions to the community." },
+                 { before: "The company is ", blank: ["at the forefront"], after: " of social responsibility initiatives." },
+                 { before: "She ", blank: ["is an authority"], after: " on international development." },
+                 { before: "The report offers a ", blank: ["critical analysis"], after: " of the policy's overall effectiveness." },
+                 { before: "They are ", blank: ["working in partnership"], after: " with local communities to implement the project." },
+                 { before: "He ", blank: ["is poised to lead"], after: " the company into a new and prosperous era." },
+                 { before: "The policy is ", blank: ["designed to promote"], after: " economic stability and growth." },
+                 { before: "She ", blank: ["is deeply committed"], after: " to environmental protection and conservation." },
+                 { before: "The organization is ", blank: ["dedicated to fostering"], after: " a culture of lifelong learning and development." },
+                 { before: "The research provides ", blank: ["compelling evidence"], after: " of the strong correlation between the two factors." },
+                 { before: "He ", blank: ["is widely regarded"], after: " as a thought leader in the technology industry." },
+                 { before: "The company is ", blank: ["at the vanguard"], after: " of ethical and sustainable business practices." },
+                 { before: "She ", blank: ["is an expert"], after: " on public health policy and its implementation." },
+                 { before: "The report offers a ", blank: ["comprehensive review"], after: " of the existing literature on the topic." },
+                 { before: "They are ", blank: ["working collaboratively"], after: " to address the complex social issue." },
+                 { before: "He ", blank: ["is on the cusp"], after: " of a major technological advancement." },
+                 { before: "The technology has the ", blank: ["potential to disrupt"], after: " established market structures." },
+                 { before: "She ", blank: ["is highly proficient"], after: " in quantitative analysis." },
+                 { before: "The organization is ", blank: ["committed to promoting"], after: " global citizenship and responsibility." }
+            ]
+        };
+
+        let currentDifficulty = 'easy';
+        let availableQuestions = []; // Array of questions for the current session, will be depleted
+        let currentQuestion = null; // Store the current question object
+
+        const homeSection = document.getElementById('homeSection');
+        const practiceSection = document.getElementById('practiceSection');
+        const startButton = document.getElementById('startButton');
+        const restartButton = document.getElementById('restartButton');
+        const submitButton = document.getElementById('submitButton');
+        const hintNextButton = document.getElementById('hintNextButton'); // Get the new merged button
+        const homeButton = document.getElementById('homeButton');
+        const sentenceBeforeSpan = document.getElementById('sentenceBefore');
+        const blankAnswerInput = document.getElementById('blankAnswer');
+        const sentenceAfterSpan = document.getElementById('sentenceAfter');
+        const messageBox = document.getElementById('messageBox');
+
+        // Variable to track if input should be enabled
+        let isInputEnabled = true;
+
+         // Fisher-Yates (Knuth) Shuffle Algorithm
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]]; // Swap elements
+            }
+            return array;
+        }
+
+
+        // Function to display a message box
+        function showMessage(message, type = 'info') { // type can be 'correct', 'incorrect', 'info', 'hint'
+            // Clear any existing message timeout to prevent overlap
+            if (messageBox.timeoutId) {
+                clearTimeout(messageBox.timeoutId);
+            }
+
+            messageBox.innerText = message;
+            // Use classList.add to ensure 'show' is added
+            messageBox.classList.add('show');
+
+            // Remove previous type classes before adding new ones
+            messageBox.classList.remove('correct', 'incorrect', 'hint');
+
+            if (type === 'correct') {
+                messageBox.classList.add('correct');
+            } else if (type === 'incorrect') {
+                messageBox.classList.add('incorrect');
+            } else if (type === 'hint') { // Added condition for hint type
+                 messageBox.classList.add('hint');
+            }
+            // No specific class for 'info' yet, could add if needed
+
+            // Hide the message box after a short time
+            messageBox.timeoutId = setTimeout(() => {
+                messageBox.classList.remove('show');
+                 // Remove type classes after hiding animation
+                 setTimeout(() => {
+                     // Also explicitly remove all type classes here for a clean state
+                     messageBox.classList.remove('correct', 'incorrect', 'hint');
+                 }, 500); // Wait for fade-out transition (0.5s)
+            }, 1500); // Display time (1.5 seconds)
+        }
+
+
+        // Function to load and display the current question
+        function loadQuestion() {
+            console.log("Loading question. Remaining questions:", availableQuestions.length);
+            if (availableQuestions.length === 0) {
+                 showMessage("You've completed all questions for this difficulty!", 'info');
+                 console.log("All questions completed for this difficulty.");
+                 // Option: Automatically go back to home or offer to restart difficulty
+                 setTimeout(goToHome, 3000); // Go home after message
+                 return;
+            }
+
+            // Get the next question from the shuffled array and remove it
+            currentQuestion = availableQuestions.shift();
+             console.log("Shifted question:", currentQuestion);
+
+
+            sentenceBeforeSpan.innerText = currentQuestion.before;
+            sentenceAfterSpan.innerText = currentQuestion.after;
+            blankAnswerInput.value = ''; // Clear the input field
+
+            // Ensure input is enabled and submit button is active
+            isInputEnabled = true;
+            blankAnswerInput.disabled = !isInputEnabled;
+            submitButton.disabled = !isInputEnabled;
+            hintNextButton.disabled = !isInputEnabled; // Ensure hint/next is also enabled
+
+            blankAnswerInput.focus(); // Set focus to the input field
+             console.log("Question loaded:", currentQuestion);
+        }
+
+        // Function to check the user's answer
+        function checkAnswer() {
+            console.log("Checking answer...");
+            // Only check if input is currently enabled
+            if (!isInputEnabled || !currentQuestion) {
+                 console.log("Input is disabled or no current question, not checking answer.");
+                return; // Do nothing if input is disabled or no question loaded
+            }
+
+            const userAnswer = blankAnswerInput.value.trim().toLowerCase();
+            // Handle multiple possible correct answers if needed in the future
+            const correctAnswers = currentQuestion.blank.map(answer => answer.toLowerCase());
+             console.log("User answer:", userAnswer, "Correct answers:", correctAnswers);
+
+            if (correctAnswers.includes(userAnswer)) {
+                showMessage("Correct!", 'correct');
+                 console.log("Answer is correct.");
+                // Disable input and buttons after correct answer
+                isInputEnabled = false;
+                blankAnswerInput.disabled = true;
+                submitButton.disabled = true;
+                hintNextButton.disabled = true; // Disable hint/next after correct answer
+                // Automatically move to the next question after a short delay
+                setTimeout(loadQuestion, 1000); // Wait 1 second before loading next question
+            } else {
+                showMessage("Incorrect. Try again!", 'incorrect');
+                 console.log("Answer is incorrect.");
+                // User can try again, input and submit remain enabled
+            }
+        }
+
+        // Function to show hint and move to the next question
+        function showHintAndNext() {
+            console.log("Showing hint and moving to next...");
+             // Prevent multiple actions while a hint/next is in progress
+             if (!isInputEnabled || !currentQuestion) {
+                  console.log("Input is disabled or no current question, not showing hint/next.");
+                 return;
+             }
+
+             const correctAnswer = currentQuestion.blank.join(' / '); // Join multiple possible answers with /
+             showMessage(correctAnswer, 'hint'); // Show only the answer
+             console.log("Hint displayed:", correctAnswer);
+
+             // Fill the blank, disable input and buttons
+             blankAnswerInput.value = currentQuestion.blank[0]; // Fill with the first possible answer
+             isInputEnabled = false; // Disable input
+             blankAnswerInput.disabled = true;
+             submitButton.disabled = true;
+             hintNextButton.disabled = true; // Disable hint/next button
+
+             // Automatically move to the next question after a short delay
+             setTimeout(loadQuestion, 2000); // Wait 2 seconds after hint before loading next question
+        }
+
+        // Function to go back to the home page
+        function goToHome() {
+            console.log("Going to home page.");
+            // Hide and clear the message box when going home
+            if (messageBox.timeoutId) {
+                clearTimeout(messageBox.timeoutId);
+            }
+            // Remove ALL classes from the message box to ensure it's reset
+            messageBox.className = 'message-box';
+            messageBox.innerText = ''; // Clear text content
+
+             practiceSection.style.display = 'none';
+             homeSection.style.display = 'block';
+             // Reset state when going home
+             availableQuestions = []; // Clear the current session's questions
+             currentQuestion = null; // Clear the current question
+             isInputEnabled = true; // Ensure input is enabled for the next session
+
+             // Explicitly re-enable home buttons
+             startButton.disabled = false;
+             restartButton.disabled = false;
+
+              console.log("State reset for home page.");
+        }
+
+
+        // Event Listeners
+
+        startButton.addEventListener('click', function() {
+            console.log("Start button clicked.");
+            const selectedDifficulty = document.querySelector('input[name="difficulty"]:checked').value;
+            console.log('Selected Difficulty:', selectedDifficulty);
+            currentDifficulty = selectedDifficulty;
+
+            if (allQuestions[currentDifficulty] && allQuestions[currentDifficulty].length > 0) {
+                 // Create a shuffled copy of the questions for the session
+                 availableQuestions = shuffleArray([...allQuestions[currentDifficulty]]); // Use spread to create a shallow copy
+                 console.log("Loaded and shuffled questions for difficulty:", currentDifficulty, availableQuestions);
+
+                 loadQuestion(); // Load the first question
+
+                 // Hide home section and show practice section
+                 homeSection.style.display = 'none';
+                 practiceSection.style.display = 'block';
+                 console.log("Switched to practice section.");
+            } else {
+                 console.error("No questions available for selected difficulty:", currentDifficulty);
+                 showMessage("No questions available for this difficulty.", 'info');
+            }
+        });
+
+        restartButton.addEventListener('click', function() {
+            console.log("Restart button clicked.");
+            // Hide practice section and show home section
+            goToHome(); // Use the new function
+        });
+
+        submitButton.addEventListener('click', checkAnswer);
+
+        // Add event listener for the new merged button
+        hintNextButton.addEventListener('click', showHintAndNext);
+
+        homeButton.addEventListener('click', goToHome); // Add event listener for the home button
+
+
+        // Allow pressing Enter key to submit answer
+        blankAnswerInput.addEventListener('keypress', function(event) {
+            // Only allow submission via Enter if input is enabled
+            if (isInputEnabled && event.key === 'Enter') {
+                event.preventDefault(); // Prevent default form submission
+                checkAnswer();
+            }
+        });
+
+        // Initial state: show home section
+        homeSection.style.display = 'block';
+        practiceSection.style.display = 'none';
+         console.log("Initial state: Home section displayed.");
+
+    </script>
+</body>
+</html>
+

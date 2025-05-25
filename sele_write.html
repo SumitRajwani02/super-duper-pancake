@@ -1,0 +1,1581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Duolingo Spelling Practice</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles */
+        body {
+            font-family: "Inter", sans-serif; /* Use Inter font */
+            background-color: #f3f4f6; /* Light gray background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px; /* Add some padding */
+        }
+        .container {
+            background-color: #ffffff; /* White background for container */
+            padding: 30px;
+            border-radius: 12px; /* More rounded corners */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Softer shadow */
+            text-align: center;
+            width: 100%; /* Full width on small screens */
+            max-width: 600px; /* Max width for larger screens */
+        }
+        h1 {
+            color: #1f2937; /* Dark gray color */
+            margin-bottom: 20px;
+            font-size: 2rem; /* Larger heading */
+        }
+
+        /* Styles for Selection Mode */
+        .selection-options {
+            display: flex;
+            flex-direction: column; /* Stack buttons on small screens */
+            gap: 15px; /* Space between buttons */
+            margin-bottom: 20px;
+        }
+        .selection-button {
+            padding: 15px 25px; /* More padding */
+            font-size: 1.2rem; /* Larger font size for buttons */
+            cursor: pointer;
+            border: none;
+            border-radius: 8px; /* Rounded button corners */
+            transition: background-color 0.3s ease; /* Smooth transition */
+        }
+        .selection-button:hover {
+            opacity: 0.9; /* Slight opacity change on hover */
+        }
+         .selection-button.correct {
+            background-color: #34d399; /* Green background */
+            color: white;
+        }
+        .selection-button.incorrect {
+            background-color: #f87171; /* Red background */
+            color: white;
+        }
+
+
+        /* Styles for Read & Write Mode */
+        .word-prompt {
+            font-size: 1.8rem; /* Larger word display */
+            font-weight: bold;
+            margin-bottom: 20px; /* Adjusted margin */
+            color: #374151; /* Slightly lighter dark gray */
+        }
+        .read-button {
+            background-color: #60a5fa; /* Light blue */
+            color: white;
+            padding: 10px 20px;
+            font-size: 1rem;
+            cursor: pointer;
+            border: none;
+            border-radius: 8px;
+            margin-bottom: 20px; /* Added margin */
+            transition: background-color 0.3s ease;
+        }
+        .read-button:hover {
+            background-color: #3b82f6; /* Darker blue on hover */
+        }
+         .hint-button {
+            background-color: #fcd34d; /* Yellow */
+            color: #1f2937; /* Dark text */
+            padding: 10px 20px;
+            font-size: 1rem;
+            cursor: pointer;
+            border: none;
+            border-radius: 8px;
+            margin-top: 10px; /* Space above hint button */
+            transition: background-color 0.3s ease;
+        }
+        .hint-button:hover {
+            background-color: #fbbf24; /* Darker yellow on hover */
+        }
+        .spelling-input {
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #d1d5db; /* Light gray border */
+            border-radius: 6px;
+            font-size: 1.1rem;
+            width: 80%; /* Adjusted width */
+            max-width: 300px; /* Max width for input */
+            text-align: center;
+        }
+        .submit-button {
+            background-color: #10b981; /* Green */
+            color: white;
+            padding: 12px 25px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            border: none;
+            border-radius: 8px;
+            transition: background-color 0.3s ease;
+        }
+        .submit-button:hover {
+            background-color: #059669; /* Darker green on hover */
+        }
+
+        /* General Feedback Styles */
+        .feedback-message {
+            margin-top: 15px; /* Adjusted margin */
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .feedback-message.correct { /* Unified correct feedback */
+            background-color: #d1fae5; /* Light green */
+            color: #065f46; /* Dark green text */
+        }
+        .feedback-message.incorrect { /* Unified incorrect feedback */
+            background-color: #fee2e2; /* Light red */
+            color: #991b1b; /* Dark red text */
+        }
+         .feedback-message.hint { /* Hint feedback style */
+            background-color: #fffbeb; /* Light yellow */
+            color: #b45309; /* Dark yellow text */
+        }
+
+
+        /* Button Styles */
+        .start-button, .restart-button, .play-again-button, .back-button {
+            background-color: #3b82f6; /* Blue background */
+            color: white;
+            padding: 15px 30px;
+            font-size: 1.3rem; /* Larger button */
+            cursor: pointer;
+            border: none;
+            border-radius: 8px;
+            transition: background-color 0.3s ease;
+            margin: 10px; /* Added margin */
+        }
+        .start-button:hover, .restart-button:hover, .play-again-button:hover, .back-button:hover {
+            background-color: #2563eb; /* Darker blue on hover */
+        }
+         .back-button {
+            background-color: #6b7280; /* Gray */
+            font-size: 1rem; /* Smaller size for back button */
+            padding: 10px 20px;
+            margin-top: 20px; /* Space above back button */
+        }
+        .back-button:hover {
+             background-color: #4b5563; /* Darker gray */
+        }
+
+
+        /* Difficulty Selection Styles */
+        .difficulty-selection {
+            margin-bottom: 20px;
+        }
+
+        .difficulty-selection label {
+            margin-right: 15px;
+            font-size: 1.1rem;
+        }
+
+        /* Hidden Class Fix */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Progress Indicator Styles */
+        .progress-indicator {
+            margin-bottom: 15px;
+            font-size: 1rem;
+            color: #6b7280; /* Gray text */
+        }
+
+        /* End Screen Styles */
+        .end-summary {
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .end-summary h2 {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            color: #1f2937;
+        }
+
+        .end-summary p {
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .incorrect-words-list {
+            margin-top: 15px;
+        }
+
+        .incorrect-words-list h3 {
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+            color: #ef4444; /* Red */
+        }
+
+        .incorrect-words-list ul {
+            list-style: disc;
+            padding-left: 20px;
+        }
+
+        .incorrect-words-list li {
+            margin-bottom: 5px;
+            font-size: 1rem;
+        }
+
+
+        /* Responsive adjustments */
+        @media (min-width: 640px) {
+             .selection-options {
+                flex-direction: row; /* Buttons side-by-side on larger screens */
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Duolingo Spelling Practice</h1>
+
+        <div id="home-screen">
+            <div class="difficulty-selection">
+                <p class="mb-4 text-lg font-semibold">Select Difficulty:</p>
+                <input type="radio" id="easy" name="difficulty" value="easy" checked>
+                <label for="easy">Easy</label>
+                <input type="radio" id="medium" name="difficulty" value="medium">
+                <label for="medium">Medium</label>
+                <input type="radio" id="hard" name="difficulty" value="hard">
+                <label for="hard">Hard</label>
+            </div>
+            <button id="start-selection-btn" class="start-button">Start Selection Practice</button>
+            <button id="start-read-write-btn" class="start-button">Start Listen & Write Practice</button>
+            <button id="restart-btn" class="restart-button">Restart Practice</button> </div>
+
+        <div id="selection-screen" class="hidden">
+             <div id="selection-progress" class="progress-indicator"></div> <div id="selection-word-display" class="word-display">Which is the correct spelling?</div> <button id="selection-read-btn" class="read-button">Read Word</button> <div id="selection-options" class="selection-options">
+                <button id="selection-option1-btn" class="selection-button"></button>
+                <button id="selection-option2-btn" class="selection-button"></button>
+            </div>
+            <div id="selection-feedback" class="feedback-message hidden"></div> <button id="selection-back-btn" class="back-button">Back to Home</button> </div>
+
+         <div id="read-write-screen" class="hidden">
+            <div id="read-write-progress" class="progress-indicator"></div> <div id="word-prompt" class="word-prompt">Spell the word:</div> <button id="read-btn" class="read-button">Read Word</button> <input type="text" id="spelling-input" class="spelling-input" placeholder="Type the spelling here"> <button id="submit-btn" class="submit-button">Submit</button> <button id="hint-btn" class="hint-button">Hint</button> <div id="read-write-feedback" class="feedback-message hidden"></div> <button id="read-write-back-btn" class="back-button">Back to Home</button> </div>
+
+
+        <div id="end-screen" class="hidden">
+            <div class="end-summary">
+                <h2>Practice Complete!</h2>
+                <p>Correct Answers: <span id="correct-count">0</span></p>
+                <p>Incorrect Answers: <span id="incorrect-count">0</span></p>
+                <div id="incorrect-words-section" class="incorrect-words-list hidden">
+                    <h3>Words to Review:</h3>
+                    <ul id="incorrect-words-list"></ul>
+                </div>
+            </div>
+            <button id="play-again-btn" class="play-again-button">Play Again</button> </div>
+    </div>
+
+    <script>
+        // Categorized word lists (expanded significantly)
+        const easyWords = [
+            "apple", "house", "run", "cat", "dog", "book", "pen", "cup", "sun", "moon",
+            "tree", "car", "bus", "train", "blue", "red", "green", "big", "small", "happy",
+            "sad", "good", "bad", "eat", "drink", "sleep", "walk", "talk", "read", "write",
+            "play", "sing", "fast", "slow", "hot", "cold", "day", "night", "morning", "evening",
+            "yes", "no", "hello", "bye", "thank", "please", "one", "two", "three", "four",
+            "five", "six", "seven", "eight", "nine", "ten", "go", "come", "see", "hear",
+            "find", "lose", "give", "take", "make", "do", "have", "is", "am", "are",
+            "was", "were", "will", "can", "may", "must", "should", "this", "that", "these",
+            "those", "here", "there", "now", "then", "always", "never", "often", "sometimes", "usually",
+            "very", "too", "so", "and", "but", "or", "if", "because", "when", "where",
+            "why", "how", "what", "who", "which", "whom", "whose", "my", "your", "his",
+            "her", "its", "our", "their", "me", "you", "him", "her", "it", "us",
+            "them", "i", "he", "she", "it", "we", "they", "a", "an", "the",
+            "in", "on", "at", "to", "of", "for", "with", "by", "from", "about",
+            "over", "under", "through", "above", "below", "near", "far", "up", "down", "in front of",
+            "behind", "next to", "between", "among", "around", "throughout", "before", "after", "during", "while",
+            "until", "since", "ago", "today", "yesterday", "tomorrow", "week", "month", "year", "minute",
+            "hour", "second", "time", "people", "man", "woman", "child", "boy", "girl", "friend",
+            "family", "mother", "father", "sister", "brother", "son", "daughter", "teacher", "student", "work",
+            "job", "school", "city", "town", "village", "street", "road", "park", "garden", "food",
+            "water", "milk", "juice", "bread", "rice", "meat", "fish", "fruit", "vegetable", "color",
+            "shape", "size", "number", "word", "sentence", "question", "answer", "picture", "music", "game",
+            "sport", "run", "jump", "swim", "fly", "climb", "open", "close", "start", "stop",
+            "finish", "clean", "dirty", "empty", "full", "new", "old", "young", "love", "like",
+            "hate", "want", "need", "think", "know", "learn", "teach", "help", "ask", "tell",
+            "show", "hide", "find", "lose", "win", "lose", "give", "take", "bring", "carry",
+            "send", "receive", "buy", "sell", "pay", "cost", "price", "money", "free", "easy",
+            "hard", "medium", "long", "short", "tall", "small", "big", "large", "wide", "narrow",
+            "thick", "thin", "heavy", "light", "strong", "weak", "loud", "quiet", "fast", "slow",
+            "early", "late", "first", "last", "next", "previous", "same", "different", "kind", "type",
+            "sort", "part", "whole", "piece", "group", "team", "place", "area", "room", "house",
+            "building", "door", "window", "table", "chair", "bed", "sofa", "light", "dark", "bright",
+            "clean", "dirty", "wet", "dry", "hot", "cold", "warm", "cool", "good", "bad",
+            "nice", "kind", "happy", "sad", "angry", "tired", "hungry", "thirsty", "sick", "well",
+            "beautiful", "ugly", "pretty", "handsome", "old", "new", "young", "easy", "difficult", "simple",
+            "complex", "important", "necessary", "possible", "impossible", "real", "fake", "true", "false", "right",
+            "wrong", "correct", "incorrect", "sure", "certain", "maybe", "perhaps", "probably", "possible", "impossible",
+            "can", "cannot", "could", "could not", "will", "will not", "would", "would not", "should", "should not",
+            "may", "may not", "might", "might not", "must", "must not", "have to", "do not have to", "need to", "do not need to",
+            "above", "across", "act", "add", "after", "again", "against", "age", "ago", "agree",
+            "ahead", "air", "all", "allow", "almost", "alone", "along", "also", "always", "am",
+            "an", "and", "animal", "answer", "any", "are", "area", "arm", "around", "as",
+            "ask", "at", "away", "back", "bad", "bag", "ball", "bank", "be", "bear",
+            "bed", "bee", "been", "before", "begin", "behind", "believe", "bell", "below", "best",
+            "better", "between", "big", "bird", "black", "blue", "boat", "body", "bone", "book",
+            "both", "bottom", "box", "boy", "bread", "break", "bring", "brother", "brown", "build",
+            "burn", "bus", "but", "buy", "by", "call", "can", "car", "card", "care",
+            "carry", "cat", "catch", "center", "chair", "chance", "change", "check", "child", "city",
+            "class", "clean", "clear", "close", "clothes", "cloud", "cold", "color", "come", "common",
+            "company", "compare", "complete", "concern", "condition", "connect", "consider", "contain", "continue", "control",
+            "cook", "copy", "corn", "cost", "could", "country", "course", "cover", "cross", "cry",
+            "cup", "cut", "dance", "dark", "date", "day", "dead", "deal", "dear", "death",
+            "decide", "deep", "degree", "delay", "deliver", "demand", "depend", "describe", "design", "desk",
+            "detail", "develop", "die", "difference", "difficult", "dig", "dinner", "direction", "discover", "discuss",
+            "do", "doctor", "dog", "door", "down", "draw", "dream", "dress", "drink", "drive",
+            "drop", "during", "each", "ear", "early", "east", "easy", "eat", "edge", "effect",
+            "effort", "eight", "either", "eleven", "else", "end", "enjoy", "enough", "enter", "even",
+            "evening", "event", "ever", "every", "example", "except", "expect", "eye", "face", "fact",
+            "fall", "family", "far", "farm", "fast", "father", "fear", "feed", "feel", "feet",
+            "fell", "female", "few", "field", "fight", "figure", "fill", "film", "find", "fine",
+            "finger", "finish", "fire", "first", "fish", "five", "floor", "fly", "follow", "food",
+            "foot", "for", "force", "form", "forward", "four", "free", "friend", "from", "front",
+            "fruit", "full", "game", "garden", "gas", "gate", "general", "get", "girl", "give",
+            "glass", "go", "goal", "god", "gone", "good", "grass", "great", "green", "ground",
+            "group", "grow", "guess", "gun", "hair", "half", "hall", "hand", "handle", "hang",
+            "happen", "happy", "hard", "has", "hat", "hate", "have", "he", "head", "hear",
+            "heart", "heat", "heavy", "held", "hello", "help", "her", "here", "herself", "hide",
+            "high", "hill", "him", "himself", "his", "history", "hit", "hold", "hole", "home",
+            "hope", "horse", "hot", "hotel", "hour", "house", "how", "however", "human", "hundred",
+            "hungry", "hunt", "husband", "i", "ice", "if", "imagine", "important", "in", "increase",
+            "indeed", "inside", "instead", "interest", "into", "iron", "is", "it", "its", "itself",
+            "job", "join", "joy", "jump", "just", "keep", "key", "kid", "kill", "kind",
+            "king", "kiss", "kitchen", "knee", "knew", "know", "lady", "lake", "land", "language",
+            "large", "last", "late", "laugh", "law", "lay", "lead", "learn", "least", "leave",
+            "left", "leg", "less", "lesson", "let", "letter", "level", "lie", "life", "light",
+            "like", "line", "list", "listen", "little", "live", "local", "long", "look", "lose",
+            "loss", "lost", "lot", "love", "low", "luck", "lunch", "machine", "main", "make",
+            "male", "man", "manage", "many", "map", "mark", "market", "marry", "match", "material",
+            "matter", "may", "maybe", "mean", "meaning", "meat", "meet", "member", "memory", "men",
+            "message", "metal", "method", "middle", "might", "mile", "milk", "million", "mind", "mine",
+            "minute", "miss", "mistake", "mix", "model", "moment", "money", "month", "moon", "more",
+            "morning", "most", "mother", "mountain", "mouse", "mouth", "move", "movie", "much", "music",
+            "must", "my", "myself", "name", "near", "need", "never", "new", "next", "night",
+            "nine", "no", "none", "north", "not", "note", "nothing", "notice", "now", "number",
+            "nurse", "object", "off", "offer", "office", "often", "oil", "old", "on", "once",
+            "one", "only", "open", "operate", "option", "or", "order", "other", "ought", "out",
+            "outside", "over", "own", "owner", "page", "pain", "paint", "pair", "paper", "parent",
+            "park", "part", "party", "pass", "past", "path", "pay", "peace", "pen", "people",
+            "per", "percent", "perfect", "perhaps", "period", "person", "phone", "photo", "pick", "picture",
+            "piece", "place", "plan", "plant", "play", "player", "please", "point", "police", "policy",
+            "pool", "poor", "post", "power", "practice", "prepare", "present", "press", "pretty", "price",
+            "prince", "print", "private", "problem", "process", "produce", "product", "program", "project", "prove",
+            "public", "pull", "push", "put", "queen", "question", "quick", "quiet", "quite", "race",
+            "radio", "rain", "raise", "range", "rate", "reach", "read", "ready", "real", "reason",
+            "receive", "record", "red", "remember", "remove", "rent", "report", "rest", "result", "return",
+            "rich", "ride", "right", "ring", "river", "road", "rock", "role", "room", "root",
+            "rope", "rose", "round", "rule", "run", "sad", "safe", "sale", "salt", "same",
+            "sand", "save", "say", "school", "science", "sea", "second", "see", "seem", "sell",
+            "send", "sense", "sentence", "seven", "several", "sex", "shade", "shake", "share", "she",
+            "sheet", "shelf", "ship", "shirt", "shoe", "shoot", "shop", "short", "shot", "should",
+            "show", "shut", "side", "sign", "silent", "silver", "similar", "simple", "since", "sing",
+            "single", "sister", "sit", "six", "size", "skill", "skin", "sky", "sleep", "slide",
+            "slow", "small", "smile", "snow", "so", "social", "soft", "soil", "soldier", "solve",
+            "some", "son", "song", "soon", "sort", "sound", "south", "space", "speak", "special",
+            "speed", "spell", "spend", "sport", "spot", "spring", "square", "staff", "stage", "stand",
+            "star", "start", "state", "station", "stay", "step", "stick", "still", "stock", "stone",
+            "stop", "storage", "store", "storm", "story", "street", "strong", "student", "study", "style",
+            "subject", "such", "sugar", "suit", "summer", "sun", "sunday", "support", "sure", "system",
+            "table", "take", "talk", "tall", "tape", "task", "taste", "tax", "tea", "teach",
+            "team", "tell", "ten", "term", "test", "than", "thank", "that", "the", "their",
+            "them", "then", "there", "these", "they", "thick", "thin", "thing", "think", "third",
+            "this", "those", "though", "thought", "three", "through", "throw", "thus", "ticket", "time",
+            "tiny", "tip", "tire", "to", "today", "together", "told", "tomorrow", "tone", "tongue",
+            "tonight", "too", "tool", "top", "total", "touch", "town", "train", "travel", "tree",
+            "trial", "trip", "true", "try", "tube", "turn", "twelve", "twenty", "twice", "two",
+            "type", "ugly", "under", "unit", "until", "up", "upon", "us", "use", "usual",
+            "valley", "value", "very", "view", "village", "visit", "voice", "vote", "wait", "wake",
+            "walk", "wall", "want", "war", "warm", "wash", "waste", "watch", "water", "wave",
+            "way", "wear", "week", "weight", "well", "went", "were", "west", "wet", "what",
+            "when", "where", "whether", "which", "while", "white", "who", "whole", "whom", "whose",
+            "why", "wide", "wife", "wild", "will", "win", "wind", "window", "wine", "wing",
+            "winner", "winter", "wish", "with", "within", "without", "woman", "wonder", "wood", "word",
+            "work", "world", "worry", "would", "write", "wrong", "yard", "year", "yell", "yes",
+            "yesterday", "yet", "you", "young", "your", "yourself", "youth", "zero", "zone", "zoo"
+        ];
+
+        const mediumWords = [
+            "abandon", "abbreviate", "abdomen", "abdominal", "abide", "ability", "ablaze", "aboard", "abolish",
+            "abolition", "abolitionist", "abound", "about", "above", "abroad", "abrupt", "absent", "absentee", "absenteeism",
+            "absolute", "absolutely", "absorb", "absorption", "absurd", "absurdity", "abundant", "abundantly", "abuse", "abut",
+            "academic", "academician", "accelerate", "acceleration", "accessibility", "accessible", "accessory", "accident", "acclaim",
+            "accommodate", "accommodation", "accompaniment", "accompanying", "accomplish", "accord", "account", "accountant", "accounting", "accurate",
+            "accurately", "accuse", "accustomed", "ache", "achieve", "achievement", "acid", "acid rain", "acknowledge", "acquaint",
+            "acquaintance", "acquire", "acquisition", "acrobat", "acrobatic", "across", "act", "action", "actionable", "activist",
+            "activity", "actor", "actress", "actual", "actually", "acumen", "adapt", "adaptability", "add", "addition",
+            "additional", "address", "adequate", "adequately", "adhere", "adherence", "adjacent", "adjective", "adjust", "adjustment",
+            "administer", "administration", "administrative", "administrator", "admire", "admission", "admit", "admittedly", "adolescent", "adopt",
+            "adoption", "adorable", "adult", "advance", "advanced", "advantage", "adventurer", "adventurous", "adverb", "adversity",
+            "advertise", "advertising", "advice", "advise", "advisor", "advocate", "aesthetic", "aesthetically", "affair", "affect",
+            "affection", "affiliate", "affiliated", "affliction", "afford", "affordable", "aftermath", "afternoon",
+            "again", "against", "age", "aged", "agency", "agenda", "agent", "aggressive", "agitator", "ago",
+            "agree", "agreement", "agricultural", "agriculture", "ahead", "aid", "ailment", "aim", "air", "aircraft",
+            "airfield", "airline", "airliner", "airport", "airship", "aisle", "ajar", "alarm", "alarming", "album",
+            "alcohol", "alcoholic", "alert", "alien", "align", "alignment", "alike", "alive", "all", "allege",
+            "allegedly", "allergy", "alleviate", "alley", "alliance", "allied", "allocate", "allocation", "allow", "allowance",
+            "almost", "alone", "along", "alongside", "aloud", "alphabet", "already", "also", "alter", "alteration",
+            "alternative", "although", "altitude", "altogether", "aluminum", "always", "amateur", "amazing", "ambassador", "ambiance",
+            "ambition", "ambitious", "amble", "ambulance", "amend", "amendment", "amiable", "amid", "among", "amongst",
+            "amount", "ample", "amplify", "amuse", "amusement", "amusing", "analogous", "analysis", "analyst", "analyze",
+            "ancient", "angel", "anger", "angle", "angry", "animal", "animate", "animation", "ankle", "anniversary",
+            "announce", "announcement", "annoy", "annoyance", "annual", "annually", "anonymous", "another", "answer", "antagonism",
+            "antagonist", "antarctica", "antenna", "anthem", "anthropology", "antibody", "anticipate", "anticipation", "antique", "anxiety",
+            "anxious", "any", "anybody", "anyhow", "anyone", "anything", "anyway", "anywhere", "apart", "apartment",
+            "apologize", "apology", "apparent", "apparently", "appeal", "appealing", "appear", "appearance", "appetite", "applaud",
+            "applause", "appliance", "applicable", "applicant", "application", "apply", "appoint", "appointment", "appreciate", "appreciation",
+            "apprehend", "apprehension", "approach", "appropriate", "approval", "approve", "approximate", "approximately", "apron", "aquarium",
+            "aqueduct", "aquifer", "arbitrary", "archaeologist", "archaeology", "archery", "architect", "architecture", "archive", "area",
+            "arena", "argue", "argument", "arise", "aristocracy", "arm", "army", "around", "arrange", "arrangement",
+            "array", "arrest", "arrival", "arrive", "arrow", "art", "artery", "article", "articulate", "artificial",
+            "artist", "artistic", "as", "ash", "asia", "aside", "ask", "asleep", "aspect", "aspirant",
+            "aspire", "aspirin", "assault", "assemble", "assembly", "assert", "assertion", "assess", "assessment", "asset",
+            "assign", "assignment", "assist", "assistance", "assistant", "associate", "associated", "association", "assume", "assumption",
+            "assurance", "assure", "astonish", "astonishing", "astonishment", "astray", "astronaut", "astronomer", "astronomy", "asymmetric",
+            "asymmetry", "asymptomatic", "at", "ate", "athlete", "athletic", "atmosphere", "atmospheric", "atom", "atomic",
+            "attach", "attachment", "attack", "attain", "attainment", "attempt", "attend", "attendance", "attendant", "attention",
+            "attitude", "attract", "attraction", "attractive", "attribute", "auction", "audience", "audio", "audit", "audition",
+            "august", "aunt", "australia", "authentic", "author", "authority", "authorize", "auto", "automatic", "automobile",
+            "autonomous", "autonomy", "autumn", "available", "availability", "avenue", "average", "avoid", "avoidance", "await",
+            "awake", "award", "aware", "awareness", "away", "awe", "awe-inspiring", "awful", "awkward", "awning",
+            "axe", "axis", "baby", "bachelor", "back", "backdrop", "background", "backpack", "backlash", "backward",
+            "bacteria", "bad", "badge", "badminton", "baffle", "bag", "bail", "bake", "balance", "balanced",
+            "balcony", "bald", "ballet", "balloon", "ballot", "bamboo", "banana", "band", "bandanna", "bang",
+            "banish", "bank", "bankrupt", "bankruptcy", "banner", "banjo", "bank statement", "bar", "barbell", "barbeque",
+            "bare", "barely", "bargain", "bark", "barren", "barrier", "bartender", "bartending", "base", "baseball",
+            "basement", "basic", "basically", "basin", "basis", "basket", "basketball", "bat", "bath", "bather",
+            "bathrobe", "bathroom", "batuan", "battle", "bay", "be", "beach", "beam", "bean", "bear",
+            "beard", "beast", "beat", "beautiful", "beauty", "beckon", "become", "bed", "bedroom", "bee",
+            "beef", "been", "beer", "before", "beg", "begin", "beginner", "beginning", "behalf", "behave",
+            "behavior", "behind", "being", "belief", "believe", "bell", "belligerent", "bellow", "belly", "belong",
+            "below", "belt", "bemoan", "bench", "bend", "beneath", "beneficial", "benefit", "benevolent", "bengali",
+            "bent", "berate", "beside", "besides", "best", "best-selling", "bet", "better", "between", "bewilder",
+            "beyond", "bias", "bicycle", "bid", "big", "bignay", "bike", "biking", "bikini", "bill",
+            "billiards", "bilimbi", "bin", "bind", "binding", "biography", "biological", "biology", "bird", "birdwatching",
+            "biriba", "birth", "birthday", "biscuit", "bishop", "bistro", "bit", "bite", "bitter", "bizarre",
+            "blackberry", "blackcurrant", "black", "blame", "bland", "blank", "blanket", "blatant", "blazer", "blaze",
+            "bleach", "bleed", "blend", "bless", "blessing", "blight", "blind", "blinded", "blissful", "blister",
+            "block", "blond", "blood", "bloody", "bloom", "bloopers", "blouse", "blow", "blue", "bluetooth",
+            "blueberry", "board", "boat", "body", "bodyboarding", "boil", "boiled", "bold", "bolster", "bolt",
+            "bomb", "bomber jacket", "bone", "bonus", "book", "bookishness", "bookmark", "bookshop", "boot", "border",
+            "boredom", "boring", "borojo", "borrow", "bottle", "bottom", "bough",
+            "bought", "bound", "boundless", "bountiful", "bow", "bow-legged", "bowl", "bowls", "bow-tie", "box",
+            "boxer", "boxing", "boy", "boyfriend", "boysenberry", "bra", "brace", "braces", "brain", "branch",
+            "brand", "brass", "brave", "brawl", "braised", "brazilian", "brazen", "bread", "breadfruit", "breadth",
+            "break", "breakdown", "breakfast", "breast", "breath", "breathe", "breathing", "brevity", "breeze", "brick",
+            "bridge", "brief", "briefly", "bright", "brilliant", "bring", "brisk", "broadcast", "broaden", "brochure",
+            "broke", "broken", "broken-hearted", "bronze", "brood", "broom", "brother", "brought", "brown", "browse",
+            "browsing", "brunch", "brush", "brutal", "brute", "bubble", "budget", "budget deficit", "build", "building",
+            "bulb", "bulky", "bull-headed", "bullet", "bumblebee", "bumpy", "bunch", "bungee jumping", "bungalow", "bungle",
+            "burden", "burglar", "burger", "burial", "burn", "burning", "burst", "bury", "bus", "bush",
+            "business", "business card", "business management", "bustling", "but", "butcher", "butter", "butterfly", "button",
+            "buy", "buyer", "buzz", "by", "bypass", "cab", "cabin", "cabin cruiser", "cabinet", "cable",
+            "cabbage", "cafeteria", "cafe", "cage", "cake", "calamansi", "calamondin", "calculate", "calculation", "calendar",
+            "calf", "call", "calligraphy", "calm", "calmly", "camel", "camera", "cameraman", "camper", "camping",
+            "campus", "can", "canal", "canal boat", "candle", "candle-making", "candid", "candidate", "candy", "candy-stripped",
+            "cane", "canoe", "canoeing", "canteen", "cantaloupe", "canyon", "cap", "capable", "capital", "capitulate",
+            "capricious", "captain", "capture", "car", "carambola", "carbohydrate", "carbohydrates", "carbon dioxide", "carbon monoxide", "carcinogen",
+            "card", "cardboard", "cardigan", "cardigans", "care", "career", "carefree", "careful", "carefully", "cargo",
+            "cargo plane", "carnival", "carpenter", "carpet", "carriage", "carrier", "carrot", "carry", "carve", "case",
+            "cash", "cashier", "casino", "cassette", "cast", "castle", "casual", "cat", "catastrophe", "catch",
+            "category", "cater", "cattle", "cause", "caution", "cautious", "cave", "caving", "cease", "ceiling",
+            "celebrate", "celebration", "celebrity", "cell", "cellar", "cello", "cement", "cemetery", "cent", "center",
+            "centerpiece", "central", "central station", "century", "ceramics", "cereal", "cereals", "cerebral", "ceremony", "certain",
+            "certainly", "certainty", "certificate", "certify", "cetacean", "chain", "chair", "chairman", "chalk", "challenge",
+            "chamber", "championship", "chance", "change", "channel", "chaos", "chaotic", "chapter", "character", "characteristic",
+            "charge", "charismatic", "charity", "charm", "charming", "chart", "chase", "chatterbox", "cheap", "cheapest",
+            "check", "cheek", "cheese", "cheeseburger", "chef", "chemical", "chemical-free", "chemistry", "cheque", "cherimoya",
+            "cherry", "chess", "chest", "chew", "chicken", "chico", "chief", "child", "childhood", "chimney",
+            "chimpanzee", "chin", "chinese", "chip", "chocolate", "choice", "chokeberry", "chokecherry", "choose", "chop",
+            "chorus", "christian", "christmas", "chubby", "church", "cigar", "cigarette", "cinema", "cinemas", "cinnamon",
+            "circle", "circuit", "circuit breaker", "circular", "circumstance", "circumvent", "citrus", "citrus fruits", "city", "city center",
+            "city council", "civil", "claim", "clan", "clarify", "clarity", "clash", "class", "classic", "classical",
+            "classical music", "classroom", "classmate", "claw", "clay", "clean", "clear", "clearly", "clench", "clerk",
+            "clever", "cliché ridden", "client", "cliff", "climate", "climate power", "climb", "climber", "climbing", "clinic",
+            "clinical", "clip", "clock", "close", "closely", "closet", "cloth", "clothes", "clothing", "cloud",
+            "cloudberry", "club", "clue", "cluster", "coach", "coal", "coalesce", "coast", "coastal", "coat",
+            "cocooning", "coconut", "cocona", "code", "coffee", "coffee table", "coherent", "cohesion", "coil", "coin",
+            "coincide", "coincidence", "cola", "cold", "cold beverage", "collaboration", "collaborate", "collapse", "collar", "colleague",
+            "collect", "collectible", "collecting", "collection", "collective", "collector", "college", "collision", "colonial", "colony",
+            "color", "colored", "colorful", "column", "combat", "combative", "combination", "combine", "come", "comedy",
+            "comfort", "comfortable", "comical", "command", "comment", "commerce", "commercial", "commission", "commitment", "committee",
+            "common", "commoners", "commonly", "commonplace", "communal", "communicate", "communication", "communicable", "community", "companion",
+            "company", "comparable", "compare", "comparison", "compassion", "compatible", "compel", "compensate", "compensation", "compete",
+            "competition", "competitive", "compile", "complacent", "complain", "complaint", "complementary", "complete", "completely", "complex",
+            "complexity", "compliance", "complicate", "complicated", "composure", "compost", "compound", "comprehend", "comprehensible", "comprehensive",
+            "compromise", "compromised", "compulsory", "computer", "computer center", "computer laboratory", "concentrate", "concentration", "concept", "conceptual",
+            "concern", "concerned", "concerning", "concert", "conclude", "conclusion", "concrete", "concur", "condemn", "condensation",
+            "condition", "conditioning", "condominium", "conducive", "conductor", "conference", "confess", "confidence", "confident", "confidential",
+            "confine", "confirm", "confirmation", "conflict", "confused", "confusion", "congenial", "congestion", "congratulate", "congregation",
+            "connect", "connection", "connoisseur", "conscience", "conscious", "consciousness", "consecutive", "consensus", "consent", "consequence",
+            "consequently", "conservation", "conservationist", "conservative", "consider", "considerable", "considerably", "consideration", "consist", "consistency",
+            "consistent", "consistently", "constituent", "constitute", "constitution", "constitutional", "constrain", "constraint", "construct", "construction",
+            "consult", "consultant", "consultation", "consume", "consumer", "consumption", "contact", "contact tracing", "contagion", "contagious",
+            "contain", "container", "container ship", "containment", "contaminant", "contaminate", "contaminated", "contamination", "contemplate", "contemplative",
+            "contemporary", "content", "contention", "contentious", "contest", "context", "continent", "continents", "continue", "continuous",
+            "contract", "contradict", "contradiction", "contradictive", "contrary", "contrast", "contribute", "contribution", "contrive", "control",
+            "controlled", "controversial", "controversy", "convenience", "convenient", "convention", "conventional", "conversation", "conversational", "convert",
+            "convey", "convict", "conviction", "convincing", "convoluted", "cook", "cooked", "cooking", "cool", "cooperate",
+            "cooperation", "coordinate", "coordination", "copious", "copper", "copy", "core", "corn", "corner", "coronavirus",
+            "corporation", "corps d'elite", "correct", "correction", "correctly", "correlation", "correspond", "correspondence", "corridor", "corrode",
+            "corrosion", "corrupt", "corruption", "cost", "costly", "cottage", "cotton", "couch", "council", "counselor",
+            "count", "counterfeit", "counterfeit money", "countries", "county", "coupon", "courage", "course outline", "court", "courtesy",
+            "cousin", "cover", "cow", "craft", "craftsman", "cranberry", "crash", "crawl", "crazy", "cream",
+            "creation", "creative", "creativity", "creature", "credible", "credit card", "crew", "cricket", "crime", "criminal",
+            "crisis", "criterion", "critic", "critical", "criticism", "criticize", "crochet", "crocodile", "crop", "croquet",
+            "cross", "crossed", "crowd", "crowded", "crucial", "crude", "cruel", "cruise", "cruiser", "crush",
+            "cry", "cryptic", "crystal", "cucumber", "cue", "culminate", "culprit", "cultivate", "cultivation", "cultural",
+            "culture", "cumbersome", "cumulative", "cunning", "cup", "cupboard", "cupuacu", "cupuassu", "curb", "curiosity",
+            "currant", "currency", "currently", "curriculum", "curriculum vitae", "curry", "curse", "curved", "cushion", "custody",
+            "customer", "cut", "cute", "cutlery", "cycle", "cycling", "cyclist", "cylinder", "cylindrical", "cynical", "daddy",
+            "daily routine", "dairy", "dam", "damage", "damson", "dance studio", "dancing", "dangle", "danish", "dare",
+            "daring", "dart", "darts", "data", "date", "daughter", "dawn", "days", "daze", "dazed",
+            "dazzling", "dead", "deadline", "deadly", "deaf", "deal", "dealer", "dealing", "dean", "dear",
+            "death", "debate", "debit", "debt", "decade", "decay", "deceased", "deceive", "december", "decent",
+            "decide", "decision", "decisive", "deck", "declare", "decline", "decode", "decorate", "decorator", "decrease",
+            "decree", "dedicate", "dedication", "deduce", "deduct", "deduction", "deep", "deeply", "deer", "defeat",
+            "defect", "defense", "defend", "defendant", "deficient", "deficit", "define", "definite", "definitely", "definition",
+            "deforestation", "degradation", "degree", "delay", "delegate", "delete", "delicate", "delicious", "delight", "delighted",
+            "deliver", "delivery", "delude", "delirious", "delta", "demand", "demeanor", "democracy", "democrat", "democrats",
+            "demonstrate", "demonstration", "denial", "denote", "dense", "density", "dentist", "deny", "department store", "dependency",
+            "dependent", "describe", "description", "descriptive", "desert", "desertification", "deserve", "design", "designer", "desire",
+            "desired", "desk", "desperate", "despite", "dessert", "destination", "destiny", "destroy", "destruction", "detail",
+            "detailed", "detect", "detective", "detention", "deter", "deteriorate", "determine", "determination", "develop", "development",
+            "deviate", "device", "devil", "devise", "devoted", "devour", "dewberry", "dialect", "dialogue", "diamond",
+            "diarrhea", "diary", "dictate", "dictionary", "didactics", "die", "diet", "differ", "difference", "different",
+            "difficult", "difficulty", "dig", "digest", "digestion", "digital", "digital monitor", "dignity", "diligent", "dime",
+            "diminish", "dine", "diner", "dining", "dining room", "dinghy", "dinghy sailing", "diploma", "diplomatic", "direct",
+            "direction", "director", "dirt", "dirty", "disability", "disagree", "disagreement", "disappear", "disappoint", "disappointed",
+            "disappointing", "disapproval", "disaster", "disastrous", "discern", "discharge", "discipline", "disciplined", "disclose", "disclosure",
+            "discount", "discourage", "discover", "discovery", "discreet", "discretion", "discrimination", "discuss", "discussion", "disease",
+            "disguise", "disgust", "disgusting", "dish", "dishonestly", "disk", "dismiss", "dismissal", "disorder", "disperse",
+            "display", "disposable", "disposal", "dispose", "disproportionate", "dispute", "disruption", "dissertation", "distance", "distant",
+            "distasteful", "distinct", "distinction", "distinctive", "distinguish", "distinguished", "distort", "distribute", "distribution", "distribution costs",
+            "district", "disturb", "disturbance", "dive", "diver", "diversity", "divide", "divine", "diving", "division",
+            "divorce", "dizzy", "do", "doctor", "document", "documentary", "dodge", "dog", "doggie bag", "doing",
+            "doll", "dollar", "dome", "domestic", "dominant", "dominate", "dominance", "dominican", "donate", "donation",
+            "donkey", "door", "dormitory", "dose", "double", "doubt", "doubtless", "doub", "down", "down jacket",
+            "down vest", "downstairs", "downtown", "dozen", "drab", "dragon", "dragonfruit", "drain", "drama", "dramatic",
+            "draw", "drawing", "dreadful", "dream", "dreamer", "dreamlike", "dreamy", "dress", "dressing", "dress shorts",
+            "drew", "drink", "drinks", "drive", "driver", "driving", "driving license", "drought", "drove", "drown",
+            "drug", "drum", "drumming", "drunk", "dry", "dubbing", "duck", "due", "dull", "dumb",
+            "dumping", "dungarees", "duplex", "durable", "durian", "during", "dust", "dusty", "duty", "duty-free store",
+            "dwell", "dwelling", "dwindle", "dying", "dynamic", "dysgeusia", "each", "eager", "ear", "earlier",
+            "earmuffs", "earn", "earnings", "earth", "earthquake", "ease", "easily", "east", "eastern", "economic",
+            "economics", "economical", "economy", "ecosystem", "edge", "edit", "edition", "editor", "editorial", "educate",
+            "education", "edification", "effect", "effective", "effectively", "efficiency", "efficient", "effort", "effortless", "egg",
+            "egg yolk", "egypt", "eight", "eighteen", "eighty", "either", "elaborate", "elapse", "elastic", "elbow",
+            "elderberry", "elderly", "elect", "election", "electric", "electrical", "electricity", "electronic", "electronics", "elegant",
+            "element", "elementary", "elementary educ", "elevate", "elevated", "elevating", "elevator", "eleven", "eligible", "eliminate",
+            "elite", "eloquent", "elucidate", "elude", "elusive", "email", "embassy", "embarrass", "embarrassment", "embroidery",
+            "emerge", "emergence", "emergent", "emerging", "emission", "emissions", "emotion", "emotional", "emphasis", "emphasize",
+            "empire", "employ", "employee", "employer", "employment", "empower", "empty", "enable", "encounter", "encourage",
+            "encouraging", "endangered", "endangered species", "endeavor", "ending", "endorse", "endure", "enemy", "energetic", "energy",
+            "enforce", "enforcement", "engage", "engaged", "engagement", "engaging", "engine", "engineer", "engineering", "english",
+            "engrossed", "enjoyable", "enlarge", "enlightenment", "enlist", "enormous", "enough", "enrich", "enroll", "enrollment",
+            "ensure", "enter", "enterprise", "entertain", "entertainment", "entertainment industry", "enthusiasm", "enthusiastic", "entire", "entirely",
+            "entitle", "entitlement", "entice", "entree", "entrance", "entrepreneur", "entry", "envelope", "environment", "environmental",
+            "environmental friendly", "environmentalist", "envy", "epidemic", "epidemiologist", "epochal", "equal", "equality", "equally", "equation",
+            "equipment", "era", "eradicate", "erase", "erect", "erosion", "error", "erratic", "escape", "escort",
+            "especially", "essay", "essence", "essential", "essentially", "establish", "established", "estate", "esteem", "estimate",
+            "estimation", "eternal", "ethereal", "ethical", "ethiopia", "ethnic", "europe", "european", "evacuate", "evacuation",
+            "evacuee", "evaluate", "evaluation", "evaporation", "eventually", "ever", "every", "everybody", "everyday", "everyone",
+            "everything", "everywhere", "evidence", "evident", "evidently", "evil", "evolution", "evolve", "exact", "exactly",
+            "exaggerate", "exaggeration", "exam", "examination", "examine", "example", "exasperate", "exceed", "excel", "excellence",
+            "excellent", "except", "exception", "exceptional", "excess", "excessive", "exchange", "exciting", "exclaim", "exclude",
+            "exclusion", "exclusive", "excuse", "execute", "executed", "executive", "exemplary", "exemplify", "exercise", "exhibit",
+            "exhibition", "exist", "existence", "exit", "exotic", "expand", "expansion", "expect", "expectation", "expedition",
+            "expense", "expensive", "experience", "experiment", "expert", "expertise", "explain", "explanation", "explicit", "explode",
+            "exploit", "exploration", "explore", "explosion", "explosive", "export", "expose", "exposure", "express", "expression",
+            "expressive", "extend", "extension", "extensive", "extent", "exterior", "external", "extinct", "extinction", "extra",
+            "extraordinary", "extreme", "extremely", "extreme sports", "eye", "eyebrow", "fabric", "fabulous", "facade", "face",
+            "facilitate", "facility", "facilities", "fact", "factor", "factory", "faculty", "fade", "fail", "failure",
+            "fairly", "fair-weather", "faith", "fallacious", "false", "fame", "familiar", "family", "famine", "famous",
+            "fan", "fancy", "fantastic", "fantasy", "far", "farewell", "farm", "farmer", "fascinate", "fascinating",
+            "fashion", "fast", "fast-moving", "fatal", "fatality", "fate", "father", "fatigue", "fault", "favor",
+            "favorable", "favorite", "fear", "feather", "feature", "february", "federal", "fee", "feedback", "feed",
+            "feel", "feeling", "feijoa", "fell", "fellow", "female", "fence", "ferry", "fertile", "fertilizer",
+            "fervent", "festival", "fetch", "fever", "few", "fiber", "fiberglass", "fickle", "fiction", "field",
+            "fierce", "fifteen", "fifth", "fifty", "fig", "fight", "fighter", "figural", "figurative", "figure",
+            "file", "filipino", "fill", "film noir", "filter", "finance department", "financial", "fine", "finger", "finish",
+            "firearm", "firewood", "firewall", "firewalls", "firm", "first-rate", "fisherman", "fishkeeping", "fist", "fit",
+            "fitness", "five", "fixture", "fiasco", "flabbergasted", "flag", "flame", "flank", "flashback", "flash-forward",
+            "flat", "flawed", "flawless", "flee", "fleece", "fleece jackets", "fleet", "flesh", "flexibility", "flexible",
+            "flight", "flight attendant", "flinch", "fling", "flood", "floor", "floristry", "flourish", "flow", "flower",
+            "fluid", "flung", "flush", "flute", "flutter", "fly", "flying", "foam", "focus", "focused",
+            "fog", "fold", "folks", "follow", "following", "fond", "food pyramid", "fool", "fooled", "foolhardy",
+            "foot", "football", "footbridge", "footstep", "forbid", "force", "forecast", "forehead", "foreign students", "foremost",
+            "foresee", "forest", "forever", "forget", "forgive", "fork", "forklift", "forklift truck", "formulate", "fort",
+            "fortify", "fortnight", "fortunate", "fortune", "forty", "fossil", "fossil fuel", "fossil fuels", "foster", "fought",
+            "found", "foundation", "founder", "fountain", "four", "four-sided", "fourteen", "fourth", "fowl", "fox",
+            "fraction", "fragaria", "fragile", "fragrant", "frame", "framework", "france", "franchise", "frank", "frantic",
+            "fraud", "free", "freckle-faced", "freedom", "freelance", "freeze", "freezing", "freight", "freight train", "french",
+            "french fries", "french horn", "frequency", "frequently", "frequently updated", "fresh", "friday", "friend", "friendly", "friendship",
+            "frighten", "fringe", "frivolous", "frog", "from", "front", "frontliners", "frost", "frown", "frozen",
+            "frugal", "fruit", "frustrated", "frustration", "fry", "fuel", "fulfill", "full", "full-time", "fully",
+            "fumes", "fun", "function", "functional", "fund", "fund-raising", "fund-raising event", "fundamental", "funeral", "fungus",
+            "fur", "furious", "furnace", "furniture", "further", "furthermore", "futile", "future", "gac", "gadget",
+            "gain", "gallery", "gallon", "gamble", "game", "games", "gang", "gap", "gap year", "garden",
+            "gardening", "garlic", "garter-belt", "gas", "gasp", "gate", "gather", "gauge", "gaze", "gear",
+            "gender", "general", "generally", "generate", "generation", "generous", "genius", "genre", "gentility", "gentle",
+            "gentlefolk", "gently", "gentry", "genus", "geography", "geology", "geothermal", "german", "gesture", "get",
+            "ghost", "giant", "gigantic", "gild", "gill", "gilt", "giraffe", "give", "given", "glad",
+            "glance", "glare", "glass", "glasshouse", "gleam", "glide", "glimpse", "global warming", "gloom", "gloomy",
+            "glorious", "glory", "glove", "gloves", "glow", "glue", "go", "goal", "goat", "god",
+            "gondola", "gone", "goodness", "goods", "gooseberry", "gorgeous", "gourmand", "gourmet", "govern", "government",
+            "governor", "gown", "grace", "graceful", "grade", "gradual", "gradually", "graduate", "graffiti", "grain",
+            "grand", "grandfather", "grandmother", "granite", "granular", "granule", "grape", "graph", "graphics", "grasp",
+            "grass", "grateful", "gratitude", "grave", "gravity", "gray", "graze", "grease", "great", "greece",
+            "greedy", "greek", "greenhouse", "greenhouse effect", "green pepper", "greengage", "greet", "gregarious", "grey", "grid",
+            "grief", "grim", "grin", "grind", "grip", "groan", "grocery", "ground floor", "groundcherry", "groundwater",
+            "group discussion", "grow", "growing", "grown", "growth", "grumichama", "grumpy", "guarantee", "guard", "guarana",
+            "guess", "guest", "guidance", "guide", "guided", "guideline", "guidelines", "guilt", "guilty", "guitar",
+            "gulf", "gum", "gun", "gym", "gymnasium", "gymnastics", "habitat", "habit", "hack", "hail",
+            "hair", "half", "hall", "hallway", "halal", "halt", "hamburger", "hammer", "handbag", "handful",
+            "handicap", "handkerchief", "handle", "handshake", "handsome", "handy", "hang", "hang-gliding", "happen", "happiness",
+            "happy", "hard-hearted", "hard-nosed", "hardworking", "harm", "harmful", "harmony", "harsh", "harvest", "hat",
+            "hate", "hatred", "haunt", "haute monde", "have", "hawaiian", "hawthorn", "hazard", "hazardous", "he",
+            "head", "headband", "headache", "headquarters", "headwaiter", "heal", "health", "healthy", "hear", "heart",
+            "heartbreaking", "heated", "heating", "heaven", "heavy", "heavy-handed", "heel", "height", "helicopter", "helicopters",
+            "helmet", "help", "helpful", "hence", "her", "herbicide", "here", "heritage", "hero", "heroine",
+            "hesitate", "hesitation", "hidden", "hide", "hierarchy", "high", "high jump", "high tea", "high-heeled", "highly",
+            "highly-charged", "highly educated", "highway", "hike", "hiker", "hiking", "hilarious", "hill", "him", "hindi",
+            "hint", "hire", "historian", "historical", "history", "hitch-hiker", "hockey", "hog", "hoist", "hold",
+            "hole", "holiday", "holistic", "hollow", "holy", "home", "homeless", "homeless person", "homestay", "homework",
+            "honest", "honestly", "honor", "hoodie", "hook", "hope", "horizon", "horn", "horror", "horse",
+            "horse racing", "hors d'oeuvre", "hospital", "host", "hostel", "hostess", "hostile", "hot", "hot-air balloon", "hotel",
+            "hour", "house", "houseboat", "household", "housemate", "hovercraft", "how", "however", "hug", "huge",
+            "human", "humanity", "humanities", "humid", "humidifier", "humor", "hundred", "hungry", "hunt", "hunter",
+            "hunting", "hurricane", "hurry", "hurt", "hut", "hydroelectric", "hydroelectric power", "hydrofoil", "hygiene", "hypothesis",
+            "i", "ice", "ice-cold", "ice cubes", "ice skating", "icon", "idea", "ideal", "identical", "identify",
+            "identity", "ideology", "idiom", "idioms", "idle", "idol", "ie", "if", "ignorance", "ignorant",
+            "ignore", "ilama", "ill", "illegal", "illiteracy", "illiterateness", "illness", "illustrate", "illustration", "im",
+            "image", "imagination", "imaginative", "imagine", "imitate", "imitation", "immediate", "immediately", "immense", "immensely",
+            "immigrant", "immigrate", "immunity", "immunization", "impact", "impactful", "impatient", "imperative", "imperial", "imperial system",
+            "implement", "implication", "imply", "import", "importance", "important", "impossible", "impressed", "impression", "impressive",
+            "improve", "improvement", "in advance", "in contrast", "in sum", "in my view", "in retrospect", "incidence", "incident", "include",
+            "including", "income", "incompatible", "incomplete", "inconsiderate", "increase", "incredible", "incredibly", "incurable", "indebted",
+            "indeed", "independence", "independent", "index", "india", "indian", "indicate", "indication", "indigenous", "individual",
+            "indonesian", "industrial", "industry", "ineffective", "inevitable", "infant", "infectious", "infection", "infidelity", "infirmity",
+            "inflame", "inflammation", "inflate", "inflation", "influence", "influential", "influenza", "infodemic", "inform", "informal",
+            "informal education", "information", "information desk", "infused", "ingenious", "ingredient", "ingredients", "inhabit", "inherent", "inherit",
+            "inheritance", "inhibition", "initial", "initially", "initiate", "initiative", "inject", "injection", "injure", "injury",
+            "injustice", "ink", "innocent", "innovation", "innovative", "input", "inquire", "inquiry", "insane", "insanity",
+            "insect", "insects", "insert", "inside", "insight", "insightful", "insist", "inspect", "inspection", "inspired",
+            "inspiring", "instability", "install", "installation", "instance", "instant", "instantly", "instinctive", "institution", "instruction",
+            "instructor", "instrument", "insufficient", "insurance", "intact", "integral", "integrate", "integrity", "intellectual", "intelligence",
+            "intelligent", "intense", "intensity", "intensive", "intention", "interact", "interaction", "interactive", "interest", "interested",
+            "interesting", "interface", "interim", "interior", "intermediate", "internal", "international", "internet", "internet user", "interpret",
+            "interpretation", "interpreter", "interrupt", "interruption", "interview", "intimate", "intimidating", "into", "intolerable", "intrepid",
+            "intricate", "intriguing", "introduce", "introduction", "introductory", "intrusion", "intuitive", "invade", "invalid", "invent",
+            "invention", "inventive", "invest", "investigate", "investigation", "investment", "invisible", "invite", "involve", "involved",
+            "involvement", "invoke", "inward", "iran", "iraq", "irish", "iron", "ironic", "irony", "irrelevant",
+            "irresponsible", "irritate", "irritation", "island", "isolate", "isolation", "issue", "italian", "italy", "item",
+            "its", "itself", "ivory", "jacket", "jackets", "jackfruit", "jaboticaba", "jabuticaba", "jail", "jam",
+            "jambolan", "janitor", "january", "japanese", "jar", "java", "javelin", "jaw", "jealous", "jeans",
+            "jelly", "jerky", "jet", "jet-skiing", "jewel", "jewelry", "jigsaw", "jocote", "jogging", "join",
+            "joint", "joke", "jojoba", "jostaberry", "journal", "journalist", "journey", "joy", "joyful", "jubilant",
+            "judo", "jujube", "kashmir", "kaffir", "kapok", "karate", "karonda", "kayak", "kei", "keen",
+            "keep-fit", "ketchup", "kettle", "key", "keyboard", "kick", "kid", "kidney", "kill", "killer",
+            "kilogram", "kilometer", "kin", "kindred", "kinesis", "kinesics", "king", "kingdom", "kiss", "kit",
+            "kitchen", "kite", "kitembilla", "kitten", "kiwi", "kiwano", "knickers", "knife", "knight", "knitter",
+            "knitting", "knock", "know", "knowledgeable", "known", "kokum", "korlan", "kosher", "kooky", "korea",
+            "korean", "kumquat", "label", "labor", "laboratory", "labyrinthine", "lace", "lack", "ladder", "ladieswear",
+            "lady", "lake", "lamb", "lame", "landfill", "landlord", "landslide", "lane", "languages", "lanky",
+            "lantern", "lap", "lapse", "laptop", "large", "largely", "laser", "last", "late", "later",
+            "latest", "latter", "laugh", "laughter", "launch", "laundry", "law", "lawyer", "lay", "layered",
+            "lazy", "lead", "leader", "leadership", "leading", "leaf", "leaflet", "leaves", "lean", "leap",
+            "learn", "learner", "learning", "learnings", "lease", "least", "leather", "leave", "lecture", "lecturer",
+            "left", "left-handed", "leg", "legacy", "legal", "legendary", "leggings", "legitimate", "leisure", "leisure time",
+            "lemon", "lemonade", "lemo", "length", "lengthen", "less", "lesson", "let", "lethal", "letter",
+            "level", "leverage", "liberal", "liberal democracy", "libertarian", "liberation", "liberty", "library", "license", "lick",
+            "lid", "lie", "life expectancy", "lifeboat", "life-giving", "lifelike", "lifetime", "lift", "light", "lighthouse",
+            "lighting", "like", "likelihood", "likely", "limb", "lime", "limit", "limitation", "limited", "limp",
+            "line", "liner", "lingerie", "lingonberry", "linguistics", "link", "lion", "lip", "liquid", "liquor",
+            "list", "listen", "listener", "listserv", "literacy", "literal", "literary", "literature", "litter", "little",
+            "live", "life", "lively", "liver", "livestock", "living", "load", "loaf", "loan", "lobby",
+            "local library", "locate", "location", "lock", "lockdown", "logic", "logical", "loganberry", "log cabin", "loin",
+            "lonely", "long", "longan", "long-legged", "long-sleeve top", "long-winded", "look", "loose", "loosen", "loquat",
+            "lord", "lorry", "lose", "loser", "loss", "lost", "lot", "love", "lovely", "low",
+            "low-budget", "lower", "low-risk investment", "loyal", "loyalty", "lucid", "lucidity", "lucrative", "lucuma", "luck",
+            "lucky", "luggage", "lull", "luminous", "lump", "lunar", "lunar calendar", "lunch", "lung", "luxurious",
+            "luxury", "lychee", "lycra", "lyrical", "mabolo", "macadamia", "machine", "mad", "magazine", "magic",
+            "magnet", "magnificent", "mail", "mail address", "main", "main hall", "main course", "maintain", "maintenance", "majority",
+            "make", "makeup", "make out", "malady", "malaysia", "male", "mammal", "mammals", "mammee", "mamey",
+            "man", "manage", "management", "manager", "mandarin", "mandatory", "manifest", "manipulate", "manipulation", "manila",
+            "mankind", "man-made", "manner", "manufacture", "manufacturer", "many", "map", "marang", "marble", "march",
+            "margin", "maritime", "mark", "market", "marketing", "marriage", "married", "marrow", "marula", "masculine",
+            "mask", "masks", "mass", "mass media", "massive", "master", "mastercard", "match", "material", "materialism",
+            "materialistic", "materials", "mathematics", "matter", "mature", "maximum", "may", "mayapple", "maybe", "meal",
+            "mean", "meaning", "meaningful", "means", "meantime", "meanwhile", "measure", "measurement", "meat", "mechanical",
+            "mechanical pencil", "mechanic", "mechanism", "medal", "media", "media room", "mediate", "mediation", "medical", "medicine",
+            "mediocre", "medlar", "medium", "meet", "meeting", "melinjo", "mellow", "melodic", "melon", "melt",
+            "member", "membership", "memorable", "memorabilia", "memory", "memo", "mental", "mention", "menu", "merchandise",
+            "merchant", "mercy", "mere", "merely", "merge", "merit", "mess", "message", "metal", "methane",
+            "method", "methodology", "metric", "metric system", "mexico", "microenvironment", "microwave", "midday", "middle", "middle class",
+            "midnight", "might", "mild", "mile", "military", "milk", "million", "mind", "mine", "minister",
+            "minor", "minority", "minus", "minuscule", "minute", "miracle", "mirabelle", "mirror", "miserable", "misinform",
+            "misleading", "miss", "missile", "missing", "mission", "mistake", "mistaken", "mitten", "mittens", "mix",
+            "mixture", "mob", "mobile", "mobile home", "mock", "mode", "model", "moderate", "modern", "modest",
+            "modification", "modify", "module", "moisture", "molecular", "molecule", "moment", "momentous", "momentum", "monday",
+            "money", "money management", "monitor", "monkey", "monopoly", "monopoly power", "monstera", "month", "monthly", "monthly membership",
+            "months", "monument", "mood", "moon", "moor", "moral", "morality", "more", "moreover", "morning",
+            "moronic", "mortal", "mortality", "mortgage", "mosaic-like", "mosquito", "most", "mostly", "mother", "motion",
+            "motivate", "motivation", "motor", "motorcycle", "mountain", "mountain biking", "mouse", "mouth", "move", "movement",
+            "movie", "movie star", "moving", "much", "mud", "mug", "mulberry", "multiple", "multitude", "mummy",
+            "municipal", "murrain", "muscle", "museum", "mushroom", "music", "musical", "musical instrument", "musician", "must",
+            "mustard", "mysterious", "mystery", "mystical", "myth", "nail", "naked", "name", "namely", "napkin",
+            "narrative", "narrow", "narrowboat", "naseberry", "nasty", "nation", "national", "nationality", "nationwide", "native",
+            "natural", "naturally", "nature", "nature conservation", "naughty", "naval", "navigation", "navy", "near", "nearby",
+            "nearly", "neat", "necessary", "necessity", "neck", "necklace", "nectaplum", "nectarine", "need", "needle",
+            "negative", "neglect", "negotiate", "negotiation", "neighbor", "neighborhood", "neither", "nephew", "nerve", "network",
+            "neutral", "never", "nevertheless", "new", "newly", "newsletter", "newspaper", "next", "next-door", "nice",
+            "nicely", "niche", "nickel", "nickname", "niece", "nigeria", "night", "nightmare", "nine", "nineteen",
+            "ninety", "nitrogen", "nitrogen oxide", "no", "nobility", "noble", "nobody", "nod", "nodded", "noise",
+            "noisy", "nominate", "nominated", "nomination", "non", "none", "nonetheless", "noni", "non-profit", "non-refundable",
+            "nonverbal", "noodle", "noodles", "noon", "nor", "normal", "normally", "north", "north america", "north korea",
+            "north macedonia", "nose", "nostalgia", "not", "note", "noteworthy", "nothing", "notice", "noticeable", "notion",
+            "notorious", "november", "now", "nowadays", "nuclear", "nuclear energy", "nuisance", "number", "numerous", "nursery",
+            "nursing", "nurturance", "nut", "nutmeg", "nuts", "nutrition", "nutritious", "obey", "object", "objection",
+            "objective", "obligation", "oblige", "obscene", "obscure", "observation", "observe", "observer", "obsession", "obsolete",
+            "obstacle", "obtain", "obvious", "obviously", "occasion", "occasional", "occasionally", "occupation", "occupy", "occur",
+            "occurrence", "ocean", "ocean currents", "octopus", "odd", "oddball", "of", "offend", "offense", "offensive",
+            "offer", "office", "office assistant", "officer", "official", "officially", "often", "ohelo", "oil", "okari",
+            "old", "olive", "omicron", "on", "once", "one", "onion", "onlooker", "only", "onto",
+            "open", "opening", "opera", "operate", "operation", "opinion", "opportunity", "oppose", "opposite", "opposition",
+            "oppress", "oppression", "optimism", "optimistic", "optimize", "option", "or", "oral", "orange", "orchestra",
+            "orchestral", "order", "ordinary", "organic", "organization", "organize", "origami", "origin", "original", "original inhabitant",
+            "originally", "originate", "ornament", "ornate", "orienteering", "orthodox", "other", "otherwise", "ought", "ounce",
+            "our", "ours", "ourselves", "out", "outbreak", "outcome", "outcomes", "outdated", "outdoor", "outdoor activities",
+            "outer", "outline", "outrageous", "outside", "outskirts", "outstanding", "outstretched", "outtake", "outtakes", "oval",
+            "oven", "over", "overall", "overcome", "overdue", "overflow", "overhead", "overhear", "overlap", "overlook",
+            "overseas", "overseas students", "overtake", "overthrow", "overweight", "owe", "own", "owner", "oxygen", "oyster",
+            "ozone", "ozone layer", "pace", "pacific", "package", "paddle", "paddle steamer", "page", "paid", "pain",
+            "painful", "paint", "painting", "pair", "pajamas", "pakistan", "pal", "palace", "pale", "palo",
+            "palm", "palmyra", "pamphlet", "pan", "pandemic", "pandanus", "panel", "panic", "pant", "pantomime",
+            "pantry", "pants", "papaya", "paper", "parade", "paradigm", "paradox", "paradoxical", "paragraph", "paragliding",
+            "parallel", "paralysis", "paralyze", "paramount", "paranoid", "parent", "park", "parliament", "parrot", "part",
+            "partial", "partial refund", "participate", "participation", "particular", "particularly", "partly", "partner", "partnership", "party",
+            "party animal", "pass", "passage", "passenger", "passion", "passionate", "passionfruit", "passport", "passport photo", "past",
+            "pasta", "paste", "pastor", "pasture", "pat", "patch", "patent", "path", "pathetic", "patient",
+            "patio", "patriciate", "patrol", "patron", "patted", "pattern", "pause", "pawpaw", "pay", "payment",
+            "peace", "peaceful", "peach", "peak", "peanut", "pear", "peasant", "pecan", "pedagogics", "pedagogy",
+            "pedant", "pedantry", "pedestrian", "pedestrian safety", "peer", "peerage", "pelican", "pen", "penalty", "pencil",
+            "peninsula", "pension", "people", "pepper", "pepino", "perceive", "perception", "percent", "percentage", "perceptual",
+            "perfect", "perfectly", "perform", "performance", "performing arts", "perhaps", "period", "permanent", "permission", "permit",
+            "persian", "persist", "persistence", "persistent", "person", "personal", "personal fulfillment", "personality", "personnel", "perspective",
+            "persuade", "persuasion", "pessimism", "pessimistic", "pest", "pestilence", "pesticide", "pet", "petroleum", "petty",
+            "phase", "phenomenal", "phenomenon", "philosophy", "phylum", "physalis", "physical", "physically", "physician", "physics",
+            "piano", "pick", "pick out", "pick up", "pickup", "picnic", "pictorial", "picture", "pie", "piece",
+            "pierce", "pig", "pigeon", "pigeon-toed", "pile", "pili", "pill", "pillar", "pilot", "pin",
+            "pinball", "pine", "pineapple", "pink", "pioneer", "pioneering", "pipe", "pipeline", "pirate", "pistachio",
+            "pitch", "pitanga", "pity", "pizza", "place", "placement", "placement test", "plague", "plain", "plan",
+            "plane", "planet", "plant", "plantain", "plants", "plasma", "plastic", "plate", "platform", "play",
+            "player", "playful", "playground", "pleasant", "please", "pleased", "pleasure", "plebeian", "plebeians", "plebs",
+            "pledge", "plenty", "plight", "plot", "plum", "plumber", "plunge", "plus", "pneumonia", "poach",
+            "poaching", "pocket", "poem", "poet", "poetry", "point", "pointed", "pointing", "poison", "poisonous",
+            "poker", "polarizing", "pole", "police", "policeman", "policy", "polish", "polite", "political", "politician",
+            "politics", "poll", "pollutant", "pollute", "pollution", "polo", "polyglot", "polygon", "pomegranate", "pomelo",
+            "poncho", "pond", "pool", "poor", "poor quality", "pop", "populace", "popular", "popularity", "population",
+            "porch", "pork", "port", "portable", "porter", "portion", "portrait", "portuguese", "pose", "position",
+            "positive", "possess", "possession", "possibility", "possible", "possibly", "post", "poster", "post-secondary", "posture",
+            "pot", "potato", "potatoes", "potential", "pottery", "poultry", "poultry and game", "pound", "pour", "poverty",
+            "powder", "power", "powerful", "powerless", "power plants", "practice", "practical", "practically", "practice", "praise",
+            "prank", "pray", "prayer", "precedence", "precious", "precise", "precision", "predict", "predictable", "prediction",
+            "predominant", "preference", "pregnant", "prejudice", "preliminary", "premiere", "premise", "prepare", "preparation", "preschool",
+            "presence", "present", "presentation", "preserve", "president", "press", "press-up", "pressure", "presume", "presumption",
+            "pretend", "pretty", "prevail", "prevailing", "prevent", "prevention", "previous", "previously", "price", "prickly",
+            "pride", "priest", "primary", "primates", "prime", "prince", "princess", "principal", "principle", "print",
+            "printer", "prior", "priority", "prison", "prisoner", "private", "private sector", "prize", "probability", "probable",
+            "probe", "problem", "procedure", "procedures", "proceed", "process", "procession", "producer", "product", "production",
+            "productive", "profession", "professional", "professor", "proficiency", "profile", "profit", "profit margin", "program", "progress",
+            "prohibit", "project", "projection", "proletariat", "promise", "promote", "promotion", "prompt", "pronounce", "pronunciation",
+            "proof", "proofread", "proofreading", "propaganda", "proper", "properly", "property", "proportion", "proposal", "propose",
+            "proposition", "prosecution", "prosecutor", "prospect", "prosper", "prosperity", "prosperous", "protect", "protection", "protein",
+            "protest", "protestor", "prototype", "proud", "prove", "proven", "provide", "province", "provision", "provoke",
+            "provoking", "psychologist", "psychology", "public", "publicly", "public money", "publication", "publicity", "publish", "publisher",
+            "pudding", "pull", "pulasan", "pulp", "pummelo", "pump", "pumpkin", "punch", "puncture", "punish",
+            "punishment", "punjabi", "pupil", "pupils", "puppet", "puppetry", "purchase", "pure", "purple", "purpose",
+            "purse", "pursue", "pursuing", "pursing", "push", "push-up", "put", "put away", "put off", "put on",
+            "puzzle", "pyramid", "qualification", "qualified", "qualify", "quality", "quantity", "quarrel", "quarry", "quarter",
+            "queen", "question", "questionable", "questionnaire", "queue", "quick", "quickly", "quiet", "quietly", "quince",
+            "quit", "quite", "quota", "quote", "rabble", "rabblement", "rabbit", "rabutan", "race", "racing",
+            "radiation", "radiant", "radio", "radioactive", "raft", "rafting", "rag", "rage", "raid", "rail",
+            "railroad", "railroading", "rain", "rainbow", "raincoat", "rainforest", "raise", "rambutan", "ramification", "ranch",
+            "random", "range", "rank", "rank and file", "ransom", "rangpur", "rape", "rapid", "rapidly", "rare",
+            "rarely", "rat", "rate", "rather", "rating", "ratio", "rational", "rattle", "raw", "ray",
+            "reach", "react", "reaction", "read", "reader", "readership", "reading", "read over", "ready", "real",
+            "realistic", "reality", "realize", "really", "realm", "reason", "reasonable", "reasonably", "recall", "receive",
+            "received", "reception", "receptionist", "recession", "recipe", "recipient", "recognize", "recognition", "recommend", "recommendation",
+            "recommended", "record", "recording", "recover", "recovery", "recreation", "recruit", "recruitment", "rectangular", "red",
+            "red-blooded", "redcurrant", "reduce", "reduction", "reef", "reel", "refer", "reference", "referendum", "reflect",
+            "reflection", "reform", "refrigerator", "refugee", "refund", "refusal", "refuse", "regard", "regarding", "regardless",
+            "regime", "region", "regional", "register", "registrar", "registrar's office", "regret", "regular", "regular exercise", "regularly",
+            "regulate", "regulation", "rehearsal", "reign", "reinforce", "reject", "rejection", "relate", "related", "relation",
+            "relationship", "relative", "relatively", "relax", "relaxation", "release", "relevant", "reliable", "relief", "relieve",
+            "religion", "religious", "reluctant", "rely", "remain", "remainder", "remark", "remarkable", "remedy", "remember",
+            "remind", "reminder", "remote", "removal", "remove", "render", "rent", "renter", "repair", "repeat",
+            "repeatedly", "replace", "replacement", "reply", "report", "report writing", "represent", "representation", "representative", "republic",
+            "republican", "republicans", "reputation", "request", "require", "requirement", "rescue", "research", "research method", "resemblance",
+            "resemble", "reservation", "reserve", "resident", "residential", "resist", "resistance", "resolution", "resolve", "resource",
+            "resourceful", "resources", "resources room", "respect", "respectable", "respectively", "respond", "response", "responsibility", "responsible",
+            "rest", "restaurant", "restricted", "result", "results", "retain", "retention", "retire", "retiree", "retirement",
+            "retreat", "retrieve", "retrospect", "return", "reunion", "reveal", "revealing", "revenge", "revenue", "reverse",
+            "review", "revise", "revision", "revival", "revolution", "revolutionary", "reward", "rhythm", "ribbon", "rice",
+            "rich", "ride", "rider", "ridge", "ridiculous", "rife", "riffraff", "rifle", "right", "rigid",
+            "ring", "riot", "rioter", "rip", "rise", "risk", "risky", "riveting", "river", "road",
+            "road system", "robe", "robot", "robust", "rock", "rocket", "rockets", "rodent", "rodents", "role",
+            "roll", "romantic", "roof", "room", "roommate", "root", "roots", "rope", "rose", "rotate",
+            "rotation", "rough", "roughly", "round", "rout", "route", "routine", "row", "row house", "rowboat",
+            "rowing", "rowing boat", "royal", "royalty", "rubber", "rubbish", "rudder", "rugby", "ruin", "rule",
+            "ruling", "rumor", "run", "runner", "running", "running shorts", "rural", "russian", "rustic", "sack",
+            "sacred", "sacrifice", "sad", "sadness", "safe", "safely", "safety", "safou", "sail", "sailboat",
+            "sailing", "saint", "salad", "salad bar", "salary", "sale", "sales", "salmon", "salmonberry", "saloon",
+            "salt", "salty", "salute", "same", "sample", "sanction", "sand", "sandwich", "sanitizer", "santol",
+            "saree", "satellite", "satisfied", "satisfaction", "satisfactory", "saturday", "sauce", "saucer", "sausage", "save",
+            "saving", "saw", "say", "scale", "scan", "scarce", "scarcely", "scarf", "scary", "scatter",
+            "scene", "scenery", "scenario", "schedule", "scheme", "scholar", "scholarship", "school", "school bus", "schooling",
+            "school reunion", "science", "science fiction", "scientist", "scope", "score", "scored", "scorn", "scrabble", "scrap",
+            "scrapbooking", "scrape", "scratch", "scream", "screen", "screenplay", "script", "scriptwriter", "scrutiny", "sculpting",
+            "sculptural", "sculpture", "scum", "scuba", "scuba diving", "sea", "seabird", "seabirds", "seafood", "seal",
+            "search", "season", "seat", "second", "second-rate", "secondary", "secondary education", "secret", "secretary", "section",
+            "sector", "secure", "security", "see", "seed", "seek", "seem", "segment", "seize", "select",
+            "selection", "self", "self-centered", "self-isolation", "self-satisfied", "sell", "seller", "semi-abstract", "seminar", "semi-detached house",
+            "senator", "send", "senior", "sense", "senseless", "sensible", "sensitive", "sensual", "sentence", "sentimental",
+            "separate", "separation", "sepia", "september", "sequel", "sequence", "serene", "serenity", "serial", "series",
+            "serious", "seriously", "servant", "serve", "server", "service", "serviceberry", "session", "set", "set menu",
+            "set up", "settle", "settlement", "seven", "seventeen", "seventy", "several", "severe", "severely", "sewing",
+            "sewer", "sewer systems", "sex", "sexual", "shade", "shadow", "shaft", "shake", "shallow", "shame",
+            "shape", "shapes", "share", "shared", "sharp", "shatter", "shattered", "shave", "she", "shed",
+            "sheep", "sheet", "shelf", "shell", "shelter", "shield", "shielding", "shift", "shine", "ship",
+            "shipment", "shirt", "shock", "shoe", "shoot", "shooting", "shop", "shopping", "shore", "short",
+            "shortage", "shorten", "short-tempered", "shorts", "shot", "should", "shoulder", "shout", "show", "show jumping",
+            "showroom", "shred", "shrug", "shrugged", "shush", "shuffle", "shuffled", "sick", "sickness", "side",
+            "side order", "sidewalk", "sigh", "sight", "sign", "signal", "signature", "significance", "significant", "significantly",
+            "sign language", "silent", "silicon", "silicon chip", "silk", "silly", "silver", "silverware", "similar", "similarly",
+            "simple", "simply", "simplify", "sin", "since", "sincere", "sing", "singer", "singing", "single",
+            "single-decker", "single double-bedded room", "singlet", "sink", "sir", "sister", "site", "situation", "six", "sixteen",
+            "sixty", "size", "skate", "skateboarding", "skater", "skeptical", "sketch", "ski", "ski-jacket", "skier",
+            "skiing", "skilled", "skin", "skinny", "skirt", "skirts", "sky", "skydiving", "skyscraper", "slacks",
+            "slam", "slang", "slap", "slash", "slaughter", "slave", "slavery", "sleep", "sleeper", "sleeping",
+            "sleeveless", "sleeveless-shirt", "sleeve", "slender", "slice", "slide", "slight", "slightly", "slip", "slope",
+            "slouching", "slow", "slowly", "sludge", "sly", "small", "smart", "smash", "smell", "smile",
+            "smog", "smoke", "smoking", "smooth", "snake", "snakes", "snack", "snackable", "snap", "snigger",
+            "snorkeling", "snooker", "snow", "snowboard", "snowboarding", "snowmobile", "so", "soak", "soap", "soccer",
+            "social", "social climber", "socially", "society", "sock", "socks", "soda", "sofa", "soft", "soggy",
+            "soil", "soil conditioner", "solar", "solar panels", "solar power", "sold", "soldier", "sole", "solid", "solitary",
+            "solution", "solve", "some", "somebody", "somehow", "someone", "something", "sometimes", "somewhat", "somewhere",
+            "son", "song", "soncoya", "soon", "sore", "sorry", "sort", "soul", "soul mate", "sound",
+            "sound effects", "soup", "source", "soursop", "south", "south america", "southern", "souvenir", "space", "spanish",
+            "spare", "spark", "sparse", "speak", "speaker", "special", "specialist", "special offer", "specially", "species",
+            "specific", "specifically", "specification", "specify", "specimen", "spectacle", "spectacular", "spectator", "spectrum", "speech",
+            "speed", "spell", "spelling", "spelunking", "spend", "spent", "spherical", "spices", "spicy", "spider",
+            "spill", "spin", "spiral", "spirit", "spiritual", "spit", "spite", "splash", "splendid", "splendor",
+            "split", "spoil", "spoke", "spoken", "sponsor", "sponsorship", "spoon", "sport", "sports", "sports center",
+            "sportcoat", "spot", "spotted", "spouse", "spread", "spring", "sprinkle", "squad", "squash", "squint",
+            "stable", "stadium", "staff", "staff selection", "stage", "stagger", "stain", "stair", "staircase", "stall",
+            "stamp", "stamp collection", "stand", "standard", "star", "starfruit", "stare", "start", "starters", "starve",
+            "state", "statement", "static", "station", "stationery", "statistic", "statistics", "status", "stay", "steak",
+            "steal", "steam", "steamer", "steel", "steep", "steer", "stem", "step", "stepmother", "stick",
+            "sticky", "stiff", "still", "stimulate", "stimulating", "stimulus", "stir", "stirring", "stock", "stocking",
+            "stockings", "stole", "stomach", "stone", "stood", "stool", "stop", "storage", "store", "storm",
+            "story", "straight", "strain", "strange", "stranger", "strategic", "strategy", "stratosphere", "straw", "strawberry",
+            "stream", "stream train", "street", "strength", "strengthen", "stress", "stressed", "stretch", "strict", "strictly",
+            "strike", "strikebreaker", "striker", "string", "strip", "striped", "stripe", "stroke", "strong", "strongly",
+            "strongly recommended", "struck", "structure", "struggle", "student", "student advisor", "student account", "student retention", "student support services", "studied",
+            "studio", "study", "stuff", "stumble", "stump", "stunning", "stunt", "stuntman", "stupid", "style",
+            "subject", "submarine", "submit", "subordinate", "subscribe", "subscription", "substance", "substantive", "substitute", "subtle",
+            "subtitles", "subtle", "suburb", "subway", "succeed", "success", "successful", "succession", "such", "suck",
+            "sudden", "suddenly", "sue", "suffer", "suffering", "sufficient", "sugar", "suggest", "suggestion", "suicide",
+            "suit", "suitable", "suite", "sum", "summary", "summer", "summit", "sun", "sunday", "sunlight",
+            "sunny", "super", "superintendent", "superior", "supermarket", "super-spreader", "supervise", "supervisor", "supper", "supplement",
+            "supply", "support", "supporter", "suppose", "supposition", "suppress", "supreme", "sure", "sure-footed", "surface",
+            "surge", "surging", "surgeon", "surgery", "surprise", "surprising", "surrender", "surround", "surrounding", "survey",
+            "survival", "survive", "survivor", "suspect", "suspend", "suspense", "suspenseful", "suspicion", "suspicious", "sustainable",
+            "swallow", "swamp", "swan", "sway", "swear", "sweat", "sweatband", "sweater", "sweatpant", "sweatshirt",
+            "sweep", "sweet", "swim", "swimmer", "swimming", "swimming pool", "swimsuit", "swimsuits", "swing", "swiss",
+            "switch", "switzerland", "swollen", "sword", "sycamore", "symbol", "symbolic", "symmetry", "sympathy", "symptom",
+            "symptomatic", "synopsis", "syntax", "synthesis", "synthesize", "synergy", "syndrome", "synonym", "synonyms", "system",
+            "systematic", "syzygium", "table", "table tennis", "tactful", "tactile", "tactless", "tail", "tailor", "tai-chi",
+            "take", "takedown", "talent", "talented", "talisay", "talk", "tall", "tamarind", "tamarillo", "tame",
+            "tank", "tanker", "tanktop", "tap", "tapping", "tape", "target", "task", "tasks", "taste",
+            "tasteful", "tattered", "tax", "taxi", "taxpayer", "taxpayers' money", "tayberry", "tea", "teach", "teacher",
+            "teaching", "team", "team leaders", "teammate", "teamwork", "tear", "technical", "technical cooperation", "technique", "technology",
+            "tectonic", "teenage", "teenager", "tee shirt", "telecom", "telephone", "telescope", "television", "tell", "temper",
+            "temperature", "temple", "temporary", "tempting", "tenant", "tend", "tendency", "tender", "tennis", "tennis shorts",
+            "tension", "tent", "term", "terminal", "terminate", "terms", "terrace", "terraced house", "terrible", "terrify",
+            "territory", "terror", "test", "tested", "testing", "text", "textbook", "textile", "texture", "thai",
+            "thames", "than", "thank", "thanks", "that", "thatched cottage", "the", "the arts and media", "the animal kingdom", "the discus",
+            "the dominican republic", "the hammer", "the high jump", "the javelin", "the philippines", "the press", "theatre", "their", "theirs", "them",
+            "theme", "themselves", "then", "theory", "therapy", "there", "therefore", "thesis", "they", "thick",
+            "thin", "thin-skinned", "thing", "think", "third", "third-rate", "thirsty", "thirteen", "thirty", "this",
+            "thornless", "thorny", "thorough", "thoroughly", "those", "though", "thought", "thoughtful", "thoughtless", "thought-provoking",
+            "thousand", "thread", "threat", "threaten", "threatening", "three", "three dimensions", "three times", "three times per week", "three-piece suit",
+            "threshold", "thrive", "throat", "through", "throughout", "throw", "thumb", "thursday", "thus", "tidal",
+            "tie", "tight", "tighten", "tight-fisted", "tile", "till", "tilt", "timber", "time", "timeless",
+            "timing", "tin", "tiny", "tip", "tired", "tissue", "title", "to", "toast", "tobacco",
+            "today", "toe", "together", "told", "tomorrow", "tone", "tongue", "tonight", "too", "took",
+            "tool", "tools", "tooth", "top", "topic", "topics", "torn", "tornado", "total", "totally",
+            "touch", "touching", "tough", "tour", "touring", "tourist", "tourist attraction", "tourist guided tour", "tournament", "towards",
+            "tow truck", "tower", "town", "townhouse", "toxic", "toxic waste", "toy", "trace", "track", "tracksuit",
+            "tractor", "trade", "trading", "tradition", "traditional", "traffic", "traffic jams", "train", "transfer", "transform",
+            "transformation", "transit", "transition", "translate", "translation", "translator", "transmission", "transmit", "transparency", "transparent",
+            "transplant", "transport", "transportation", "transporter", "trap", "trash", "travel", "traveler", "tray", "treacherous",
+            "treadmill", "treasure", "treat", "treatment", "tree", "tremble", "tremendous", "trend", "trial", "triangle",
+            "triangular", "tribe", "trick", "tried", "trigger", "trilingual", "trim", "trip", "trivial", "trophy",
+            "trouble", "troublesome", "trousers", "trout", "truck", "true", "truly", "trumpet", "trunk", "trust",
+            "trustworthy", "truth", "try", "tube", "tuesday", "tuition", "tuition fees", "tulip", "tumble", "tumor",
+            "tune", "tunnel", "turbulent", "turkey", "turmoil", "turn", "turtle", "turtles", "turtle neck", "tutor",
+            "tuxedo", "tv", "tv program", "twelve", "twenty", "twenty-one", "twenty-two", "twenty-three", "twenty-four", "twenty-five",
+            "twenty-six", "twenty-seven", "twenty-eight", "twenty-nine", "twice", "twig", "twilight", "twin", "twist", "twitch",
+            "two", "tycoon", "typhoon", "typical", "typically", "typist", "ugly", "ugli", "ukraine", "ukrainian",
+            "ultrasound", "umbrella", "unable", "unanimous", "unanimously", "unaware", "unbelievable", "uncertain", "uncertainty", "unchanging",
+            "uncle", "unconventional", "uncover", "under", "underdeveloped", "underestimate", "undergo", "undergraduate", "underground", "underline",
+            "undershirt", "undershirts", "understand", "understanding", "undertake", "undertaking", "undesirable", "undo", "uneven", "unexpected",
+            "unfair", "unfamiliar", "unforgettable", "unfortunately", "unhappy", "uniform", "unify", "uninteresting", "union", "unique",
+            "unit", "united", "united kingdom", "united states", "united states of america", "universal", "universe", "university", "unjust",
+            "unknown", "unleaded", "unless", "unlike", "unlikely", "until", "unusual", "unwashed", "up", "up to",
+            "upcoming", "update", "uphill", "upon", "upper", "upper crust", "uproar", "uproarious", "upset", "upstairs",
+            "urban", "urge", "urgent", "us", "usa", "use", "used", "useful", "usual", "usually",
+            "utensil", "utensils", "utility", "utilize", "utterly", "vacancy", "vacant", "vacation", "vacationer", "vaccinate",
+            "vaccination", "vaccine", "vacuum", "vagabond", "vague", "vain", "valley", "valuable", "value", "van",
+            "vanilla", "vanish", "variable", "variation", "varied", "variety", "various", "vary", "vast", "vegetable",
+            "vegetables", "vegetation", "vegetarian", "vehicle", "vehicles", "veil", "vein", "velvet", "ventilator", "ventilators",
+            "venture", "verb", "verbs", "verdant", "verdict", "verify", "version", "versus", "vertical", "very",
+            "vest", "veteran", "via", "vibrant", "vice", "victim", "victory", "video", "videos", "view",
+            "viewer", "viewers", "village", "vinegar", "violate", "violation", "violence", "violent", "violin", "viper",
+            "viral", "virus", "visa", "visible", "vision", "visionary", "visit", "visitor", "visual", "visual arts",
+            "visual effects", "vital", "vitamin", "vocalist", "vocabulary", "vocation", "voice", "voice over", "volcano", "volunteer",
+            "voluntary", "vote", "voter", "vow", "voyage", "voyeuristic", "vulnerable", "wacky", "waist", "waist-coat",
+            "wait", "waiter", "waiting", "waiting list", "waitress", "wake", "walk", "walker", "walking", "wall",
+            "wallet", "wander", "want", "war", "warehouse", "warm", "warning", "wash", "waste", "watch",
+            "water", "waterfall", "watermelon", "wave", "wax", "way", "wear", "weather", "weather forecast", "weave",
+            "web", "wedding", "wedding dress", "wednesday", "weed", "week", "weekend", "weekdays", "weekly", "weep",
+            "weigh", "weight", "weight lifter", "welcome", "welfare", "well", "wellbeing", "well-done", "well-known", "went",
+            "west", "western", "wet", "wetland", "wetlands", "whale", "what", "whatever", "when", "whenever",
+            "where", "wherever", "whether", "which", "while", "white", "white-water rafting", "whitecurrant", "who", "whoever",
+            "whole", "whom", "whose", "why", "wide", "widespread", "width", "wife", "wild", "wildlife",
+            "will", "willing", "win", "wind", "windmill", "window", "windbreakers", "windsurfing", "wine", "wing",
+            "wink", "winked", "winner", "winter", "wish", "wit", "witch", "with", "withdraw", "within",
+            "without", "witness", "wolf", "wolfberry", "woman", "wonder", "wonderful", "wood", "woodcarving", "wooden",
+            "wool", "word", "words", "word to spell", "work", "worker", "work experience", "workplace", "workplaces",
+            "workshop", "world", "worm", "worn", "worry", "worse", "worsen", "worship", "worst", "worth",
+            "worthwhile", "worthy", "would", "wound", "wounded", "wounded person", "wrap", "wrist", "write", "writer",
+            "writing", "written", "written work", "wrong", "wrongly", "wrought", "yacht", "yank", "yard", "yawn",
+            "yawning", "year", "yell", "yellow", "yes", "yesterday", "yet", "yield", "yoga", "yogurt",
+            "yolk", "you", "young", "youngster", "your", "yours", "yourself", "youth", "yuzu", "zest",
+            "zinc", "zinfandel", "zip", "zipper", "zone", "zoo", "zoology", "zucchini"
+        ];
+
+        const hardWords = [
+            "aberration", "abnegation", "abrogate", "abscond", "abstain", "abstruse", "accede", "accolade", "acerbic", "acrimony",
+            "acumen", "adamant", "adjudicate", "admonish", "adroit", "adulation", "adumbrate", "alacrity", "alleviate", "allude",
+            "altruism", "amalgamate", "ambivalent", "ameliorate", "amenable", "anachronism", "anathema", "animosity", "annex", "anomaly",
+            "antipathy", "antithesis", "apathy", "aplomb", "apostate", "apposite", "apprise", "approbation", "appropriate", "arcane",
+            "arraign", "articulate", "ascetic", "askance", "asperity", "assiduous", "assuage", "astringent", "atrophy", "attenuate",
+            "audacious", "august", "auspicious", "austere", "avarice", "aver", "avow", "baleful", "banal", "bane",
+            "beget", "beleaguer", "belie", "bellicose", "belligerent", "bemoan", "bemused", "benediction", "benevolent", "benign",
+            "bequeath", "berate", "bereft", "bewail", "bifurcate", "bilk", "blanch", "blandish", "blight", "blithe",
+            "bombastic", "boon", "boorish", "bovine", "brazen", "brevity", "brusque", "bucolic", "bungle", "burgeon",
+            "cabal", "cachinnate", "cacophony", "cajole", "callous", "calumny", "candor", "cantankerous", "capacious", "capitulate",
+            "capricious", "captious", "castigate", "catalyst", "catharsis", "caustic", "censure", "chagrin", "charlatan", "chary",
+            "chastise", "chicanery", "choleric", "churlish", "circuitous", "circumscribe", "circumvent", "clandestine", "clement", "coalesce",
+            "coerce", "cogent", "cognizant", "commensurate", "compelling", "compendium", "complacent", "compliant", "complicity", "conciliatory",
+            "concord", "conduit", "confluence", "congenial", "conjecture", "connive", "consecrate", "consign", "consonance", "constituent",
+            "construe", "consummate", "contend", "contentious", "contrite", "contrived", "controvert", "conundrum", "convivial", "convoluted",
+            "copious", "corpulent", "corroborate", "coterie", "countenance", "countermand", "covenant", "covetous", "credulous", "crescendo",
+            "culminate", "culpable", "cumbersome", "cupidity", "cursory", "curtail", "cynical", "dearth", "debacle", "debilitate",
+            "debunk", "decimate", "decorum", "deference", "defile", "deft", "defunct", "degenerate", "deign", "delineate",
+            "delude", "deluge", "demean", "demur", "denigrate", "deplete", "deplore", "deprecate", "depredation", "derelict",
+            "deride", "derogatory", "desecrate", "desiccate", "desist", "desultory", "detrimental", "deviate", "devious", "diaphanous",
+            "diatribe", "dichotomy", "didactic", "diffident", "diffuse", "digress", "dilapidated", "dilatory", "diligent", "disabuse",
+            "discern", "discomfit", "disparage", "disparate", "dispassionate", "dissension", "dissipate", "dissonance", "dissuade", "divisive",
+            "dogmatic", "dolorous", "dubious", "duplicity", "ebullient", "eclectic", "edify", "efface", "effervescent", "effrontery",
+            "egregious", "elicit", "eloquent", "elucidate", "elusive", "embellish", "embezzle", "emend", "empathy", "empirical",
+            "emulate", "enclave", "encomium", "encumber", "enervate", "engender", "enigmatic", "enmity", "ennui", "enormity",
+            "ensconce", "enthrall", "ephemeral", "epiphany", "epitome", "equanimity", "equivocal", "eradicate", "erratic", "erudite",
+            "eschew", "esoteric", "espouse", "ethereal", "euphemism", "evanescent", "evince", "exacerbate", "exacting", "exalt",
+            "exasperate", "exculpate", "execrable", "exhort", "exigent", "exonerate", "exorbitant", "expedient", "expunge", "extant",
+            "extol", "extraneous", "extricate", "exuberant", "facetious", "fallacious", "fathom", "fatuous", "feckless", "fecund",
+            "feign", "felicitous", "ferret", "fervid", "fetter", "fickle", "fidelity", "figurative", "finesse", "flagrant",
+            "florid", "flout", "foible", "foment", "forbearance", "forestall", "forgo", "forsake", "fortuitous", "foster",
+            "fractious", "frugal", "fugacious", "fulminate", "furtive", "gainsay", "garish", "garner", "garrulous", "germane",
+            "gesticulate", "glib", "goad", "gourmand", "grandiloquent", "gratuitous", "gregarious", "grievous", "guile", "hackneyed",
+            "hallow", "harangue", "haughty", "hegemony", "heterogeneous", "histrionic", "hoary", "homogeneous", "hyperbole", "iconoclast",
+            "ignominious", "ilk", "illicit", "imbibe", "imbroglio", "immutable", "impecunious", "impede", "imperative", "imperious",
+            "impertinent", "impervious", "impetuous", "impinge", "implacable", "importune", "impotent", "imprecation", "impugn", "inadvertent",
+            "inane", "inasmuch", "incandescent", "incantation", "incapacitate", "incarcerate", "inchoate", "incisive", "incognito", "incongruous",
+            "incredulous", "incriminate", "incubus", "inculcate", "incumbent", "indefatigable", "indigent", "indolent", "ineffable", "inept",
+            "inert", "inexorable", "infallible", "infamous", "infirmity", "inflame", "infringe", "ingenuous", "inimical", "iniquity",
+            "innocuous", "inscrutable", "insidious", "insinuate", "insipid", "insolent", "insouciant", "instigate", "insurgent", "intemperate",
+            "interdict", "interloper", "internecine", "interpolate", "intimation", "intransigent", "intrepid", "inundate", "inure", "invective",
+            "inveigh", "inveigle", "inveterate", "invidious", "irascible", "irresolute", "itinerant", "jettison", "jingoism", "jocose",
+            "jocular", "judicious", "juxtapose", "kismet", "knavery", "kudos", "labyrinthine", "lacerate", "lachrymose", "lackadaisical",
+            "languid", "languish", "largess", "lascivious", "lassitude", "latent", "laudatory", "lax", "legacy", "lethargic",
+            "levity", "libertarian", "licentious", "limpid", "linchpin", "litany", "lithe", "livid", "loquacious", "lurid",
+            "macabre", "machination", "maelstrom", "magnanimous", "malaise", "malapropism", "malevolent", "malfeasance", "malicious", "malign",
+            "malinger", "malleable", "mandarin", "manifest", "manifold", "marginal", "maudlin", "mawkish", "meander", "mediate",
+            "medley", "mellifluous", "mendacious", "mendicant", "mercurial", "meretricious", "meticulous", "mettle", "misanthrope", "miscreant",
+            "modicum", "mollify", "morass", "moribund", "morose", "mundane", "munificent", "myriad", "nadir", "nascent",
+            "nebulous", "nefarious", "negligent", "neophyte", "nexus", "nonchalant", "nonplussed", "nostalgia", "noxious", "nuance",
+            "obdurate", "obfuscate", "oblique", "oblivious", "obloquy", "obsequious", "obstreperous", "obtuse", "obviate", "occlude",
+            "occult", "offset", "officious", "ogle", "opaque", "opulent", "oration", "ostensible", "ostentatious", "oust",
+            "pacify", "paean", "palatable", "palaver", "palpable", "panacea", "panache", "pandemic", "pandemonium", "panegyric",
+            "paragon", "pariah", "parochial", "parody", "parsimonious", "partisan", "paucity", "peccadillo", "pecuniary", "pedagogue",
+            "pedantic", "pejorative", "penchant", "penitent", "pensive", "penurious", "perceptive", "perfidious", "perfunctory", "peripatetic",
+            "permeate", "pernicious", "perspicacious", "pertinacious", "pertinent", "peruse", "pervade", "petulant", "philanthropic", "phlegmatic",
+            "picaresque", "pied", "piety", "pious", "pique", "placate", "placid", "plaintive", "platitude", "plethora",
+            "pliant", "plucky", "plummet", "poignant", "polemic", "politic", "polyglot", "pompous", "ponderous", "portend",
+            "portent", "postulate", "pragmatic", "precedent", "precipitate", "precocious", "predilection", "preeminent", "preempt", "prescient",
+            "presumptuous", "prevaricate", "primordial", "probity", "proclivity", "prodigal", "prodigious", "profane", "profess", "proffer",
+            "profligate", "profound", "profuse", "proliferate", "promulgate", "propensity", "propitiate", "propriety", "proscribe", "prosaic",
+            "proscribe", "proselytize", "protagonist", "protean", "protocol", "provident", "provincial", "provisional", "proximate", "prudent",
+            "puerile", "pugnacious", "puissant", "pulchritude", "punctilious", "pundit", "pungent", "pusillanimous", "quaint", "qualify",
+            "qualm", "querulous", "quiescent", "quixotic", "quotidian", "rancid", "rancorous", "rapacious", "rarefy", "ratiocinate",
+            "recalcitrant", "recant", "reclusive", "recondite", "rectify", "redoubtable", "redundant", "refractory", "refute", "relegate",
+            "relinquish", "remonstrate", "replete", "reprehensible", "reprobate", "repudiate", "rescind", "resilient", "resolute", "resplendent",
+            "restive", "reticent", "retinue", "revere", "reverent", "ribald", "rife", "robust", "rococo", "rubric",
+            "rue", "ruminate", "rustic", "sagacious", "salient", "salubrious", "salutary", "sanctimonious", "sanguine", "sardonic",
+            "satiate", "scintillating", "scurrilous", "sedulous", "semaphore", "sententious", "serendipity", "servile", "shard", "sidereal",
+            "simper", "sinecure", "singular", "sinuous", "slake", "sleight", "solicitous", "solipsism", "somber", "somnolent",
+            "sonorous", "sophistry", "sophomoric", "spate", "specious", "sporadic", "spurious", "squalid", "stanch", "staunch",
+            "steid", "stentorian", "stigma", "stolid", "stratagem", "strident", "stringent", "stymie", "sublime", "subpoena",
+            "subterfuge", "succinct", "succor", "suffuse", "sundry", "supercilious", "supersede", "supine", "surfeit", "surreptitious",
+            "swarthy", "sycophant", "symbiosis", "synchronicity", "tacit", "taciturn", "tangential", "tantamount", "tautology", "temerity",
+            "temperate", "tenable", "tenacious", "tendentious", "tenuous", "terse", "thesaurus", "timorous", "tirade", "titular",
+            "torpid", "tortuous", "tractable", "transient", "transitory", "travesty", "trenchant", "trepidation", "truculent", "turgid",
+            "turpitude", "ubiquitous", "umbrage", "unctuous", "undulate", "unfeigned", "untenable", "upbraid", "urbane", "usurp",
+            "vacillate", "vacuous", "valid", "vanquish", "vapid", "vehement", "venal", "venerate", "veracity", "verbose",
+            "verdant", "verisimilitude", "veritable", "vex", "vicarious", "vicissitude", "vilify", "vindicate", "virtuoso", "visceral",
+            "vitiate", "vitriolic", "vituperate", "vivacious", "vociferous", "volatile", "voluminous", "voracious", "waive", "whimsical",
+            "wily", "winsome", "wistful", "wizened", "wrath", "writhe", "zany", "zealous", "zenith", "zest"
+        ];
+
+
+        let currentWordIndex = 0;
+        let shuffledWordList = [];
+        let selectedWordList = []; // To hold the words for the selected difficulty
+        let correctCount = 0;
+        let incorrectCount = 0;
+        let incorrectlySpelledWords = [];
+        let currentMode = ''; // 'selection' or 'read-write'
+        let currentDifficulty = 'easy'; // Track current difficulty
+
+        // Object to store game state for each mode and difficulty combination
+        let sessionStates = {
+            easy: {
+                selection: { index: 0, correct: 0, incorrect: 0, incorrectWords: [] },
+                readWrite: { index: 0, correct: 0, incorrect: 0, incorrectWords: [] }
+            },
+            medium: {
+                selection: { index: 0, correct: 0, incorrect: 0, incorrectWords: [] },
+                readWrite: { index: 0, correct: 0, incorrect: 0, incorrectWords: [] }
+            },
+            hard: {
+                selection: { index: 0, correct: 0, incorrect: 0, incorrectWords: [] },
+                readWrite: { index: 0, correct: 0, incorrect: 0, incorrectWords: [] }
+            }
+        };
+
+
+        const homeScreen = document.getElementById('home-screen');
+        const selectionScreen = document.getElementById('selection-screen');
+        const readWriteScreen = document.getElementById('read-write-screen');
+        const endScreen = document.getElementById('end-screen');
+
+        const startSelectionBtn = document.getElementById('start-selection-btn');
+        const startReadWriteBtn = document.getElementById('start-read-write-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const playAgainBtn = document.getElementById('play-again-btn');
+
+        // Selection Mode Elements
+        const selectionProgressDiv = document.getElementById('selection-progress');
+        const selectionWordDisplayDiv = document.getElementById('selection-word-display');
+        const selectionReadBtn = document.getElementById('selection-read-btn'); // Read Button for Selection
+        const selectionOption1Btn = document.getElementById('selection-option1-btn');
+        const selectionOption2Btn = document.getElementById('selection-option2-btn');
+        const selectionFeedbackDiv = document.getElementById('selection-feedback');
+        const selectionBackBtn = document.getElementById('selection-back-btn'); // Back Button
+
+        // Read & Write Mode Elements
+        const readWriteProgressDiv = document.getElementById('read-write-progress');
+        const wordPromptDiv = document.getElementById('word-prompt');
+        const readBtn = document.getElementById('read-btn');
+        const spellingInput = document.getElementById('spelling-input');
+        const submitBtn = document.getElementById('submit-btn');
+        const hintBtn = document.getElementById('hint-btn'); // Hint Button
+        const readWriteFeedbackDiv = document.getElementById('read-write-feedback');
+        const readWriteBackBtn = document.getElementById('read-write-back-btn'); // Back Button
+
+        // End Screen Elements
+        const correctCountSpan = document.getElementById('correct-count');
+        const incorrectCountSpan = document.getElementById('incorrect-count');
+        const incorrectWordsSection = document.getElementById('incorrect-words-section');
+        const incorrectWordsListUl = document.getElementById('incorrect-words-list');
+
+        const difficultyRadios = document.querySelectorAll('input[name="difficulty"]');
+
+
+        // Function to shuffle an array
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]]; // Swap elements
+            }
+            return array;
+        }
+
+        // Function to generate a slightly incorrect spelling for selection mode
+        function generateIncorrectSpelling(word) {
+            if (word.length <= 2) return word + "x"; // Simple case for very short words
+
+            const indexToChange = Math.floor(Math.random() * word.length);
+            const charToChange = word[indexToChange];
+            let newChar = charToChange;
+
+            // Try to change the character to a different one
+            while (newChar === charToChange) {
+                const randomCharCode = Math.floor(Math.random() * 26) + 97; // Random lowercase letter ASCII
+                newChar = String.fromCharCode(randomCharCode);
+            }
+
+            // Ensure the incorrect spelling is different from the correct one and not a real word
+            let incorrect = word.substring(0, indexToChange) + newChar + word.substring(indexToChange + 1);
+             while(incorrect === word || selectedWordList.includes(incorrect)) {
+                 const idx = Math.floor(Math.random() * word.length);
+                 const char = word[idx];
+                 let newC = char;
+                 while(newC === char) {
+                     const randomCharCode = Math.floor(Math.random() * 26) + 97;
+                     newC = String.fromCharCode(randomCharCode);
+                 }
+                 incorrect = word.substring(0, idx) + newC + word.substring(idx + 1);
+             }
+
+
+            return incorrect;
+        }
+
+        // Function to display the current word prompt and options/input based on mode
+        function displayWord() {
+            if (currentWordIndex >= shuffledWordList.length) {
+                // Game over - show end screen
+                showEndScreen();
+                return; // Stop displaying words
+            }
+
+            const currentWord = shuffledWordList[currentWordIndex];
+
+            // Update progress indicator based on the current mode
+            if (currentMode === 'selection') {
+                 selectionProgressDiv.textContent = `Word ${currentWordIndex + 1} of ${shuffledWordList.length}`;
+                 selectionWordDisplayDiv.textContent = "Which is the correct spelling?";
+                 selectionFeedbackDiv.classList.add('hidden');
+                 selectionFeedbackDiv.textContent = '';
+                 selectionFeedbackDiv.className = 'feedback-message hidden';
+
+                 // Generate and display options for selection mode
+                 let incorrectWord = generateIncorrectSpelling(currentWord);
+                 while(incorrectWord === currentWord) {
+                     incorrectWord = generateIncorrectSpelling(currentWord);
+                 }
+                 const options = shuffleArray([currentWord, incorrectWord]);
+                 selectionOption1Btn.textContent = options[0];
+                 selectionOption2Btn.textContent = options[1];
+                 selectionOption1Btn.className = 'selection-button'; // Reset classes
+                 selectionOption2Btn.className = 'selection-button'; // Reset classes
+
+                 // Ensure read button is visible in selection mode
+                 selectionReadBtn.classList.remove('hidden');
+
+            } else if (currentMode === 'read-write') {
+                readWriteProgressDiv.textContent = `Word ${currentWordIndex + 1} of ${shuffledWordList.length}`;
+                wordPromptDiv.textContent = "Spell the word:";
+                spellingInput.value = '';
+                readWriteFeedbackDiv.classList.add('hidden');
+                readWriteFeedbackDiv.textContent = '';
+                readWriteFeedbackDiv.className = 'feedback-message hidden';
+                spellingInput.focus();
+                readWord(currentWord); // Read the word aloud
+
+                 // Ensure hint button is visible in read-write mode
+                 hintBtn.classList.remove('hidden');
+            }
+        }
+
+        // Function to handle selection button clicks
+        function handleSelectionClick(event) {
+            const clickedWord = event.target.textContent;
+            const correctWord = shuffledWordList[currentWordIndex];
+
+            // Disable buttons temporarily
+            selectionOption1Btn.disabled = true;
+            selectionOption2Btn.disabled = true;
+             selectionReadBtn.disabled = true; // Disable read button
+
+
+            if (clickedWord === correctWord) {
+                // Correct answer
+                selectionFeedbackDiv.textContent = "Correct!";
+                selectionFeedbackDiv.className = 'feedback-message correct';
+                selectionFeedbackDiv.classList.remove('hidden');
+                 event.target.classList.add('correct'); // Highlight correct button
+                correctCount++;
+                currentWordIndex++; // Move to the next word
+                // Add a slight delay before showing the next word
+                setTimeout(() => {
+                     selectionOption1Btn.disabled = false; // Re-enable buttons
+                     selectionOption2Btn.disabled = false; // Re-enable buttons
+                     selectionReadBtn.disabled = false; // Re-enable read button
+                    displayWord();
+                }, 700);
+            } else {
+                // Incorrect answer
+                selectionFeedbackDiv.textContent = `Incorrect! The correct spelling is: ${correctWord}`;
+                selectionFeedbackDiv.className = 'feedback-message incorrect';
+                selectionFeedbackDiv.classList.remove('hidden');
+                 event.target.classList.add('incorrect'); // Highlight incorrect button
+                 // Find and highlight the correct button
+                 if (selectionOption1Btn.textContent === correctWord) {
+                     selectionOption1Btn.classList.add('correct');
+                 } else {
+                     selectionOption2Btn.classList.add('correct');
+                 }
+
+                incorrectCount++;
+                 if (!incorrectlySpelledWords.includes(correctWord)) {
+                    incorrectlySpelledWords.push(correctWord);
+                }
+                // Stay on the same word for practice
+                 setTimeout(() => {
+                     selectionOption1Btn.disabled = false; // Re-enable buttons
+                     selectionOption2Btn.disabled = false; // Re-enable buttons
+                      selectionReadBtn.disabled = false; // Re-enable read button
+                 }, 700); // Re-enable buttons after delay
+            }
+
+             // Update score display immediately (if you want to show score during game, add elements to game screens)
+             // For now, score is only shown on end screen.
+        }
+
+
+        // Function to handle submit button click or Enter key press for read & write mode
+        function handleSubmit() {
+            const typedWord = spellingInput.value.trim().toLowerCase();
+            const correctWord = shuffledWordList[currentWordIndex].toLowerCase();
+
+            // Disable input and button temporarily
+            spellingInput.disabled = true;
+            submitBtn.disabled = true;
+             hintBtn.disabled = true; // Disable hint button after submit
+             readBtn.disabled = true; // Disable read button
+
+
+            if (typedWord === correctWord) {
+                // Correct answer
+                readWriteFeedbackDiv.textContent = "Correct!";
+                readWriteFeedbackDiv.className = 'feedback-message correct';
+                readWriteFeedbackDiv.classList.remove('hidden');
+                correctCount++;
+                currentWordIndex++; // Move to the next word
+                // Add a slight delay before showing the next word
+                setTimeout(() => {
+                    spellingInput.disabled = false; // Re-enable
+                    submitBtn.disabled = false; // Re-enable
+                     hintBtn.disabled = false; // Re-enable hint button
+                     readBtn.disabled = false; // Re-enable read button
+                    displayWord();
+                }, 700);
+            } else {
+                // Incorrect answer
+                readWriteFeedbackDiv.textContent = `Incorrect! The correct spelling is: ${correctWord}`;
+                readWriteFeedbackDiv.className = 'feedback-message incorrect';
+                readWriteFeedbackDiv.classList.remove('hidden');
+                incorrectCount++;
+                 if (!incorrectlySpelledWords.includes(correctWord)) {
+                    incorrectlySpelledWords.push(correctWord);
+                }
+                // Stay on the same word for practice
+                 setTimeout(() => {
+                    spellingInput.disabled = false; // Re-enable
+                    submitBtn.disabled = false; // Re-enable
+                     hintBtn.disabled = false; // Re-enable hint button
+                     readBtn.disabled = false; // Re-enable read button
+                 }, 700); // Re-enable after delay
+            }
+
+             // Update score display immediately (if you want to show score during game, add elements to game screens)
+             // For now, score is only shown on end screen.
+        }
+
+        // Function to handle hint button click in read & write mode
+        function handleHint() {
+            const correctWord = shuffledWordList[currentWordIndex];
+            readWriteFeedbackDiv.textContent = `Hint: The spelling is ${correctWord}`;
+            readWriteFeedbackDiv.className = 'feedback-message hint';
+            readWriteFeedbackDiv.classList.remove('hidden');
+             // Disable hint button after use until next word
+             hintBtn.disabled = true;
+        }
+
+
+        // Function to read a word aloud
+        function readWord(word) {
+            // Use the Web Speech API
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(word);
+                window.speechSynthesis.speak(utterance);
+            } else {
+                console.warn("Speech synthesis not supported in this browser.");
+            }
+        }
+
+        // Function to show the end screen
+        function showEndScreen() {
+            // Hide all game screens
+            selectionScreen.classList.add('hidden');
+            readWriteScreen.classList.add('hidden');
+            homeScreen.classList.add('hidden'); // Ensure home screen is also hidden
+
+            endScreen.classList.remove('hidden');
+
+            // Display final score
+            correctCountSpan.textContent = correctCount;
+            incorrectCountSpan.textContent = incorrectCount;
+
+            // Display incorrectly spelled words
+            incorrectWordsListUl.innerHTML = ''; // Clear previous list
+            if (incorrectlySpelledWords.length > 0) {
+                incorrectWordsSection.classList.remove('hidden');
+                incorrectlySpelledWords.forEach(word => {
+                    const li = document.createElement('li');
+                    li.textContent = word;
+                    incorrectWordsListUl.appendChild(li);
+                });
+            } else {
+                incorrectWordsSection.classList.add('hidden');
+            }
+
+             // Save the final state before ending
+             saveCurrentState();
+        }
+
+        // Function to show the home screen
+        function showHomeScreen() {
+            // Hide all other screens
+            selectionScreen.classList.add('hidden');
+            readWriteScreen.classList.add('hidden');
+            endScreen.classList.add('hidden');
+
+            // Show home screen
+            homeScreen.classList.remove('hidden');
+
+             // Save the current state when returning to home from a game screen
+             if (currentMode !== '') { // Only save if coming from a game
+                 saveCurrentState();
+             }
+
+             // Reset global state variables. They will be loaded in startGame if a session exists.
+             currentWordIndex = 0;
+             correctCount = 0;
+             incorrectCount = 0;
+             incorrectlySpelledWords = [];
+             shuffledWordList = [];
+             selectedWordList = [];
+             currentMode = ''; // Reset mode
+
+        }
+
+        // Function to save the current game state
+        function saveCurrentState() {
+             if (currentMode && currentDifficulty) {
+                 const sessionKey = `${currentDifficulty}-${currentMode}`;
+                 sessionStates[currentDifficulty][currentMode] = {
+                     index: currentWordIndex,
+                     correct: correctCount,
+                     incorrect: incorrectCount,
+                     incorrectWords: [...incorrectlySpelledWords], // Save a copy
+                     shuffledList: [...shuffledWordList] // Save the shuffled list
+                 };
+                 console.log("State saved for:", sessionKey, sessionStates[currentDifficulty][currentMode]); // Debug log
+             }
+        }
+
+        // Function to load a saved game state
+        function loadState(difficulty, mode) {
+             const sessionKey = `${difficulty}-${mode}`;
+             if (sessionStates[difficulty] && sessionStates[difficulty][mode] && sessionStates[difficulty][mode].shuffledList && sessionStates[difficulty][mode].shuffledList.length > 0) {
+                 const savedState = sessionStates[difficulty][mode];
+                 currentWordIndex = savedState.index;
+                 correctCount = savedState.correct;
+                 incorrectCount = savedState.incorrect;
+                 incorrectlySpelledWords = [...savedState.incorrectWords]; // Load a copy
+                 shuffledWordList = [...savedState.shuffledList]; // Load the shuffled list
+                 console.log("State loaded for:", sessionKey, savedState); // Debug log
+                 return true; // State loaded successfully
+             }
+             console.log("No saved state found for:", sessionKey); // Debug log
+             return false; // No saved state found
+        }
+
+
+        // Function to start a new game based on selected mode and difficulty
+        function startGame(mode) {
+            currentMode = mode; // Set the current mode
+
+            // Find the selected difficulty
+            for (const radio of difficultyRadios) {
+                if (radio.checked) {
+                    currentDifficulty = radio.value; // Update current difficulty
+                    break;
+                }
+            }
+
+            // Attempt to load saved state
+            const stateLoaded = loadState(currentDifficulty, currentMode);
+
+            if (!stateLoaded) {
+                // If no state loaded, initialize a new game
+                 console.log("Initializing new game for:", currentDifficulty, currentMode); // Debug log
+                // Set the word list based on difficulty
+                switch (currentDifficulty) {
+                    case 'easy':
+                        selectedWordList = [...easyWords];
+                        break;
+                    case 'medium':
+                        selectedWordList = [...mediumWords];
+                        break;
+                    case 'hard':
+                        selectedWordList = [...hardWords];
+                        break;
+                    default:
+                        selectedWordList = [...easyWords]; // Default to easy
+                }
+
+                // Reset game state for a new session
+                currentWordIndex = 0;
+                correctCount = 0;
+                incorrectCount = 0;
+                incorrectlySpelledWords = [];
+                shuffledWordList = shuffleArray([...selectedWordList]); // Shuffle the selected list
+            } else {
+                 // If state was loaded, selectedWordList is not needed for shuffling,
+                 // as shuffledWordList is loaded directly.
+                 console.log("Resuming game for:", currentDifficulty, currentMode); // Debug log
+                 // Make sure selectedWordList is set for generateIncorrectSpelling
+                  switch (currentDifficulty) {
+                    case 'easy':
+                        selectedWordList = [...easyWords];
+                        break;
+                    case 'medium':
+                        selectedWordList = [...mediumWords];
+                        break;
+                    case 'hard':
+                        selectedWordList = [...hardWords];
+                        break;
+                    default:
+                        selectedWordList = [...easyWords]; // Default to easy
+                }
+            }
+
+
+            // Transition to the appropriate game screen
+            homeScreen.classList.add('hidden');
+            endScreen.classList.add('hidden'); // Hide end screen if visible
+
+            if (currentMode === 'selection') {
+                selectionScreen.classList.remove('hidden');
+                readWriteScreen.classList.add('hidden');
+                 // Ensure hint button is hidden in selection mode
+                 if(hintBtn) hintBtn.classList.add('hidden');
+                 // Ensure selection read button is visible
+                 if(selectionReadBtn) selectionReadBtn.classList.remove('hidden');
+
+            } else if (currentMode === 'read-write') {
+                selectionScreen.classList.add('hidden');
+                readWriteScreen.classList.remove('hidden');
+                 // Ensure read button is visible in read-write mode
+                 if(readBtn) readBtn.classList.remove('hidden');
+                 // Ensure hint button is visible
+                 if(hintBtn) hintBtn.classList.remove('hidden');
+                 // Ensure selection read button is hidden
+                 if(selectionReadBtn) selectionReadBtn.classList.add('hidden');
+            }
+
+            displayWord(); // Start/Resume the word display
+        }
+
+
+        // Function to go back to the home screen and save state
+        function goBackToHome() {
+             saveCurrentState(); // Save the current game state
+             showHomeScreen();   // Go to the home screen
+        }
+
+
+        // Event listeners
+        startSelectionBtn.addEventListener('click', () => startGame('selection'));
+        startReadWriteBtn.addEventListener('click', () => startGame('read-write'));
+        restartBtn.addEventListener('click', () => {
+             sessionStates = { // Clear all saved states for a full restart
+                easy: { selection: { index: 0, correct: 0, incorrect: 0, incorrectWords: [], shuffledList: [] }, readWrite: { index: 0, correct: 0, incorrect: 0, incorrectWords: [], shuffledList: [] } },
+                medium: { selection: { index: 0, correct: 0, incorrect: 0, incorrectWords: [], shuffledList: [] }, readWrite: { index: 0, correct: 0, incorrect: 0, incorrectWords: [], shuffledList: [] } },
+                hard: { selection: { index: 0, correct: 0, incorrect: 0, incorrectWords: [], shuffledList: [] }, readWrite: { index: 0, correct: 0, incorrect: 0, incorrectWords: [], shuffledList: [] } }
+             };
+             showHomeScreen(); // Go to the home screen after clearing state
+        });
+        playAgainBtn.addEventListener('click', showHomeScreen); // Play Again button also goes to home screen
+
+        // Event listeners for Selection Mode buttons
+        selectionOption1Btn.addEventListener('click', handleSelectionClick);
+        selectionOption2Btn.addEventListener('click', handleSelectionClick);
+         selectionReadBtn.addEventListener('click', () => {
+             // Read the correct word in selection mode
+             if (currentMode === 'selection' && shuffledWordList[currentWordIndex]) {
+                 readWord(shuffledWordList[currentWordIndex]);
+             }
+         });
+         selectionBackBtn.addEventListener('click', goBackToHome); // Back button listener
+
+
+        // Event listeners for Read & Write Mode
+        submitBtn.addEventListener('click', handleSubmit);
+        readBtn.addEventListener('click', () => {
+             // Read the current word in read-write mode
+             if (currentMode === 'read-write' && shuffledWordList[currentWordIndex]) {
+                 readWord(shuffledWordList[currentWordIndex]);
+             }
+        });
+         hintBtn.addEventListener('click', handleHint); // Hint button event listener
+         readWriteBackBtn.addEventListener('click', goBackToHome); // Back button listener
+
+
+        // Allow submitting with Enter key in the input field (Read & Write Mode)
+        spellingInput.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter' && currentMode === 'read-write') {
+                event.preventDefault(); // Prevent default form submission if it were in a form
+                handleSubmit();
+            }
+        });
+
+
+        // Initial setup - show home screen
+        showHomeScreen();
+
+    </script>
+
+</body>
+</html>
+

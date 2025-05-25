@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Read & Complete - Duolingo Practice</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Custom styles for specific elements or overrides */
+    body {
+      font-family: 'Inter', sans-serif; /* Using Inter font as per guidelines */
+    }
+    /* Styles for the input fields within the sentence */
+    input[type="text"] {
+      background-color: #e0f2fe; /* Light blue background for blanks */
+      border: 1px solid #90cdf4; /* Blue border */
+      border-radius: 0.375rem; /* rounded-md */
+      padding: 0.25rem 0.5rem; /* px-2 py-1 */
+      font-size: 1rem; /* text-base */
+      width: 100px; /* Default width, can be adjusted by JS if needed */
+      text-align: center;
+      transition: all 0.2s ease-in-out;
+      outline: none; /* Remove default outline */
+      color: #333; /* Default text color */
+    }
+    input[type="text"]:focus {
+      border-color: #3182ce; /* Darker blue on focus */
+      box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5); /* Focus ring */
+    }
+    /* Feedback styles */
+    .correct {
+      background-color: #d1fae5 !important; /* Light green */
+      border-color: #34d399 !important; /* Green border */
+      color: #065f46 !important; /* Dark green text */
+    }
+    .incorrect {
+      background-color: #fee2e2 !important; /* Light red */
+      border-color: #ef4444 !important; /* Red border */
+      color: #991b1b !important; /* Dark red text */
+    }
+    .sentence-word {
+        display: inline-block;
+        margin: 0 0.25rem; /* Small margin between words */
+        padding: 0.25rem 0;
+        line-height: 1.6;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 text-gray-800 p-4 min-h-screen flex items-center justify-center">
+  <div class="max-w-3xl w-full mx-auto">
+    <div id="home" class="bg-white p-8 rounded-xl shadow-lg text-center">
+      <h1 class="text-4xl font-bold text-blue-800 mb-4">Read & Complete - Practice Test</h1>
+      <p class="text-lg text-gray-600 mb-8">Choose your difficulty level to begin.</p>
+      <div id="difficultyBtns" class="flex flex-col sm:flex-row justify-center gap-4">
+        <button class="btn bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition-all duration-200" onclick="selectLevel('easy')">Easy</button>
+        <button class="btn bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition-all duration-200" onclick="selectLevel('medium')">Medium</button>
+        <button class="btn bg-red-500 hover:bg-red-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition-all duration-200" onclick="selectLevel('hard')">Hard</button>
+      </div>
+    </div>
+
+    <div id="testSection" class="hidden bg-white p-8 rounded-xl shadow-lg">
+      <h2 id="levelTitle" class="text-3xl font-bold text-blue-700 mb-6 text-center"></h2>
+      <div id="testCard" class="card mb-8">
+        </div>
+      <div id="navBtns" class="flex flex-col sm:flex-row justify-center gap-4">
+        <button class="btn bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition-all duration-200" onclick="submitAnswer()">CHECK ANSWERS</button>
+        <button class="btn bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition-all duration-200" onclick="nextQuestion()">NEXT EXERCISE</button>
+        <button class="btn bg-gray-400 hover:bg-gray-500 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition-all duration-200" onclick="goHome()">HOME</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // The data object remains unchanged as per your request
+    const data = {
+      easy: [
+        { sentence: "I usually go to the supermarket on weekends. Today, I put _____ in my cart. I also buy a bag of _____. Then I pay with my _____. After that, I _____ back home.", answers: ["milk", "apples", "money", "walk"] },
+        { sentence: "I usually shop for fruits. Today, I pick up _____ and _____ from the produce section. I put them in the _____. I then pay and _____ home.", answers: ["apples", "bananas", "bag", "walk"] },
+        { sentence: "I want to buy clothes. I try on a new shirt, but it’s too small. Instead, I pick a _____ that fits me. I pay with my _____ and leave the store _____.", answers: ["sweater", "card", "happily"] },
+        { sentence: "I enjoy reading books. Yesterday, I _____ a new novel. It was so interesting that I finished it in one _____.", answers: ["bought", "day"] },
+        { sentence: "She loves to travel. Last summer, she _____ to Paris and visited many famous _____.", answers: ["went", "places"] },
+        { sentence: "He is a great cook. Today, he _____ a delicious dinner for his friends. They all _____ it very much.", answers: ["prepared", "enjoyed"] },
+        { sentence: "I have a pet cat. It _____ on my bed every morning. I always _____ it before I leave for work.", answers: ["sleeps", "feed"] },
+        { sentence: "We are planning a picnic. We need to _____ sandwiches, drinks, and a blanket. I will _____ the sandwiches, and you can bring the drinks.", answers: ["prepare", "bring"] },
+        { sentence: "They are learning to play the guitar. Every evening, they _____ for an hour. They hope to _____ a song at the school concert.", answers: ["practice", "perform"] },
+        { sentence: "I like to watch movies. Last weekend, I _____ a comedy film. It was so funny that I _____ several times.", answers: ["watched", "laughed"] },
+        { sentence: "She is studying for her exams. Every day, she _____ for two hours. She believes that hard work will _____ her success.", answers: ["studies", "bring"] },
+        { sentence: "We are redecorating our house. Yesterday, we _____ the living room. It looks much brighter now.", answers: ["painted"] },
+        { sentence: "He is learning Spanish. He _____ new words every day. He hopes to _____ a conversation with a native speaker soon.", answers: ["learns", "have"] },
+        { sentence: "I enjoy gardening. This morning, I _____ some flowers in the garden. They will bloom in a few _____.", answers: ["planted", "weeks"] },
+        { sentence: "She is a photographer. Last month, she _____ a photo exhibition. Many people _____ her work.", answers: ["held", "appreciated"] },
+        { sentence: "We are going camping. We need to _____ a tent, sleeping bags, and a flashlight. I will _____ the tent, and you can bring the sleeping bags.", answers: ["pack", "bring"] },
+        { sentence: "He is a teacher. Every day, he _____ lessons to his students. They always _____ his classes.", answers: ["gives", "enjoy"] },
+        { sentence: "I like to bake. Last weekend, I _____ a chocolate cake. It was so delicious that I _____ the recipe.", answers: ["baked", "shared"] },
+        { sentence: "She is a dancer. Every week, she _____ in a dance studio. She dreams of _____ on a big stage someday.", answers: ["practices", "performing"] },
+        { sentence: "We are renovating our kitchen. Yesterday, we _____ new cabinets. They look much better than the old ones.", answers: ["installed"] },
+        { sentence: "He is a writer. He _____ short stories in his free time. He hopes to _____ a novel soon.", answers: ["writes", "publish"] },
+        { sentence: "I enjoy hiking. Last weekend, I _____ a mountain trail. The view from the top was absolutely _____.", answers: ["hiked", "breathtaking"] },
+        { sentence: "She is a musician. Every day, she _____ the piano. She dreams of _____ in a concert hall.", answers: ["plays", "performing"] },
+        { sentence: "We are planning a surprise party. We need to _____ decorations, food, and drinks. I will _____ the decorations, and you can bring the food.", answers: ["prepare", "bring"] },
+        { sentence: "He is a photographer. Last month, he _____ a photo of a rare bird. It was published in a wildlife _____.", answers: ["took", "magazine"] },
+        { sentence: "I like to swim. Every morning, I _____ laps in the pool. It helps me _____ fit and healthy.", answers: ["swim", "stay"] },
+        { sentence: "She is learning French. She _____ new vocabulary every day. She hopes to _____ a conversation with a native speaker soon.", answers: ["learns", "have"] },
+        { sentence: "We are going to the beach. We need to _____ sunscreen, towels, and snacks. I will _____ the sunscreen, and you can bring the towels.", answers: ["pack", "bring"] },
+        { sentence: "He is a chef. Every day, he _____ new recipes. He dreams of _____ his own restaurant someday.", answers: ["creates", "opening"] },
+        { sentence: "I enjoy reading. Last week, I _____ a mystery novel. It was so exciting that I _____ it in two days.", answers: ["read", "finished"] },
+        { sentence: "She is a scientist. She _____ experiments in her lab. She hopes to _____ a breakthrough discovery.", answers: ["conducts", "make"] },
+        { sentence: "We are organizing a charity event. We need to _____ volunteers, food, and drinks. I will _____ the volunteers, and you can bring the food.", answers: ["recruit", "bring"] },
+        { sentence: "He is a traveler. Last year, he _____ to Japan and explored many cities. He hopes to _____ more countries this year.", answers: ["traveled", "visit"] },
+        { sentence: "I like to draw. Every weekend, I _____ sketches in my notebook. I hope to _____ an art exhibition someday.", answers: ["make", "host"] },
+        { sentence: "She is a teacher. Every day, she _____ lessons to her students. They always _____ her classes.", answers: ["delivers", "enjoy"] },
+        { sentence: "We are redecorating our living room. Yesterday, we _____ new curtains. They match the furniture perfectly.", answers: ["hung"] },
+      ],
+      medium: [
+        { sentence: "I plan to cook dinner tonight. I need to buy _____, _____, and _____ from the supermarket. However, it is raining outside, so I _____ by car. I arrive _____ minutes later and start cooking.", answers: ["carrots", "onions", "rice", "drive", "fifteen"] },
+        { sentence: "During the meeting, I took _____ notes and _____ the main points. Later, I _____ the notes to my colleagues via email.", answers: ["detailed", "summarized", "shared"] },
+        { sentence: "She _____ the book on the shelf and _____ it to her friend. They _____ the story together over tea.", answers: ["placed", "lent", "discussed"] },
+        { sentence: "The scientist conducted a series of experiments to test the _____ of the new drug. The results were _____, showing a significant improvement in patient outcomes.", answers: ["efficacy", "promising"] },
+        { sentence: "The artist’s latest exhibition explores the _____ between technology and human emotion. It challenges viewers to consider how digital media _____ our perceptions.", answers: ["intersection", "influence"] },
+        { sentence: "The novel’s protagonist embarks on a journey to _____ the mysteries of the ancient civilization. Along the way, she _____ unexpected challenges that test her resolve.", answers: ["uncover", "encounters"] },
+        { sentence: "The company’s CEO emphasized the importance of _____ in achieving long-term success. He believes that fostering a culture of _____ can drive innovation.", answers: ["collaboration", "creativity"] },
+        { sentence: "The environmental study revealed a _____ in biodiversity across the region. Conservation efforts are _____ to reverse the negative trends and protect endangered species.", answers: ["decline", "crucial"] },
+        { sentence: "The historian’s research sheds light on the _____ of ancient trade routes. Understanding these pathways _____ insights into cultural exchanges and economic development.", answers: ["network", "provides"] },
+        { sentence: "The architect’s design integrates _____ elements with modern aesthetics. The building’s _____ features blend seamlessly with its natural surroundings.", answers: ["organic", "innovative"] },
+        { sentence: "The documentary filmmaker captures the _____ of rural communities facing economic hardships. The film _____ the resilience and resourcefulness of its subjects.", answers: ["struggles", "highlights"] },
+        { sentence: "The philosopher’s lecture delved into the _____ of consciousness. He proposed that understanding the mind’s nature _____ ethical considerations in artificial intelligence.", answers: ["nature", "raises"] },
+        { sentence: "The chef’s culinary techniques _____ traditional recipes with contemporary flavors. His approach _____ a fusion of cultural influences, creating unique dishes.", answers: ["reinterpret", "celebrates"] },
+        { sentence: "The environmental policy aims to _____ carbon emissions and promote sustainable practices. It _____ businesses to adopt green technologies and reduce their ecological footprint.", answers: ["reduce", "encourages"] },
+        { sentence: "The author’s writing style is characterized by _____ prose and vivid imagery. Her narratives _____ readers into immersive worlds filled with emotion.", answers: ["elegant", "transport"] },
+        { sentence: "The technological startup focuses on developing _____ solutions for urban transportation. Their innovations _____ traffic congestion and improve public transit efficiency.", answers: ["smart", "alleviate"] },
+        { sentence: "The medical conference featured discussions on the _____ of personalized medicine. Experts _____ the potential benefits and ethical dilemmas associated with genetic testing.", answers: ["advancements", "debated"] },
+        { sentence: "The sociologist’s study examines the _____ of social media on interpersonal relationships. Findings suggest that online interactions _____ face-to-face communication skills.", answers: ["impact", "affect"] },
+        { sentence: "The conservation project aims to _____ endangered species through habitat restoration. Volunteers _____ efforts to plant native vegetation and monitor wildlife populations.", answers: ["protect", "contribute"] },
+        { sentence: "The economist analyzed the _____ of global trade policies on emerging markets. His findings _____ policymakers to reconsider tariffs and trade agreements.", answers: ["effects", "prompted"] },
+        { sentence: "The linguist’s research explores the _____ of language acquisition in early childhood. Studies indicate that exposure to multiple languages _____ cognitive development.", answers: ["process", "enhances"] },
+        { sentence: "The educator implemented _____ teaching methods to engage students in active learning. These strategies _____ critical thinking and problem-solving skills.", answers: ["interactive", "foster"] },
+        { sentence: "The environmental activist organized a campaign to _____ plastic waste in the community. Local businesses _____ to reduce packaging and promote recycling initiatives.", answers: ["reduce", "agreed"] },
+        { sentence: "The psychologist conducted a study on the _____ of stress management techniques. Results showed that mindfulness practices _____ anxiety levels among participants.", answers: ["effectiveness", "lowered"] },
+        { sentence: "The architect’s blueprint incorporates _____ designs to maximize energy efficiency. The building’s layout _____ natural light and ventilation, reducing energy consumption.", answers: ["sustainable", "optimizes"] },
+        { sentence: "The journalist’s investigative report _____ corruption within the local government. Her findings _____ public outcry and calls for accountability.", answers: ["exposed", "sparked"] },
+        { sentence: "The biologist’s fieldwork focused on the _____ of migratory bird patterns. Data collected over several years _____ insights into climate change effects on species.", answers: ["study", "provided"] },
+        { sentence: "The entrepreneur launched a startup that offers _____ services for small businesses. Their platform _____ entrepreneurs to access affordable marketing tools.", answers: ["digital", "enables"] },
+        { sentence: "The historian’s lecture highlighted the _____ of ancient civilizations in shaping modern societies. She emphasized how cultural exchanges _____ technological advancements.", answers: ["contribution", "accelerated"] },
+        { sentence: "The software developer introduced an _____ feature to enhance user experience. Feedback from beta testers _____ the effectiveness of the new tool.", answers: ["innovative", "validated"] },
+        { sentence: "The nutritionist’s seminar discussed the _____ of balanced diets in maintaining health. Attendees _____ the importance of portion control and nutrient diversity.", answers: ["benefits", "recognized"] },
+        { sentence: "The urban planner proposed a _____ to revitalize the downtown area. The plan includes green spaces and pedestrian-friendly pathways to _____ community engagement.", answers: ["strategy", "encourage"] },
+        { sentence: "The marine biologist’s research focuses on the _____ of coral reef ecosystems. Her studies _____ the urgent need for conservation efforts to protect marine life.", answers: ["health", "highlighted"] },
+        { sentence: "The physicist’s experiment tested the _____ of quantum entanglement. Results _____ the theory’s validity and opened avenues for future research.", answers: ["principle", "confirmed"] },
+        { sentence: "The artist’s mural depicts the _____ of cultural diversity in urban settings. The vibrant colors and symbols _____ unity among different communities.", answers: ["celebration", "symbolize"] },
+        { sentence: "The mathematician’s theorem provides a _____ for solving complex equations. Its application _____ advancements in computational algorithms.", answers: ["framework", "facilitated"] },
+        { sentence: "The linguist’s analysis focused on the _____ of dialects within a language family. Her findings _____ the rich linguistic heritage of the region.", answers: ["variation", "preserved"] },
+        { sentence: "The economist’s report examined the _____ of inflation on consumer behavior. It _____ policymakers to consider measures to stabilize prices.", answers: ["impact", "advised"] },
+        { sentence: "The sociologist’s survey assessed the _____ of community programs on youth development. Results _____ the positive influence of mentorship and education.", answers: ["effectiveness", "demonstrated"] },
+      ],
+      hard: [
+        { sentence: "I debated whether to _____ a laptop or a tablet. I eventually decided to _____ the one with better specs. After choosing, I negotiated with the salesperson, and we settled on a _____ price. It was a _____ of sorts since we were friends.", answers: ["buy", "purchase", "fair", "transaction"] },
+        { sentence: "The professor _____ the research findings in the journal article, _____ the methodology and _____ the results with statistical evidence.", answers: ["outlined", "explained", "supported"] },
+        { sentence: "The company _____ a new policy to _____ employee productivity. They _____ the policy to all departments during the annual meeting.", answers: ["introduced", "enhance", "communicated"] },
+        { sentence: "The philosopher's treatise delves into the _____ of human consciousness, exploring its intricate layers and _____ nature.", answers: ["complexity", "elusive"] },
+        { sentence: "The scientist's groundbreaking research challenges the _____ theories of quantum mechanics, proposing a _____ framework for understanding particle behavior.", answers: ["established", "novel"] },
+        { sentence: "The linguist's analysis of ancient texts reveals the _____ of language evolution, highlighting the _____ influences of cultural exchange.", answers: ["nuances", "profound"] },
+        { sentence: "The artist's abstract painting captures the _____ of emotion, using bold strokes and _____ colors to convey a sense of turmoil.", answers: ["intensity", "vivid"] },
+        { sentence: "The economist's model predicts a _____ in global markets due to unforeseen geopolitical events, emphasizing the _____ of economic forecasting.", answers: ["downturn", "uncertainty"] },
+        { sentence: "The historian's account offers a _____ perspective on the revolution, shedding light on the _____ motivations behind the uprising.", answers: ["multifaceted", "underlying"] },
+        { sentence: "The architect's design incorporates _____ elements, blending traditional aesthetics with _____ technologies to create a sustainable structure.", answers: ["timeless", "innovative"] },
+        { sentence: "The mathematician's theorem provides a _____ for solving complex equations, offering a _____ approach to previously unsolvable problems.", answers: ["framework", "systematic"] },
+        { sentence: "The biologist's study uncovers the _____ of genetic mutations, revealing their _____ impact on species adaptation.", answers: ["mechanisms", "significant"] },
+        { sentence: "The physicist's experiment challenges the _____ principles of classical mechanics, suggesting a _____ interpretation of quantum phenomena.", answers: ["fundamental", "radical"] },
+        { sentence: "The philosopher's discourse examines the _____ of ethical dilemmas, proposing a _____ methodology for moral reasoning.", answers: ["complexity", "rigorous"] },
+        { sentence: "The sociologist's research highlights the _____ of social structures, illustrating their _____ effects on individual behavior.", answers: ["dynamics", "profound"] },
+        { sentence: "The psychologist's study explores the _____ of cognitive biases, revealing their _____ influence on decision-making processes.", answers: ["origins", "subtle"] },
+        { sentence: "The linguist's theory posits a _____ relationship between language and thought, suggesting a _____ connection between the two.", answers: ["intricate", "bi-directional"] },
+        { sentence: "The economist's analysis predicts a _____ in inflation rates, attributing it to _____ fiscal policies.", answers: ["decline", "restrictive"] },
+        { sentence: "The historian's narrative provides a _____ account of the empire's rise and fall, emphasizing the _____ factors that contributed to its demise.", answers: ["comprehensive", "multifactorial"] },
+        { sentence: "The artist's sculpture embodies the _____ of human form, capturing its _____ essence through minimalist design.", answers: ["elegance", "pure"] },
+        { sentence: "The architect's blueprint outlines a _____ vision for urban development, integrating _____ elements to promote environmental sustainability.", answers: ["holistic", "green"] },
+        { sentence: "The mathematician's proof offers a _____ solution to a longstanding problem, presenting a _____ argument that resolves the paradox.", answers: ["elegant", "convincing"] },
+        { sentence: "The biologist's observation reveals the _____ of species interaction, highlighting the _____ of ecological balance.", answers: ["interdependence", "fragility"] },
+        { sentence: "The physicist's theory introduces a _____ paradigm in understanding cosmic phenomena, challenging _____ assumptions about the universe.", answers: ["revolutionary", "long-held"] },
+        { sentence: "The philosopher's essay delves into the _____ of existence, questioning the _____ of human perception.", answers: ["nature", "limitations"] },
+        { sentence: "The sociologist's study examines the _____ of cultural norms, uncovering their _____ role in shaping societal behavior.", answers: ["evolution", "pivotal"] },
+        { sentence: "The psychologist's research investigates the _____ of emotional intelligence, demonstrating its _____ impact on interpersonal relationships.", answers: ["development", "significant"] },
+        { sentence: "The linguist's fieldwork documents the _____ of endangered languages, emphasizing the _____ of linguistic diversity.", answers: ["extinction", "importance"] },
+        { sentence: "The economist's forecast anticipates a _____ in unemployment rates, attributing it to _____ market conditions.", answers: ["rise", "adverse"] },
+        { sentence: "The historian's analysis traces the _____ of ancient civilizations, highlighting their _____ contributions to modern society.", answers: ["legacy", "lasting"] },
+        { sentence: "The artist's installation challenges the _____ of perception, inviting viewers to question the _____ of reality.", answers: ["boundaries", "nature"] },
+        { sentence: "The architect's design incorporates _____ technologies, aiming to _____ energy consumption in urban buildings.", answers: ["smart", "reduce"] },
+        { sentence: "The mathematician's conjecture presents a _____ hypothesis, proposing a _____ solution to a complex problem.", answers: ["bold", "novel"] },
+        { sentence: "The biologist's experiment tests the _____ of a new drug, assessing its _____ effects on cellular processes.", answers: ["efficacy", "potential"] },
+        { sentence: "The physicist's model predicts the _____ of a black hole, suggesting a _____ mechanism for its formation.", answers: ["behavior", "unique"] },
+        { sentence: "The philosopher's treatise explores the _____ of free will, questioning the _____ of human autonomy.", answers: ["concept", "extent"] },
+        { sentence: "The sociologist's survey assesses the _____ of public opinion, analyzing its _____ influence on policy decisions.", answers: ["validity", "significant"] },
+        { sentence: "The psychologist's study examines the _____ of cognitive development, identifying _____ factors that influence learning.", answers: ["stages", "key"] },
+        { sentence: "The linguist's research investigates the _____ of language acquisition, highlighting the _____ of early exposure.", answers: ["process", "importance"] },
+        { sentence: "The economist's analysis evaluates the _____ of trade agreements, considering their _____ impact on national economies.", answers: ["effectiveness", "long-term"] },
+        { sentence: "The historian's account provides a _____ perspective on the revolution, emphasizing the _____ causes behind the conflict.", answers: ["balanced", "underlying"] },
+        { sentence: "The artist's work reflects the _____ of human experience, capturing its _____ through abstract forms.", answers: ["complexity", "essence"] },
+        { sentence: "The architect's vision reimagines urban spaces, proposing _____ solutions to _____ challenges.", answers: ["innovative", "modern"] },
+        { sentence: "The mathematician's theorem introduces a _____ approach to problem-solving, offering a _____ method for complex calculations.", answers: ["systematic", "structured"] },
+      ]
+    };
+
+    let level = '';
+    let index = 0;
+    // Store shuffled questions for the current level
+    let shuffledQuestions = [];
+
+    /**
+     * Shuffles an array in place using the Fisher-Yates (Knuth) algorithm.
+     * @param {Array} array The array to shuffle.
+     */
+    function shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]]; // Swap elements
+      }
+    }
+
+    function selectLevel(selectedLevel) {
+      level = selectedLevel;
+      index = 0;
+      // Shuffle the questions for the selected level
+      shuffledQuestions = [...data[level]]; // Create a shallow copy to avoid modifying original data
+      shuffleArray(shuffledQuestions);
+
+      document.getElementById('home').classList.add('hidden');
+      document.getElementById('testSection').classList.remove('hidden');
+      document.getElementById('levelTitle').innerText = level.toUpperCase() + ' TEST';
+      renderQuestion();
+    }
+
+    function renderQuestion() {
+      const container = document.getElementById('testCard');
+      container.innerHTML = ''; // Clear previous content
+      // Use shuffledQuestions instead of data[level]
+      const q = shuffledQuestions[index];
+      
+      const sentenceDisplay = document.createElement('div');
+      sentenceDisplay.className = 'text-xl leading-relaxed text-gray-700 flex flex-wrap justify-center mb-8';
+
+      const wordsAndBlanks = q.sentence.split(/(\s+|_*\s*_{5}\s*_*\s*)/).filter(Boolean);
+
+      let inputIndex = 0;
+      wordsAndBlanks.forEach(part => {
+        if (part.includes('_____')) {
+          const input = document.createElement('input');
+          input.type = 'text';
+          input.id = `input${inputIndex}`;
+          input.className = 'sentence-word';
+          input.placeholder = '_____';
+
+          // Dynamic hint: approximately 1/3 of the word length, min 1, max 4 characters
+          const correctAnswer = q.answers[inputIndex];
+          let hintLength = Math.max(1, Math.floor(correctAnswer.length / 3)); // Calculate 1/3, ensure at least 1 char
+          hintLength = Math.min(hintLength, 4); // Cap at a maximum of 4 characters
+
+          const hint = correctAnswer.substring(0, hintLength);
+          input.value = hint;
+
+          sentenceDisplay.appendChild(input);
+          inputIndex++;
+        } else {
+          const span = document.createElement('span');
+          span.className = 'sentence-word';
+          span.textContent = part;
+          sentenceDisplay.appendChild(span);
+        }
+      });
+      container.appendChild(sentenceDisplay);
+    }
+
+    function submitAnswer() {
+      // Use shuffledQuestions for checking answers
+      const q = shuffledQuestions[index];
+      q.answers.forEach((ans, i) => {
+        const input = document.getElementById(`input${i}`);
+        if (input) {
+          if (input.value.trim().toLowerCase() === ans.toLowerCase()) {
+            input.classList.remove('incorrect');
+            input.classList.add('correct');
+          } else {
+            input.classList.remove('correct');
+            input.classList.add('incorrect');
+            input.value = `${input.value} → ${ans}`;
+          }
+        }
+      });
+    }
+
+    function nextQuestion() {
+      // Use shuffledQuestions length for looping
+      index = (index + 1) % shuffledQuestions.length;
+      renderQuestion();
+    }
+
+    function goHome() {
+      document.getElementById('testSection').classList.add('hidden');
+      document.getElementById('home').classList.remove('hidden');
+    }
+
+    window.onload = () => {
+      document.getElementById('testSection').classList.add('hidden');
+    };
+  </script>
+</body>
+</html>
+

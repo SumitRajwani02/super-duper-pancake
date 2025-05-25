@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Read & Speak Practice - Duolingo Style</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --main-bg: #eef3fb;
+      --card-bg: #fff;
+      --primary: #6c8cff;
+      --accent: #8f9ff5;
+      --good: #56d68c;
+      --bad: #ff6565;
+      --text: #2a3142;
+      --muted: #8aa3c2;
+      --shadow: 0 6px 32px 0 rgba(50,80,150,0.10);
+      --radius: 18px;
+      --transition: all 0.3s cubic-bezier(.4,0,.2,1);
+    }
+    html, body {
+      background: var(--main-bg);
+      color: var(--text);
+      font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0; padding: 0;
+      min-height: 100vh;
+      width: 100vw;
+      height: 100vh;
+      overflow-x: hidden;
+      transition: var(--transition);
+    }
+    #container {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 34px 38px 28px 38px;
+      max-width: 480px;
+      width: 98vw;
+      box-shadow: var(--shadow);
+      margin: 48px auto 0 auto;
+      text-align: center;
+      position: relative;
+      transition: var(--transition);
+      z-index: 2;
+    }
+    h1 {
+      margin-bottom: 18px;
+      font-weight: 700;
+      font-size: 2.2rem;
+      letter-spacing: 1.1px;
+      color: var(--primary);
+      background: linear-gradient(90deg, #b2bfff 0%, #6c8cff 100%);
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    label, select, button, #feedback, #spokenText {
+      font-size: 1.07rem;
+    }
+    select, button {
+      padding: 13px 20px;
+      margin: 8px 5px;
+      border-radius: 9px;
+      border: none;
+      font-weight: 600;
+      color: #fff;
+      background: var(--primary);
+      box-shadow: 0 2px 10px 0 rgba(100,120,220,0.06);
+      cursor: pointer;
+      transition: var(--transition);
+      outline: none;
+      letter-spacing: 0.01em;
+    }
+    select {
+      color: var(--text);
+      background: #f6f8ff;
+      border: 1.5px solid var(--accent);
+      box-shadow: none;
+      padding-right: 24px;
+      font-weight: 500;
+    }
+    select:focus {
+      border-color: var(--primary);
+    }
+    button:hover, button:focus-visible {
+      background: #5286fa;
+      transform: translateY(-2px) scale(1.04);
+    }
+    #taskText {
+      font-size: 1.23rem;
+      margin: 28px 0 16px 0;
+      min-height: 55px;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: 0.02em;
+      background: #f6f8ff;
+      border-radius: 10px;
+      padding: 16px 6px;
+      transition: var(--transition);
+      box-shadow: 0 0px 12px 0 rgba(180,200,255,0.07);
+    }
+    #spokenText, #feedback {
+      margin: 12px 0 5px 0;
+      min-height: 28px;
+      font-size: 1.05rem;
+      color: var(--muted);
+      transition: var(--transition);
+    }
+    #feedback {
+      font-weight: 700;
+      color: var(--primary);
+      min-height: 32px;
+      margin-bottom: 0;
+      margin-top: 10px;
+      transition: var(--transition);
+    }
+    #controls {
+      margin-bottom: 8px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      align-items: center;
+    }
+    #controls button {
+      min-width: 120px;
+      margin: 8px 2px;
+      font-size: 1rem;
+      background: var(--primary);
+    }
+    #restartBtn {
+      background: var(--bad);
+      font-size: 0.95rem;
+      margin-top: 14px;
+    }
+    #homeBtn {
+      background: #e5e9f2;
+      color: #2a3142 !important;
+      font-weight: 700;
+      border: 1.5px solid var(--primary);
+      margin-left: 6px;
+      margin-top: 0;
+      text-shadow: none;
+      display: inline-block;
+    }
+    #homeBtn:hover {
+      background: var(--primary);
+      color: #fff !important;
+    }
+    #stopBtn {
+      background: #ff9800;
+      color: #fff;
+      font-weight: 700;
+      border: none;
+      margin-left: 6px;
+      margin-top: 0;
+      border-radius: 9px;
+      padding: 13px 20px;
+      min-width: 120px;
+      font-size: 1rem;
+      display: none;
+    }
+    #stopBtn.active {
+      display: inline-block;
+    }
+    .mic-visualizer {
+      width: 32px;
+      height: 32px;
+      margin: 0 auto 8px auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .mic-circle {
+      width: 18px;
+      height: 18px;
+      background: var(--primary);
+      border-radius: 50%;
+      animation: pulse 1.1s infinite cubic-bezier(.4,0,.2,1);
+      border: 2px solid #fff;
+      box-shadow: 0 0 8px 2px #c4d7fa;
+    }
+    .mic-circle.listening {
+      background: var(--good);
+      box-shadow: 0 0 16px 4px #c4fae0;
+    }
+    @keyframes pulse {
+      0% { transform: scale(1);}
+      60% { transform: scale(1.18);}
+      100% { transform: scale(1);}
+    }
+    #notification {
+      position: absolute;
+      top: 14px;
+      right: 18px;
+      left: 18px;
+      padding: 10px 18px;
+      border-radius: 11px;
+      font-weight: 700;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.43s var(--transition);
+      user-select: none;
+      color: white;
+      font-size: 1.1rem;
+      z-index: 10;
+    }
+    #notification.correct {
+      background: var(--good);
+    }
+    #notification.incorrect {
+      background: var(--bad);
+    }
+    #notification.show {
+      opacity: 1;
+      pointer-events: auto;
+      animation: popIn 0.4s;
+    }
+    @keyframes popIn {
+      0% {transform: translateY(-18px) scale(.92);}
+      80% {transform: translateY(2px) scale(1.04);}
+      100% {transform: translateY(0) scale(1);}
+    }
+    .confidence-bar {
+      width: 100%;
+      height: 6px;
+      background: #e9eefa;
+      border-radius: 7px;
+      margin: 3px 0 9px 0;
+      overflow: hidden;
+      position: relative;
+    }
+    .confidence-bar-inner {
+      height: 100%;
+      transition: width .32s cubic-bezier(.4,0,.2,1);
+      background: linear-gradient(90deg, #56d68c 0%, #ffcc70 100%);
+      border-radius: 7px;
+    }
+    /* Hide debug log completely */
+    #debug-container {
+      display: none !important;
+    }
+    body {
+      padding-bottom: 0 !important;
+    }
+    @media (max-width: 600px) {
+      #container {
+        max-width: 99vw;
+        width: 99vw;
+        padding: 19px 3vw 13px 3vw;
+        margin: 19px auto 0 auto;
+      }
+      #taskText { font-size: 1.1rem; min-height: 44px; }
+      #controls button, select, #restartBtn {
+        font-size: 0.99rem;
+        padding: 10px 12px;
+      }
+      h1 { font-size: 1.35rem; }
+    }
+  </style>
+</head>
+<body>
+<div id="container">
+  <div id="notification"></div>
+  <div id="home">
+    <h1>Read &amp; Speak Practice</h1>
+    <label for="difficulty" style="font-weight:600;">Choose difficulty level:</label><br />
+    <select id="difficulty">
+      <option value="easy" selected>Easy</option>
+      <option value="medium">Medium</option>
+      <option value="hard">Hard</option>
+    </select><br />
+    <button id="startBtn">Start Read & Speak</button>
+    <br />
+    <button id="restartBtn">Restart</button>
+  </div>
+  <div id="practice" style="display:none;">
+    <h2 style="font-size:1.25rem;color:var(--primary);margin-bottom:10px;">Speak the sentence below:</h2>
+    <div id="taskText" aria-live="polite">Loading...</div>
+    <div id="controls">
+      <button id="readBtn" title="Listen to the sentence">Listen</button>
+      <button id="recordBtn" title="Speak now">Record</button>
+      <button id="stopBtn" title="Manually stop listening">Stop</button>
+      <button id="submitBtn" title="Check your answer">Submit</button>
+      <button id="nextBtn" title="Next question">Next</button>
+      <button id="homeBtn" title="Back to home">Back To Home</button>
+    </div>
+    <div class="mic-visualizer"><div class="mic-circle" id="micCircle"></div></div>
+    <div id="confidence" style="width:94%;margin:0 auto 2px auto;"></div>
+    <div id="spokenText"></div>
+    <div id="feedback"></div>
+  </div>
+</div>
+<div id="debug-container"><div id="debug"></div></div>
+<script>
+  // DATA
+  const data = {
+    easy: [
+      "I like apples.","She has a cat.","We go to school.","He is my friend.","It is sunny today.","They play soccer.","The dog is barking.","I drink milk.","She reads books.","We eat lunch.","The sky is blue.","I am happy.","He runs fast.","They listen to music.","She sings well.","We watch TV.","The baby is sleeping.","I write letters.","He drives a car.","They dance together.","She smiles a lot.","We like pizza.","The grass is green.","I sleep early.","He studies math.","They travel abroad.","She paints pictures.","We play games.","The fish swims.","I drink coffee.","He reads books.","They cook dinner.","I love music.","She works hard.","We walk to school.","The bird is flying.","He plays guitar.","They swim in the pool.","She drinks tea.","We read books.","The sun is shining.","I have a red car.","He likes chocolate.","They study English.","She cooks dinner.","We are friends.","It is raining.","The cat is black.","I am tired.","He is tall.","They are happy.","She is kind."
+    ],
+    medium: [
+      "He is training for the marathon.","The bus arrives at seven thirty.","She loves historical novels.","They visited the museum last Saturday.","I have been learning English for two years.","Children play in the garden.","We went to the beach during vacation.","She bought a new laptop yesterday.","They will arrive at the airport soon.","He often jogs in the morning.","The weather forecast says it will rain.","I enjoyed the movie last night.","She studies medicine at university.","They live near the city center.","He fixed the broken chair quickly.","We plan a trip to Europe next month.","She writes emails daily for work.","They have three dogs and two cats.","He reads newspapers to stay informed.","The teacher explained the lesson clearly.","I like classical music.","She decorated the house for the party.","They play basketball every weekend.","He learned to cook Italian food recently.","We attended the concert last Friday.","She drives to work every morning.","They visited several museums on their trip.","He enjoys swimming in the lake.","I need to finish my homework tonight.","She teaches English to young children.","They are building a new library in town.","He won the chess tournament last year.","We celebrated our anniversary yesterday.","She practiced piano for two hours.","They traveled by train across the country.","He works as a software developer.","I am saving money for a new phone.","She speaks three languages fluently.","They organized a charity event.","He loves watching documentaries.","We went hiking in the mountains.","She studied art in college.","They enjoy cooking together.","He is repairing his bicycle.","I attended a workshop last weekend.","She reads novels before sleeping.","They often visit their grandparents.","He learned to drive a car.","We bought tickets for the theater.","She is planning to start a business."
+    ],
+    hard: [
+      "Despite the rain, the concert continued without interruption.","The scientific community widely accepted the new theory after extensive research.","Economic policies must adapt swiftly to global market changes.","She delivered a compelling argument during the international conference.","The complexities of quantum physics challenge even the brightest minds.","Sustainable development requires a balance between growth and environmental care.","He meticulously documented the experiment’s results in the lab notebook.","The government implemented strict regulations to control pollution levels.","Innovations in technology have transformed communication worldwide.","Her eloquent speech inspired many to take action against injustice.","The book explores themes of identity, culture, and belonging.","Climate change poses significant risks to biodiversity and ecosystems.","They embarked on a mission to provide aid to remote communities.","The legal framework supports the protection of intellectual property rights.","Advanced mathematics plays a crucial role in computer science algorithms.","The debate highlighted contrasting perspectives on economic reform.","Philosophical inquiries into ethics have shaped modern moral thought.","His profound knowledge of history impressed the academic panel.","Renewable energy sources are vital for a sustainable future.","The architectural design blends tradition with modernity seamlessly.","Globalization affects cultural diversity in complex ways.","The medical breakthrough offers hope for patients with rare diseases.","Her linguistic skills facilitated communication across different cultures.","The environmental impact assessment revealed several critical issues.","Technological advancements demand continuous learning and adaptation.","The novel's intricate plot challenges readers’ expectations.","International relations require diplomacy and strategic negotiation.","The researcher published groundbreaking findings in the journal.","Societal changes influence educational policies and practices.","The philosophical treatise addresses questions about existence and reality.","Efficient resource management is essential for economic stability.","The art exhibition showcased contemporary and classical works.","Urban planning must consider sustainability and population growth.","The documentary sheds light on the consequences of deforestation.","Artificial intelligence raises ethical and practical concerns.","The historian uncovered new evidence about ancient civilizations.","Public health initiatives aim to reduce chronic diseases.","The legal case set a precedent for future rulings.","Cultural heritage preservation requires community involvement.","The physicist explained complex concepts in an accessible way.","Renewable energy adoption is accelerating globally.","The film explores psychological themes through surreal storytelling.","The symposium gathered experts from diverse fields.","Economic inequality remains a major challenge worldwide.","The linguistic analysis revealed patterns in language evolution.","The project integrates technology with environmental conservation.","Cross-cultural communication skills are increasingly important.","The artist’s innovative techniques revolutionized the medium."
+    ]
+  };
+
+  let usedIndices = { easy: [], medium: [], hard: [] };
+  let currentIndex = null;
+  let currentLevel = null;
+
+  const home = document.getElementById('home');
+  const practice = document.getElementById('practice');
+  const taskText = document.getElementById('taskText');
+  const spokenText = document.getElementById('spokenText');
+  const feedback = document.getElementById('feedback');
+  const difficultySelect = document.getElementById('difficulty');
+  const startBtn = document.getElementById('startBtn');
+  const restartBtn = document.getElementById('restartBtn');
+  const readBtn = document.getElementById('readBtn');
+  const recordBtn = document.getElementById('recordBtn');
+  const stopBtn = document.getElementById('stopBtn');
+  const submitBtn = document.getElementById('submitBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const homeBtn = document.getElementById('homeBtn');
+  const notification = document.getElementById('notification');
+  const micCircle = document.getElementById('micCircle');
+  const confidenceDiv = document.getElementById('confidence');
+
+  let recognition;
+  let supportsSpeech = false;
+
+  // Only set up recognition if available, but always allow UI to start test
+  if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    recognition = new SpeechRecognition();
+    recognition.lang = 'en-US';
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 3;
+    supportsSpeech = true;
+  }
+
+  let recordedTranscript = '';
+  let recordedConfidence = 0;
+  let lastRecognitionHadResult = false;
+  let recognitionTimeoutId = null;
+
+  // Hidden logDebug, does nothing
+  function logDebug(msg) {}
+
+  function showNotification(type, msg) {
+    notification.textContent = msg || (type === 'correct' ? 'Correct!' : 'Incorrect!');
+    notification.classList.remove('correct', 'incorrect');
+    notification.classList.add(type);
+    notification.classList.add('show');
+    setTimeout(() => notification.classList.remove('show'), 1100);
+  }
+
+  function getRandomIndex(level) {
+    const len = data[level].length;
+    if (usedIndices[level].length === len) usedIndices[level] = [];
+    let index;
+    do {
+      index = Math.floor(Math.random() * len);
+    } while (usedIndices[level].includes(index));
+    usedIndices[level].push(index);
+    return index;
+  }
+
+  function loadNextTask() {
+    currentIndex = getRandomIndex(currentLevel);
+    taskText.textContent = data[currentLevel][currentIndex];
+    spokenText.textContent = '';
+    feedback.textContent = '';
+    recordedTranscript = '';
+    recordedConfidence = 0;
+    confidenceDiv.innerHTML = '';
+    micCircle.classList.remove('listening');
+  }
+
+  function updateConfidenceBar(confidence) {
+    confidenceDiv.innerHTML = '';
+    if (typeof confidence === 'number' && confidence > 0) {
+      const percent = Math.round(confidence * 100);
+      const bar = document.createElement('div');
+      bar.className = 'confidence-bar';
+      const inner = document.createElement('div');
+      inner.className = 'confidence-bar-inner';
+      inner.style.width = percent + '%';
+      bar.appendChild(inner);
+      confidenceDiv.appendChild(bar);
+      const label = document.createElement('div');
+      label.style.fontSize = '0.95rem';
+      label.style.color = '#8aa3c2';
+      label.style.marginTop = '-2px';
+      label.textContent = percent < 70 ? `Low confidence (${percent}%)` : `Confidence: ${percent}%`;
+      confidenceDiv.appendChild(label);
+    }
+  }
+
+  startBtn.onclick = () => {
+    currentLevel = difficultySelect.value;
+    usedIndices = { easy: [], medium: [], hard: [] };
+    home.style.display = 'none';
+    practice.style.display = 'block';
+    loadNextTask();
+  };
+
+  restartBtn.onclick = () => {
+    if (!currentLevel) return showNotification('incorrect', "Start a test first.");
+    usedIndices = { easy: [], medium: [], hard: [] };
+    loadNextTask();
+    feedback.textContent = '';
+    spokenText.textContent = '';
+    confidenceDiv.innerHTML = '';
+  };
+
+  homeBtn.onclick = () => {
+    practice.style.display = 'none';
+    home.style.display = 'block';
+    feedback.textContent = '';
+    spokenText.textContent = '';
+    recordedTranscript = '';
+    recordedConfidence = 0;
+    confidenceDiv.innerHTML = '';
+    micCircle.classList.remove('listening');
+  };
+
+  readBtn.onclick = () => {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      const utter = new SpeechSynthesisUtterance(taskText.textContent);
+      utter.lang = 'en-US';
+      utter.rate = 1;
+      utter.pitch = 1;
+      utter.volume = 0.95;
+      window.speechSynthesis.speak(utter);
+    } else {
+      showNotification('incorrect', "Speech Synthesis not supported in your browser.");
+    }
+  };
+
+  recordBtn.onclick = () => {
+    if (!supportsSpeech) {
+      showNotification('incorrect', "Speech Recognition API not supported in your browser.");
+      return;
+    }
+    feedback.textContent = 'Listening...';
+    spokenText.textContent = '';
+    confidenceDiv.innerHTML = '';
+    micCircle.classList.add('listening');
+    recordedTranscript = '';
+    recordedConfidence = 0;
+    lastRecognitionHadResult = false;
+
+    recognition.start();
+    stopBtn.classList.add('active');
+    logDebug('Recognition started...');
+    if (recognitionTimeoutId) clearTimeout(recognitionTimeoutId);
+    recognitionTimeoutId = setTimeout(() => {
+      try { recognition.stop(); logDebug('Recognition forcibly stopped by timeout.'); } catch(e){}
+    }, 6000); // 6 seconds max listening
+  };
+
+  stopBtn.onclick = () => {
+    try {
+      if (supportsSpeech) {
+        recognition.stop(); logDebug('Recognition manually stopped by user.');
+      }
+    } catch(e){}
+  };
+
+  if (supportsSpeech) {
+    recognition.addEventListener('start', () => {
+      micCircle.classList.add('listening');
+      feedback.textContent = "Listening...";
+      lastRecognitionHadResult = false;
+      stopBtn.classList.add('active');
+      logDebug('Recognition event: start');
+    });
+
+    recognition.addEventListener('end', () => {
+      micCircle.classList.remove('listening');
+      stopBtn.classList.remove('active');
+      if (recognitionTimeoutId) clearTimeout(recognitionTimeoutId);
+      logDebug('Recognition event: end');
+      if (!lastRecognitionHadResult) {
+        feedback.textContent = "Didn't catch any speech. Please record again, speaking clearly.";
+        setTimeout(() => { feedback.textContent = ''; }, 1800);
+      }
+    });
+
+    recognition.addEventListener('result', (event) => {
+      if (recognitionTimeoutId) clearTimeout(recognitionTimeoutId);
+      lastRecognitionHadResult = true;
+      logDebug('Recognition event: result');
+      let best = event.results[0][0];
+      let bestValue = best.transcript.trim();
+      let bestConfidence = best.confidence || 0;
+      if (event.results[0].length > 1) {
+        let target = taskText.textContent.toLowerCase().replace(/[.,?!]/g, '').trim();
+        let bestScore = -1;
+        for (let alt of event.results[0]) {
+          let altText = alt.transcript.trim().toLowerCase().replace(/[.,?!]/g, '');
+          let score = 0;
+          if (altText === target) score = 2;
+          else if (target.includes(altText) || altText.includes(target)) score = 1;
+          if (score > bestScore || (score === bestScore && alt.confidence > bestConfidence)) {
+            bestScore = score;
+            bestValue = alt.transcript.trim();
+            bestConfidence = alt.confidence;
+          }
+        }
+      }
+      recordedTranscript = bestValue;
+      recordedConfidence = bestConfidence;
+      spokenText.textContent = 'You said: "' + recordedTranscript + '"';
+      updateConfidenceBar(recordedConfidence);
+      if (recordedConfidence < 0.55) {
+        feedback.textContent = "Didn't quite catch that. Please record again, speaking clearly.";
+        micCircle.classList.remove('listening');
+        setTimeout(() => { feedback.textContent = ''; }, 2200);
+      } else {
+        feedback.textContent = '';
+      }
+      micCircle.classList.remove('listening');
+    });
+
+    recognition.addEventListener('audiostart', () => logDebug('Recognition event: audiostart'));
+    recognition.addEventListener('audioend', () => logDebug('Recognition event: audioend'));
+    recognition.addEventListener('speechstart', () => logDebug('Recognition event: speechstart'));
+    recognition.addEventListener('speechend', () => logDebug('Recognition event: speechend'));
+    recognition.addEventListener('nomatch', () => logDebug('Recognition event: nomatch'));
+    recognition.addEventListener('error', (event) => {
+      micCircle.classList.remove('listening');
+      stopBtn.classList.remove('active');
+      if (recognitionTimeoutId) clearTimeout(recognitionTimeoutId);
+      feedback.textContent = 'Error during recognition. Try again.';
+      logDebug('Recognition event: error - ' + (event.error || 'unknown'));
+      setTimeout(() => feedback.textContent = '', 2000);
+    });
+  }
+
+  submitBtn.onclick = () => {
+    if (!recordedTranscript) {
+      showNotification('incorrect', 'Please record your speech before submitting.');
+      return;
+    }
+    const correctText = taskText.textContent.toLowerCase().replace(/[.,?!]/g, '').trim();
+    const spokenLower = recordedTranscript.toLowerCase().replace(/[.,?!]/g, '').trim();
+
+    if (correctText === spokenLower) {
+      showNotification('correct');
+      loadNextTask();
+    } else {
+      showNotification('incorrect');
+      feedback.textContent = `Try again! You said: "${recordedTranscript}"`;
+    }
+    spokenText.textContent = '';
+    recordedTranscript = '';
+    recordedConfidence = 0;
+    confidenceDiv.innerHTML = '';
+  };
+
+  nextBtn.onclick = () => {
+    loadNextTask();
+    spokenText.textContent = '';
+    feedback.textContent = '';
+    recordedTranscript = '';
+    recordedConfidence = 0;
+    confidenceDiv.innerHTML = '';
+  };
+</script>
+</body>
+</html>

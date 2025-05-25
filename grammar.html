@@ -1,0 +1,1430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Calm Grammar Test App</title>
+  <style>
+    :root {
+      --bg: #f5f8fc;
+      --primary: #5b779a;
+      --accent: #86a6d3;
+      --secondary: #e3ebf7;
+      --text: #233144;
+      --shadow: 0 4px 24px rgba(40, 60, 80, 0.09);
+      --radius: 18px;
+      --focus: #2d93ad;
+      --danger: #ef767a;
+      --success: #2ed573;
+      --btn-click: #2d93ad;
+      --btn-shadow: 0 2px 7px rgba(44, 99, 174, 0.10);
+    }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 500px;
+      margin: 2rem auto;
+      background: #fff;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 2.5rem 1.5rem;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    header h1 {
+      color: var(--primary);
+      font-weight: 700;
+      letter-spacing: 1px;
+      font-size: 2rem;
+      margin: 0;
+    }
+    .difficulty, .test-types {
+      margin: 1.5rem 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem 0.7rem;
+      justify-content: center;
+    }
+    .difficulty label, .test-types label {
+      background: var(--secondary);
+      padding: 0.6rem 1.2rem;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: background 0.19s;
+      font-weight: 500;
+    }
+    .difficulty input[type="radio"]:checked + span,
+    .test-types input[type="checkbox"]:checked + span {
+      background: var(--accent);
+      color: #fff;
+    }
+    .difficulty input,
+    .test-types input {
+      display: none;
+    }
+    button, input[type="submit"] {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius);
+      padding: 0.7rem 1.7rem;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s, box-shadow 0.22s, transform 0.18s;
+      margin: 0.5rem 0.2rem;
+      outline: none;
+      box-shadow: var(--btn-shadow);
+      position: relative;
+      z-index: 1;
+      -webkit-tap-highlight-color: transparent;
+    }
+    button:active, input[type="submit"]:active {
+      background: var(--btn-click);
+      box-shadow: 0 1px 3px rgba(44, 99, 174, 0.18) inset, 0 0 0 0 #fff;
+      transform: scale(0.97);
+      color: #fff;
+    }
+    button:disabled {
+      background: #bfc9d9;
+      cursor: not-allowed;
+      color: #eaf1f8;
+    }
+    button:focus {
+      background: var(--focus);
+    }
+    .test-main {
+      margin-top: 1rem;
+    }
+    .question {
+      margin-bottom: 2rem;
+      padding: 1.2rem;
+      border-radius: var(--radius);
+      background: var(--secondary);
+      font-size: 1.1rem;
+      font-weight: 500;
+      box-shadow: 0 2px 8px rgba(91,119,154,0.03);
+    }
+    .answers label {
+      display: block;
+      margin-bottom: 0.7rem;
+      padding: 0.5rem;
+      border-radius: var(--radius);
+      background: #f7fafd;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .answers input[type="radio"] {
+      margin-right: 0.7rem;
+    }
+    .answers label:hover {
+      background: var(--accent);
+      color: #fff;
+    }
+    .test-controls {
+      text-align: center;
+      margin-top: 1.2rem;
+    }
+    .hint {
+      display: none;
+      background: #f3f7fb;
+      color: var(--primary);
+      border-left: 4px solid var(--accent);
+      border-radius: var(--radius);
+      padding: 0.8rem 1.2rem;
+      margin: 1rem 0;
+      font-size: 0.98rem;
+      box-shadow: 0 1px 3px rgba(91,119,154,0.08);
+    }
+    .feedback {
+      text-align: center;
+      font-weight: 600;
+      margin-bottom: 0.7rem;
+      font-size: 1.1rem;
+    }
+    .feedback.correct {
+      color: var(--success);
+    }
+    .feedback.incorrect {
+      color: var(--danger);
+    }
+    .progress {
+      margin: 1.2rem 0 0.5rem 0;
+      text-align: right;
+      font-size: 0.99rem;
+      color: var(--primary);
+      font-weight: 500;
+    }
+    .score-final {
+      background: #e7f7ed;
+      color: var(--focus);
+      padding: 1.2rem 1rem;
+      border-radius: var(--radius);
+      text-align: center;
+      margin-top: 2rem;
+      font-size: 1.18rem;
+      font-weight: 700;
+    }
+    .back-btn {
+      background: var(--accent);
+      margin-top: 1.5rem;
+    }
+    @media (max-width: 600px) {
+      .container { padding: 1.1rem 0.3rem; }
+      header h1 { font-size: 1.25rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="main-container">
+    <header>
+      <h1> Grammar Test </h1>
+    </header>
+    <div id="home-page">
+      <h2 style="text-align:center;">Choose Difficulty</h2>
+      <div class="difficulty">
+        <label><input type="radio" name="difficulty" value="easy"><span>Easy</span></label>
+        <label><input type="radio" name="difficulty" value="medium"><span>Medium</span></label>
+        <label><input type="radio" name="difficulty" value="hard"><span>Hard</span></label>
+      </div>
+      <h2 style="text-align:center;">Select Grammar Test Types</h2>
+      <div class="test-types">
+        <label><input type="checkbox" value="articles"><span>Articles</span></label>
+        <label><input type="checkbox" value="punctuation"><span>Punctuation</span></label>
+        <label><input type="checkbox" value="verb_tenses"><span>Verb Tenses</span></label>
+        <label><input type="checkbox" value="prepositions"><span>Prepositions</span></label>
+        <label><input type="checkbox" value="subject_verb"><span>Subject-Verb Agreement</span></label>
+      </div>
+      <div style="text-align:center; margin:2rem 0;">
+        <button id="start-test-btn">Start Test</button>
+      </div>
+    </div>
+    <div id="test-page" style="display:none;">
+      <div class="progress" id="progress-info"></div>
+      <div class="test-main" id="test-main"></div>
+      <div class="test-controls" id="test-controls"></div>
+      <button class="back-btn" onclick="backToHome()">Back to Home</button>
+    </div>
+    <div id="result-page" style="display:none;">
+      <div class="score-final" id="final-score"></div>
+      <div style="text-align:center;">
+        <button onclick="backToHome()">Back to Home</button>
+      </div>
+    </div>
+    <footer style="text-align:center; font-size:0.98rem; margin-top:2rem; color:var(--primary)">
+      <p>Practice makes perfect! &mdash; Grammar Test</p>
+    </footer>
+  </div>
+<script>
+/*
+For brevity, only the first ~10 questions are shown for each type/level, but you should
+extend each array to 50 or more for production use!
+To get a full 50+ unique real-world questions for each, consider using an external dataset or generator.
+*/
+
+const QUESTION_BANK = {
+  easy: {
+    articles: [
+      { question: "___ apple a day keeps the doctor away.", options: ["A", "An", "The"], answer: 1, hint: "Use 'an' before vowels." },
+      { question: "She is ___ best student in the class.", options: ["a", "an", "the"], answer: 2, hint: "Use 'the' for specific things." },
+      { question: "I saw ___ elephant at the zoo.", options: ["a", "an", "the"], answer: 1, hint: "Use 'an' before a word that starts with a vowel sound." },
+      { question: "He wants to buy ___ new car.", options: ["a", "an", "the"], answer: 0, hint: "Use 'a' before consonant sounds." },
+      { question: "___ sun rises in the east.", options: ["A", "An", "The"], answer: 2, hint: "Use for unique things." },
+      { question: "She bought ___ umbrella.", options: ["a", "an", "the"], answer: 1, hint: "Use before words with vowel sounds." },
+      { question: "___ dog is barking outside.", options: ["A", "An", "The"], answer: 2, hint: "Use when referring to a specific dog." },
+      { question: "She has ___ orange dress.", options: ["a", "an", "the"], answer: 1, hint: "Use before words with vowel sounds." },
+      { question: "They visited ___ museum.", options: ["a", "an", "the"], answer: 0, hint: "Use before words with consonant sounds." },
+      { question: "He is ___ teacher.", options: ["a", "an", "the"], answer: 0, hint: "Use 'a' before consonant sounds." },
+      
+  {"question":"She has ___ umbrella.","options":["a","an","the"],"answer":1,"hint":"Use 'an' before words starting with a vowel sound."},
+  {"question":"___ orange is on the table.","options":["A","An","The"],"answer":2,"hint":"Use 'the' for something already mentioned or specific."},
+  {"question":"I would like ___ apple, please.","options":["a","an","the"],"answer":1,"hint":"Use 'an' before vowel sounds."},
+  {"question":"He is ___ honest man.","options":["a","an","the"],"answer":1,"hint":"'Honest' starts with a vowel sound."},
+  {"question":"She is ___ teacher.","options":["a","an","the"],"answer":0,"hint":"Use 'a' before consonant sounds."},
+  {"question":"___ dogs are barking.","options":["A","An","The"],"answer":2,"hint":"Use 'the' for specific or already known things."},
+  {"question":"We saw ___ owl last night.","options":["a","an","the"],"answer":1,"hint":"Use 'an' before a vowel sound."},
+  {"question":"___ sun rises in the east.","options":["A","An","The"],"answer":2,"hint":"Use 'the' for unique things."},
+  {"question":"Give me ___ pen, please.","options":["a","an","the"],"answer":0,"hint":"Use 'a' before consonant sounds."},
+  {"question":"She wants to be ___ engineer.","options":["a","an","the"],"answer":1,"hint":"'Engineer' starts with a vowel sound."},
+  {"question":"He found ___ old coin.","options":["a","an","the"],"answer":1,"hint":"Use 'an' before a vowel sound."},
+  {"question":"I bought ___ car yesterday.","options":["a","an","the"],"answer":0,"hint":"Use 'a' for something not specified before."},
+  {"question":"___ stars are bright tonight.","options":["A","An","The"],"answer":2,"hint":"Use 'the' when talking about something specific."},
+  {"question":"She opened ___ window.","options":["a","an","the"],"answer":0,"hint":"First mention, so use 'a'."},
+  {"question":"___ car I bought is blue.","options":["A","An","The"],"answer":2,"hint":"Specific car, use 'the'."},
+  {"question":"He is ___ doctor.","options":["a","an","the"],"answer":0,"hint":"Use 'a' before consonant sounds."},
+  {"question":"___ earth goes around the sun.","options":["A","An","The"],"answer":2,"hint":"Unique objects take 'the'."},
+  {"question":"She wore ___ unusual dress.","options":["a","an","the"],"answer":1,"hint":"'Unusual' starts with a vowel sound."},
+  {"question":"We need ___ hour to complete this.","options":["a","an","the"],"answer":1,"hint":"'Hour' starts with a vowel sound ('our')."},
+  {"question":"He is ___ European.","options":["a","an","the"],"answer":0,"hint":"'European' starts with a 'yu' sound, a consonant."},
+  {"question":"___ Pacific Ocean is vast.","options":["A","An","The"],"answer":2,"hint":"Names of oceans take 'the'."},
+  {"question":"She gave me ___ useful tip.","options":["a","an","the"],"answer":0,"hint":"'Useful' starts with a 'yu' sound, a consonant."},
+  {"question":"___ moon looks beautiful.","options":["A","An","The"],"answer":2,"hint":"Unique, use 'the'."},
+  {"question":"He wants to be ___ artist.","options":["a","an","the"],"answer":1,"hint":"'Artist' starts with a vowel sound."},
+  {"question":"___ eggs are on the plate.","options":["A","An","The"],"answer":2,"hint":"Specific eggs."},
+  {"question":"She is eating ___ ice cream.","options":["a","an","the"],"answer":1,"hint":"'Ice' begins with a vowel sound."},
+  {"question":"I will buy ___ house.","options":["a","an","the"],"answer":0,"hint":"First mention, use 'a'."},
+  {"question":"___ Ganges is a holy river.","options":["A","An","The"],"answer":2,"hint":"Unique rivers take 'the'."},
+  {"question":"He is ___ MBA student.","options":["a","an","the"],"answer":1,"hint":"'MBA' pronounced 'em-bee-ay' starts with a vowel sound."},
+  {"question":"___ apples are rotten.","options":["A","An","The"],"answer":2,"hint":"Specific apples."},
+  {"question":"She found ___ unique gift.","options":["a","an","the"],"answer":0,"hint":"'Unique' starts with a 'yu' sound."},
+  {"question":"He gave me ___ one-rupee coin.","options":["a","an","the"],"answer":1,"hint":"'One' starts with a vowel sound ('wun')."},
+  {"question":"I saw ___ unicorn in my dream.","options":["a","an","the"],"answer":0,"hint":"'Unicorn' starts with a 'yu' sound."},
+  {"question":"___ Himalayas are beautiful.","options":["A","An","The"],"answer":2,"hint":"Mountain ranges take 'the'."},
+  {"question":"She is ___ honest girl.","options":["a","an","the"],"answer":1,"hint":"'Honest' starts with a vowel sound."},
+  {"question":"He bought ___ umbrella and ___ hat.","options":["an, a","a, a","an, the"],"answer":0,"hint":"First is vowel, second is consonant."},
+  {"question":"___ Taj Mahal is in India.","options":["A","An","The"],"answer":2,"hint":"Monuments take 'the'."},
+  {"question":"She is ___ only child.","options":["a","an","the"],"answer":2,"hint":"Use 'the' for superlatives, ordinals."},
+  {"question":"___ Amazon is a large river.","options":["A","An","The"],"answer":2,"hint":"Unique things take 'the'."},
+  {"question":"He is ___ university student.","options":["a","an","the"],"answer":0,"hint":"'University' starts with a 'yu' sound."},
+  {"question":"She has ___ hour to spare.","options":["a","an","the"],"answer":1,"hint":"'Hour' pronounced 'our'."},
+  {"question":"___ Alps are in Europe.","options":["A","An","The"],"answer":2,"hint":"Mountain ranges take 'the'."},
+  {"question":"He is ___ honest worker.","options":["a","an","the"],"answer":1,"hint":"'Honest' starts with a vowel sound."},
+  {"question":"Do you have ___ pencil?","options":["a","an","the"],"answer":0,"hint":"Use 'a' for the first mention."},
+  {"question":"___ Nile flows through Egypt.","options":["A","An","The"],"answer":2,"hint":"Rivers take 'the'."},
+  {"question":"I ate ___ egg.","options":["a","an","the"],"answer":1,"hint":"'Egg' starts with a vowel sound."},
+  {"question":"Can I have ___ orange?","options":["a","an","the"],"answer":1,"hint":"'Orange' starts with a vowel sound."},
+  {"question":"She is ___ university professor.","options":["a","an","the"],"answer":0,"hint":"'University' starts with a 'yu' sound."},
+  {"question":"He is ___ useful person.","options":["a","an","the"],"answer":0,"hint":"'Useful' starts with a 'yu' sound."},
+  {"question":"___ earth is round.","options":["A","An","The"],"answer":2,"hint":"Unique object."},
+  {"question":"___ elephant is large.","options":["A","An","The"],"answer":2,"hint":"Specific elephant."},
+  {"question":"Please give me ___ apple.","options":["a","an","the"],"answer":1,"hint":"'Apple' starts with a vowel sound."},
+  {"question":"He will be back in ___ hour.","options":["a","an","the"],"answer":1,"hint":"'Hour' starts with a vowel sound."},
+  {"question":"___ United States is a big country.","options":["A","An","The"],"answer":2,"hint":"Use 'the' with country names using 'of' or plural."},
+  {"question":"___ Pacific Ocean is the largest.","options":["A","An","The"],"answer":2,"hint":"Oceans take 'the'."},
+  {"question":"___ apple pie is delicious.","options":["A","An","The"],"answer":2,"hint":"Specific pie."}
+
+      // ...add up to 50+ for production
+    ],
+    punctuation: [
+      { question: "Add punctuation:\nwhat is your name", answer: "What is your name?", hint: "It is a question." },
+      { question: "Add punctuation:\nhello how are you", answer: "Hello, how are you?", hint: "Start with a capital, add comma and question mark." },
+      { question: "Add punctuation:\ni am fine", answer: "I am fine.", hint: "Start with a capital, end with full stop." },
+      { question: "Add punctuation:\ncan you help me", answer: "Can you help me?", hint: "It's a question." },
+      { question: "Add punctuation:\nstop", answer: "Stop.", hint: "End with a full stop." },
+      { question: "Add punctuation:\nwait for me", answer: "Wait for me.", hint: "End with a full stop." },
+      { question: "Add punctuation:\nhello john", answer: "Hello, John.", hint: "Use a comma before a name." },
+      { question: "Add punctuation:\nnice to meet you", answer: "Nice to meet you.", hint: "End with a full stop." },
+      { question: "Add punctuation:\ngood morning", answer: "Good morning.", hint: "End with a full stop." },
+      { question: "Add punctuation:\nsee you soon", answer: "See you soon.", hint: "End with a full stop." },
+      
+  { "question": "Add punctuation:\nwhere is my book", "answer": "Where is my book?", "hint": "Start with a capital, end with a question mark." },
+  { "question": "Add punctuation:\nplease come here", "answer": "Please come here.", "hint": "Start with a capital, end with a period." },
+  { "question": "Add punctuation:\nwatch out", "answer": "Watch out!", "hint": "Start with a capital, end with an exclamation mark." },
+  { "question": "Add punctuation:\nit is raining", "answer": "It is raining.", "hint": "Start with a capital, end with a period." },
+  { "question": "Add punctuation:\nopen the door", "answer": "Open the door.", "hint": "Start with a capital, end with a period." },
+  { "question": "Add punctuation:\ncan you help me", "answer": "Can you help me?", "hint": "Start with a capital, end with a question mark." },
+  { "question": "Add punctuation:\ngood morning", "answer": "Good morning.", "hint": "Start with a capital, end with a period." },
+  { "question": "Add punctuation:\nwhat is your name", "answer": "What is your name?", "hint": "Start with a capital, end with a question mark." },
+  { "question": "Add punctuation:\nstop", "answer": "Stop.", "hint": "Start with a capital, end with a period." },
+  { "question": "Add punctuation:\nhow old are you", "answer": "How old are you?", "hint": "Start with a capital, end with a question mark." },
+  { "question": "Add punctuation:\nhello my name is sara", "answer": "Hello, my name is Sara.", "hint": "Start with a capital, use a comma, end with a period." },
+  { "question": "Add punctuation:\nno thank you", "answer": "No, thank you.", "hint": "Start with a capital, use a comma, end with a period." },
+  { "question": "Add punctuation:\nyes i will go", "answer": "Yes, I will go.", "hint": "Start with a capital, use a comma, end with a period." },
+  { "question": "Add punctuation:\nhappy birthday", "answer": "Happy birthday!", "hint": "Start with a capital, end with an exclamation mark." },
+  { "question": "Add punctuation:\ni am fine", "answer": "I am fine.", "hint": "Start with a capital, end with a period." },
+  { "question": "Add punctuation:\nsee you soon", "answer": "See you soon.", "hint": "Start with a capital, end with a period." },
+  { "question": "Add punctuation:\nplease sit down", "answer": "Please sit down.", "hint": "Start with a capital, end with a period." },
+  { "question": "Add punctuation:\nwhat time is it", "answer": "What time is it?", "hint": "Start with a capital, end with a question mark." },
+  { "question": "Add punctuation:\ndont touch that", "answer": "Don't touch that!", "hint": "Start with a capital, use an apostrophe, end with an exclamation mark." },
+  { "question": "Add punctuation:\nwhere do you live", "answer": "Where do you live?", "hint": "Start with a capital, end with a question mark." },
+  { "question": "Add punctuation:\nit is cold today", "answer": "It is cold today.", "hint": "Start with a capital, end with a period." },
+  { "question": "Add punctuation:\ni love pizza", "answer": "I love pizza.", "hint": "Start with a capital, end with a period." },
+  { "question": "Add punctuation:\nlets go home", "answer": "Let's go home.", "hint": "Start with a capital, use an apostrophe, end with a period." },
+  { "question": "Add punctuation:\ndo you like music", "answer": "Do you like music?", "hint": "Start with a capital, end with a question mark." },
+  { "question": "Add punctuation:\ni have a dog", "answer": "I have a dog.", "hint": "Start with a capital, end with a period." },
+  { "question": "Add punctuation:\nhello", "answer": "Hello.", "hint": "Start with a capital, end with a period." },
+  { "question": "Add punctuation:\ni am hungry", "answer": "I am hungry.", "hint": "Start with a capital, end with a period." },
+  { "question": "Add punctuation:\nbe careful", "answer": "Be careful!", "hint": "Start with a capital, end with an exclamation mark." },
+  { "question": "Add punctuation:\ncan i have some water", "answer": "Can I have some water?", "hint": "Start with a capital, end with a question mark." },
+  { "question": "Add punctuation:\nturn off the light", "answer": "Turn off the light.", "hint": "Start with a capital, end with a period." },
+  { "question": "Add punctuation:\nwhat is that", "answer": "What is that?", "hint": "Start with a capital, end with a question mark." },
+  { "question": "Add punctuation:\nits my birthday", "answer": "It's my birthday.", "hint": "Start with a capital, use an apostrophe, end with a period." },
+  { "question": "Add punctuation:\nthe sky is blue", "answer": "The sky is blue.", "hint": "Start with a capital, end with a period." },
+  { "question": "Add punctuation:\nwhere are you going", "answer": "Where are you going?", "hint": "Start with a capital, end with a question mark." },
+  { "question": "Add punctuation:\nwhat a beautiful day", "answer": "What a beautiful day!", "hint": "Start with a capital, end with an exclamation mark." },
+  { "question": "Add punctuation:\nclose the window", "answer": "Close the window.", "hint": "Start with a capital, end with a period." },
+  { "question": "Add punctuation:\nmay i come in", "answer": "May I come in?", "hint": "Start with a capital, end with a question mark." },
+  { "question": "Add punctuation:\nyour bag is here", "answer": "Your bag is here.", "hint": "Start with a capital, end with a period." },
+  { "question": "Add punctuation:\nare you ready", "answer": "Are you ready?", "hint": "Start with a capital, end with a question mark." },
+  { "question": "Add punctuation:\nplease wait", "answer": "Please wait.", "hint": "Start with a capital, end with a period." },
+  { "question": "Add punctuation:\nlets start", "answer": "Let's start.", "hint": "Start with a capital, use an apostrophe, end with a period." },
+  { "question": "Add punctuation:\nhe is my friend", "answer": "He is my friend.", "hint": "Start with a capital, end with a period." },
+  { "question": "Add punctuation:\nhow are you feeling", "answer": "How are you feeling?", "hint": "Start with a capital, end with a question mark." },
+  { "question": "Add punctuation:\nhurry up", "answer": "Hurry up!", "hint": "Start with a capital, end with an exclamation mark." },
+  { "question": "Add punctuation:\nthats a good idea", "answer": "That's a good idea.", "hint": "Start with a capital, use an apostrophe, end with a period." },
+  { "question": "Add punctuation:\nthis is my house", "answer": "This is my house.", "hint": "Start with a capital, end with a period." },
+  { "question": "Add punctuation:\nwhat is for dinner", "answer": "What is for dinner?", "hint": "Start with a capital, end with a question mark." },
+  { "question": "Add punctuation:\nmy name is tom", "answer": "My name is Tom.", "hint": "Start with a capital, end with a period." },
+  { "question": "Add punctuation:\nsee you tomorrow", "answer": "See you tomorrow.", "hint": "Start with a capital, end with a period." },
+  { "question": "Add punctuation:\nyes please", "answer": "Yes, please.", "hint": "Start with a capital, use a comma, end with a period." },
+  { "question": "Add punctuation:\nwhat happened", "answer": "What happened?", "hint": "Start with a capital, end with a question mark." },
+  { "question": "Add punctuation:\nis it raining", "answer": "Is it raining?", "hint": "Start with a capital, end with a question mark." },
+  { "question": "Add punctuation:\ncome here", "answer": "Come here.", "hint": "Start with a capital, end with a period." },
+  { "question": "Add punctuation:\nlets play", "answer": "Let's play.", "hint": "Start with a capital, use an apostrophe, end with a period." }
+
+      // ...add up to 50+ for production
+    ],
+    verb_tenses: [
+      { question: "I ____ (go) to school every day.", options: ["go", "goes", "went"], answer: 0, hint: "First person singular, present simple." },
+      { question: "She ____ (play) tennis yesterday.", options: ["plays", "play", "played"], answer: 2, hint: "Past tense." },
+      { question: "They ____ (be) happy last week.", options: ["are", "were", "is"], answer: 1, hint: "Past tense for 'they'." },
+      { question: "She ____ (eat) breakfast every morning.", options: ["eat", "eats", "ate"], answer: 1, hint: "Present simple, she/he/it adds 's'." },
+      { question: "We ____ (go) to the park yesterday.", options: ["go", "went", "going"], answer: 1, hint: "Past simple for yesterday." },
+      { question: "They ____ (play) football now.", options: ["plays", "playing", "are playing"], answer: 2, hint: "Present continuous uses 'are + ing'." },
+      { question: "He ____ (watch) TV at the moment.", options: ["is watching", "watches", "watch"], answer: 0, hint: "Present continuous uses 'is + ing'." },
+      { question: "I ____ (read) a book right now.", options: ["reads", "am reading", "read"], answer: 1, hint: "Present continuous uses 'am + ing'." },
+      { question: "She ____ (walk) to school every day.", options: ["walk", "walked", "walks"], answer: 2, hint: "Present simple, she/he/it adds 's'." },
+      { question: "We ____ (have) dinner at 8 o'clock yesterday.", options: ["have", "had", "has"], answer: 1, hint: "Past tense for yesterday." },
+  { "question": "She ____ (walk) to school every day.", "options": ["walk", "walks", "walking"], "answer": 1, "hint": "Present simple, she/he/it adds 's'." },
+  { "question": "They ____ (play) football now.", "options": ["plays", "playing", "are playing"], "answer": 2, "hint": "Present continuous uses 'are + ing'." },
+  { "question": "I ____ (read) a book right now.", "options": ["reads", "am reading", "read"], "answer": 1, "hint": "Present continuous uses 'am + ing'." },
+  { "question": "He ____ (go) to the park yesterday.", "options": ["goes", "went", "gone"], "answer": 1, "hint": "Use past simple for yesterday." },
+  { "question": "We ____ (be) happy last week.", "options": ["were", "was", "are"], "answer": 0, "hint": "Past tense for 'we'." },
+  { "question": "They ____ (eat) lunch every day at noon.", "options": ["eat", "eats", "eating"], "answer": 0, "hint": "Present simple, plural subject." },
+  { "question": "She ____ (study) English.", "options": ["study", "studies", "studying"], "answer": 1, "hint": "Present simple, she/he/it adds 'es'." },
+  { "question": "I ____ (drink) milk every morning.", "options": ["drinks", "drink", "drank"], "answer": 1, "hint": "Present simple, 'I' form." },
+  { "question": "He ____ (not like) vegetables.", "options": ["doesn't like", "don't like", "isn't like"], "answer": 0, "hint": "Negative present simple for 'he'." },
+  { "question": "____ you ____ (watch) TV right now?", "options": ["Do you watch", "Are you watching", "Did you watch"], "answer": 1, "hint": "Present continuous, 'are + ing'." },
+  { "question": "They ____ (finish) their homework yet.", "options": ["haven't finished", "didn't finish", "aren't finishing"], "answer": 0, "hint": "Present perfect for 'yet'." },
+  { "question": "We ____ (see) a movie last night.", "options": ["see", "saw", "seen"], "answer": 1, "hint": "Past simple for last night." },
+  { "question": "I ____ (have) breakfast every morning.", "options": ["have", "has", "having"], "answer": 0, "hint": "Present simple, 'I' form." },
+  { "question": "My father ____ (work) at a bank.", "options": ["works", "work", "working"], "answer": 0, "hint": "Present simple, he/she/it adds 's'." },
+  { "question": "We ____ (visit) our grandparents every Sunday.", "options": ["visits", "visit", "visited"], "answer": 1, "hint": "Present simple, plural subject." },
+  { "question": "She ____ (cook) dinner now.", "options": ["cooks", "is cooking", "cook"], "answer": 1, "hint": "Present continuous for actions happening now." },
+  { "question": "He ____ (not go) to the party last night.", "options": ["didn't go", "don't go", "isn't go"], "answer": 0, "hint": "Negative past simple." },
+  { "question": "They ____ (play) chess at the moment.", "options": ["play", "are playing", "played"], "answer": 1, "hint": "Present continuous for actions happening now." },
+  { "question": "I ____ (buy) a new car last month.", "options": ["buy", "bought", "buying"], "answer": 1, "hint": "Past simple for last month." },
+  { "question": "We ____ (not have) any homework today.", "options": ["doesn't have", "don't have", "aren't have"], "answer": 1, "hint": "Negative present simple for 'we'." },
+  { "question": "She ____ (like) ice cream.", "options": ["like", "likes", "liking"], "answer": 1, "hint": "Present simple, she/he/it adds 's'." },
+  { "question": "____ he ____ (live) in London?", "options": ["Does he live", "Is he live", "Did he live"], "answer": 0, "hint": "Present simple question, use 'does'." },
+  { "question": "I ____ (not watch) TV every day.", "options": ["don't watch", "doesn't watch", "am not watching"], "answer": 0, "hint": "Negative present simple for 'I'." },
+  { "question": "They ____ (start) school at 8 o'clock.", "options": ["starts", "started", "start"], "answer": 2, "hint": "Present simple for plural subject." },
+  { "question": "He ____ (not do) his homework yesterday.", "options": ["doesn't do", "didn't do", "isn't do"], "answer": 1, "hint": "Negative past simple." },
+  { "question": "I ____ (go) to the gym every weekend.", "options": ["go", "goes", "went"], "answer": 0, "hint": "Present simple, 'I' form." },
+  { "question": "We ____ (not eat) meat.", "options": ["doesn't eat", "don't eat", "aren't eating"], "answer": 1, "hint": "Negative present simple for plural subject." },
+  { "question": "She ____ (read) a story now.", "options": ["reads", "is reading", "read"], "answer": 1, "hint": "Present continuous for actions happening now." },
+  { "question": "He ____ (play) tennis every Saturday.", "options": ["plays", "play", "playing"], "answer": 0, "hint": "Present simple, she/he/it adds 's'." },
+  { "question": "They ____ (not go) to school today.", "options": ["doesn't go", "aren't going", "didn't go"], "answer": 1, "hint": "Negative present continuous for 'they'." },
+  { "question": "____ you ____ (want) some tea?", "options": ["Are you want", "Do you want", "Did you want"], "answer": 1, "hint": "Present simple question, use 'do'." },
+  { "question": "She ____ (not like) coffee.", "options": ["don't like", "doesn't like", "isn't like"], "answer": 1, "hint": "Negative present simple for she/he/it." },
+  { "question": "We ____ (study) English now.", "options": ["study", "are studying", "studied"], "answer": 1, "hint": "Present continuous for actions happening now." },
+  { "question": "He ____ (visit) his uncle last weekend.", "options": ["visited", "visits", "visit"], "answer": 0, "hint": "Past simple for last weekend." },
+  { "question": "I ____ (see) that movie already.", "options": ["see", "saw", "have seen"], "answer": 2, "hint": "Present perfect for 'already'." },
+  { "question": "They ____ (not come) to the meeting yesterday.", "options": ["didn't come", "doesn't come", "aren't come"], "answer": 0, "hint": "Negative past simple." },
+  { "question": "She ____ (call) you later.", "options": ["call", "will call", "calls"], "answer": 1, "hint": "Future simple for later." },
+  { "question": "We ____ (not see) him for a week.", "options": ["didn't see", "haven't seen", "doesn't see"], "answer": 1, "hint": "Present perfect for a period of time up to now." },
+  { "question": "He ____ (go) to the library every day.", "options": ["go", "goes", "going"], "answer": 1, "hint": "Present simple, she/he/it adds 's'." },
+  { "question": "I ____ (write) a letter now.", "options": ["write", "writes", "am writing"], "answer": 2, "hint": "Present continuous for actions happening now." },
+  { "question": "They ____ (arrive) home at 6 pm every day.", "options": ["arrive", "arrives", "arrived"], "answer": 0, "hint": "Present simple for plural subject." },
+  { "question": "She ____ (sleep) at the moment.", "options": ["sleep", "sleeps", "is sleeping"], "answer": 2, "hint": "Present continuous for actions happening now." },
+  { "question": "We ____ (watch) a film last night.", "options": ["watch", "watched", "watches"], "answer": 1, "hint": "Past simple for last night." },
+  { "question": "He ____ (not eat) breakfast today.", "options": ["doesn't eat", "hasn't eaten", "didn't eat"], "answer": 2, "hint": "Negative past simple." },
+  { "question": "____ she ____ (study) French?", "options": ["Does she study", "Is she study", "Did she study"], "answer": 0, "hint": "Present simple question, use 'does'." },
+  { "question": "I ____ (not know) the answer.", "options": ["don't know", "doesn't know", "am not know"], "answer": 0, "hint": "Negative present simple for 'I'." },
+  { "question": "They ____ (play) basketball every weekend.", "options": ["plays", "play", "played"], "answer": 1, "hint": "Present simple for plural subject." },
+  { "question": "She ____ (not understand) the question.", "options": ["doesn't understand", "don't understand", "isn't understand"], "answer": 0, "hint": "Negative present simple for she/he/it." },
+  { "question": "We ____ (have) a meeting at 3 pm.", "options": ["has", "having", "have"], "answer": 2, "hint": "Present simple for plural subject." },
+  { "question": "He ____ (not answer) the phone yesterday.", "options": ["doesn't answer", "didn't answer", "isn't answer"], "answer": 1, "hint": "Negative past simple." },
+  { "question": "I ____ (finish) my homework every night.", "options": ["finish", "finishes", "finished"], "answer": 0, "hint": "Present simple for 'I'." },
+  { "question": "They ____ (work) in the garden now.", "options": ["is working", "are working", "work"], "answer": 1, "hint": "Present continuous for actions happening now." }
+      // ...add up to 50+ for production
+    ],
+    prepositions: [
+      { question: "The cat is ___ the table.", options: ["in", "on", "at"], answer: 1, hint: "'On' means above and touching." },
+      { question: "He is sitting ___ his desk.", options: ["in", "on", "at"], answer: 2, hint: "'At' for desk, table, etc." },
+      { question: "The ball is ___ the box.", options: ["in", "on", "at"], answer: 0, hint: "Inside the box." },
+      { question: "She is sitting ___ the chair.", options: ["in", "on", "at"], answer: 1, hint: "Use for surfaces." },
+      { question: "We are going ___ school.", options: ["to", "at", "on"], answer: 0, hint: "Use for direction." },
+      { question: "He lives ___ India.", options: ["in", "on", "at"], answer: 0, hint: "Use for countries/cities." },
+      { question: "The book is ___ the table.", options: ["at", "on", "in"], answer: 1, hint: "Use for surfaces." },
+      { question: "The dog is ___ the garden.", options: ["at", "in", "on"], answer: 1, hint: "'In' for areas." },
+      { question: "He will come ___ Monday.", options: ["at", "in", "on"], answer: 2, hint: "'On' with days." },
+      { question: "She was born ___ 2005.", options: ["in", "on", "at"], answer: 0, hint: "'In' with years." },
+  { "question": "The cat is ___ the box.", "options": ["in", "on", "at"], "answer": 0, "hint": "Use 'in' for inside." },
+  { "question": "She is sitting ___ the chair.", "options": ["in", "on", "at"], "answer": 1, "hint": "Use 'on' for surfaces." },
+  { "question": "We are going ___ school.", "options": ["to", "at", "on"], "answer": 0, "hint": "Use 'to' for destinations." },
+  { "question": "He lives ___ India.", "options": ["in", "on", "at"], "answer": 0, "hint": "Use 'in' for countries." },
+  { "question": "The book is ___ the table.", "options": ["at", "on", "in"], "answer": 1, "hint": "Use 'on' for surfaces." },
+  { "question": "I was born ___ 2005.", "options": ["in", "on", "at"], "answer": 0, "hint": "Use 'in' for years." },
+  { "question": "The dog is ___ the garden.", "options": ["in", "at", "on"], "answer": 0, "hint": "Use 'in' for enclosed spaces." },
+  { "question": "She is ___ the bus.", "options": ["on", "in", "at"], "answer": 0, "hint": "Use 'on' for public transport." },
+  { "question": "The picture is ___ the wall.", "options": ["in", "on", "at"], "answer": 1, "hint": "Use 'on' for flat surfaces." },
+  { "question": "We will meet ___ Monday.", "options": ["at", "in", "on"], "answer": 2, "hint": "Use 'on' for days of the week." },
+  { "question": "She is good ___ dancing.", "options": ["at", "in", "on"], "answer": 0, "hint": "Use 'at' with skills." },
+  { "question": "He is afraid ___ spiders.", "options": ["of", "for", "from"], "answer": 0, "hint": "Use 'of' with fears." },
+  { "question": "The shop is ___ the corner.", "options": ["at", "on", "in"], "answer": 0, "hint": "Use 'at' for points/places." },
+  { "question": "I will see you ___ five o'clock.", "options": ["at", "on", "in"], "answer": 0, "hint": "Use 'at' for clock times." },
+  { "question": "The train arrives ___ the station.", "options": ["at", "on", "in"], "answer": 0, "hint": "Use 'at' for stations." },
+  { "question": "She is interested ___ music.", "options": ["in", "at", "on"], "answer": 0, "hint": "Use 'in' with 'interested'." },
+  { "question": "The car is parked ___ the building.", "options": ["in front of", "between", "behind"], "answer": 0, "hint": "Use 'in front of' for before something." },
+  { "question": "The ball rolled ___ the table.", "options": ["under", "above", "around"], "answer": 0, "hint": "Use 'under' for below something." },
+  { "question": "She put the keys ___ her bag.", "options": ["into", "onto", "to"], "answer": 0, "hint": "Use 'into' for movement inside." },
+  { "question": "He jumped ___ the river.", "options": ["into", "onto", "in"], "answer": 0, "hint": "Use 'into' for movement from outside to inside." },
+  { "question": "The cat jumped ___ the roof.", "options": ["on", "onto", "to"], "answer": 1, "hint": "Use 'onto' for movement to a surface." },
+  { "question": "She walked ___ the street.", "options": ["across", "through", "in"], "answer": 0, "hint": "Use 'across' for movement from one side to another." },
+  { "question": "We walked ___ the park.", "options": ["through", "across", "over"], "answer": 0, "hint": "Use 'through' for moving inside a space." },
+  { "question": "The plane flew ___ the clouds.", "options": ["through", "over", "across"], "answer": 1, "hint": "Use 'over' for movement above." },
+  { "question": "He hid ___ the door.", "options": ["behind", "in front of", "between"], "answer": 0, "hint": "Use 'behind' for at the back of." },
+  { "question": "The cat is ___ the two dogs.", "options": ["between", "among", "beside"], "answer": 0, "hint": "Use 'between' for two things." },
+  { "question": "She sat ___ her friends.", "options": ["among", "between", "beside"], "answer": 0, "hint": "Use 'among' for more than two." },
+  { "question": "He stood ___ his brother.", "options": ["next to", "between", "above"], "answer": 0, "hint": "Use 'next to' for beside." },
+  { "question": "The lamp is ___ the table.", "options": ["on", "in", "under"], "answer": 2, "hint": "Use 'under' for below." },
+  { "question": "The bird flew ___ the house.", "options": ["over", "between", "among"], "answer": 0, "hint": "Use 'over' for above." },
+  { "question": "There is a bridge ___ the river.", "options": ["over", "under", "across"], "answer": 0, "hint": "Use 'over' for above." },
+  { "question": "The flowers are ___ the vase.", "options": ["in", "on", "at"], "answer": 0, "hint": "Use 'in' for inside." },
+  { "question": "He works ___ a bank.", "options": ["at", "in", "on"], "answer": 1, "hint": "Use 'in' for buildings." },
+  { "question": "She arrived ___ the airport.", "options": ["in", "at", "on"], "answer": 1, "hint": "Use 'at' for points/places." },
+  { "question": "The picture is ___ the window.", "options": ["near", "at", "to"], "answer": 0, "hint": "Use 'near' for close to." },
+  { "question": "He is waiting ___ the bus stop.", "options": ["at", "in", "on"], "answer": 0, "hint": "Use 'at' for specific locations." },
+  { "question": "The dog ran ___ the street.", "options": ["across", "through", "in"], "answer": 0, "hint": "Use 'across' for from one side to another." },
+  { "question": "Put the book ___ the shelf.", "options": ["on", "in", "at"], "answer": 0, "hint": "Use 'on' for surfaces." },
+  { "question": "I saw the movie ___ Friday.", "options": ["on", "at", "in"], "answer": 0, "hint": "Use 'on' for days." },
+  { "question": "She was born ___ May.", "options": ["in", "on", "at"], "answer": 0, "hint": "Use 'in' for months." },
+  { "question": "We have class ___ the morning.", "options": ["in", "on", "at"], "answer": 0, "hint": "Use 'in' for parts of the day." },
+  { "question": "He left ___ noon.", "options": ["at", "in", "on"], "answer": 0, "hint": "Use 'at' for exact times." },
+  { "question": "They arrived ___ time.", "options": ["on", "in", "at"], "answer": 2, "hint": "Use 'at' for expressions like 'at time'." },
+  { "question": "The restaurant is ___ the left.", "options": ["on", "at", "in"], "answer": 0, "hint": "Use 'on the left/right'." },
+  { "question": "He is ___ home.", "options": ["at", "in", "on"], "answer": 0, "hint": "Use 'at home' (expression)." },
+  { "question": "We will go ___ holiday next week.", "options": ["on", "at", "in"], "answer": 0, "hint": "Use 'on holiday' (expression)." },
+  { "question": "The teacher stood ___ the class.", "options": ["in front of", "behind", "next to"], "answer": 0, "hint": "Use 'in front of' for before a group." },
+  { "question": "He walked ___ the door.", "options": ["through", "over", "in"], "answer": 0, "hint": "Use 'through' for movement from one side to another inside something." },
+  { "question": "She was born ___ 2010.", "options": ["in", "on", "at"], "answer": 0, "hint": "Use 'in' for years." },
+  { "question": "My birthday is ___ July 4th.", "options": ["on", "at", "in"], "answer": 0, "hint": "Use 'on' for dates." },
+  { "question": "There is a tree ___ the house.", "options": ["behind", "between", "in"], "answer": 0, "hint": "Use 'behind' for at the back of." },
+  { "question": "She left her keys ___ the car.", "options": ["in", "at", "on"], "answer": 0, "hint": "Use 'in' for inside." },
+  { "question": "The shop is ___ the end of the street.", "options": ["at", "on", "in"], "answer": 0, "hint": "Use 'at' for points/ends." },
+  { "question": "He is looking ___ his glasses.", "options": ["for", "at", "on"], "answer": 0, "hint": "Use 'looking for' to mean searching." }
+
+      // ...add up to 50+ for production
+    ],
+    subject_verb: [
+      { question: "She ___ like ice cream.", options: ["don't", "doesn't", "isn't"], answer: 1, hint: "'She' takes 'doesn't' in negative." },
+      { question: "The dogs ___ barking.", options: ["is", "are", "am"], answer: 1, hint: "Plural subject needs plural verb." },
+      { question: "John ___ play football.", options: ["don't", "doesn't", "isn't"], answer: 1, hint: "'John' uses 'doesn't' in negative." },
+      { question: "The cat ___ sleeping.", options: ["is", "are", "am"], answer: 0, hint: "'Cat' is singular." },
+      { question: "They ___ going to the market.", options: ["is", "are", "am"], answer: 1, hint: "Plural subject." },
+      { question: "My brother ___ like pizza.", options: ["don't", "doesn't", "isn't"], answer: 1, hint: "'Brother' is singular." },
+      { question: "The students ___ in the class.", options: ["is", "are", "am"], answer: 1, hint: "Plural subject." },
+      { question: "He ___ playing football.", options: ["is", "are", "am"], answer: 0, hint: "'He' is singular." },
+      { question: "You ___ my friend.", options: ["is", "are", "am"], answer: 1, hint: "'You' uses 'are'." },
+      { question: "I ___ happy.", options: ["is", "are", "am"], answer: 2, hint: "'I am'." },
+  { "question": "He ___ playing football.", "options": ["is", "are", "am"], "answer": 0, "hint": "'He' uses 'is'." },
+  { "question": "They ___ going to school.", "options": ["is", "are", "am"], "answer": 1, "hint": "Plural subject uses 'are'." },
+  { "question": "I ___ happy today.", "options": ["is", "are", "am"], "answer": 2, "hint": "'I' uses 'am'." },
+  { "question": "She ___ not like pizza.", "options": ["does", "do", "did"], "answer": 0, "hint": "'She' uses 'does'." },
+  { "question": "We ___ friends.", "options": ["is", "are", "am"], "answer": 1, "hint": "'We' uses 'are'." },
+  { "question": "My brother ___ a doctor.", "options": ["am", "is", "are"], "answer": 1, "hint": "Singular subject uses 'is'." },
+  { "question": "The dogs ___ barking.", "options": ["is", "are", "am"], "answer": 1, "hint": "Plural subject uses 'are'." },
+  { "question": "She ___ to the market every day.", "options": ["go", "goes", "going"], "answer": 1, "hint": "'She' uses 'goes'." },
+  { "question": "I ___ my homework every day.", "options": ["does", "do", "did"], "answer": 1, "hint": "'I' uses 'do'." },
+  { "question": "The boy ___ playing with his friends.", "options": ["is", "are", "am"], "answer": 0, "hint": "Singular subject uses 'is'." },
+  { "question": "My parents ___ teachers.", "options": ["is", "are", "am"], "answer": 1, "hint": "Plural subject uses 'are'." },
+  { "question": "He ___ like coffee.", "options": ["don't", "doesn't", "isn't"], "answer": 1, "hint": "'He' uses 'doesn't'." },
+  { "question": "Children ___ playing in the park.", "options": ["is", "are", "am"], "answer": 1, "hint": "Plural subject uses 'are'." },
+  { "question": "The cat ___ under the table.", "options": ["is", "are", "am"], "answer": 0, "hint": "Singular subject uses 'is'." },
+  { "question": "We ___ not going there.", "options": ["is", "are", "am"], "answer": 1, "hint": "'We' uses 'are'." },
+  { "question": "She ___ always late.", "options": ["is", "are", "am"], "answer": 0, "hint": "'She' uses 'is'." },
+  { "question": "The students ___ studying.", "options": ["is", "are", "am"], "answer": 1, "hint": "Plural subject uses 'are'." },
+  { "question": "My mother ___ cooking dinner.", "options": ["is", "are", "am"], "answer": 0, "hint": "Singular subject uses 'is'." },
+  { "question": "You ___ my best friend.", "options": ["is", "are", "am"], "answer": 1, "hint": "'You' uses 'are'." },
+  { "question": "The flowers ___ beautiful.", "options": ["is", "are", "am"], "answer": 1, "hint": "Plural subject uses 'are'." },
+  { "question": "My sister ___ reading a book.", "options": ["is", "are", "am"], "answer": 0, "hint": "Singular subject uses 'is'." },
+  { "question": "We ___ going to the party.", "options": ["is", "are", "am"], "answer": 1, "hint": "'We' uses 'are'." },
+  { "question": "The car ___ new.", "options": ["is", "are", "am"], "answer": 0, "hint": "Singular subject uses 'is'." },
+  { "question": "The birds ___ flying.", "options": ["is", "are", "am"], "answer": 1, "hint": "Plural subject uses 'are'." },
+  { "question": "It ___ raining.", "options": ["is", "are", "am"], "answer": 0, "hint": "'It' uses 'is'." },
+  { "question": "My friend and I ___ classmates.", "options": ["is", "are", "am"], "answer": 1, "hint": "Plural subject uses 'are'." },
+  { "question": "She ___ not understand the question.", "options": ["do", "does", "did"], "answer": 1, "hint": "'She' uses 'does' for negatives." },
+  { "question": "The boys ___ playing cricket.", "options": ["is", "are", "am"], "answer": 1, "hint": "Plural subject uses 'are'." },
+  { "question": "My father ___ working late.", "options": ["is", "are", "am"], "answer": 0, "hint": "Singular subject uses 'is'." },
+  { "question": "The children ___ hungry.", "options": ["is", "are", "am"], "answer": 1, "hint": "Plural subject uses 'are'." },
+  { "question": "He ___ a good singer.", "options": ["is", "are", "am"], "answer": 0, "hint": "'He' uses 'is'." },
+  { "question": "They ___ not ready.", "options": ["is", "are", "am"], "answer": 1, "hint": "Plural subject uses 'are'." },
+  { "question": "She ___ my sister.", "options": ["is", "are", "am"], "answer": 0, "hint": "'She' uses 'is'." },
+  { "question": "You ___ welcome.", "options": ["is", "are", "am"], "answer": 1, "hint": "'You' uses 'are'." },
+  { "question": "The dog ___ barking loudly.", "options": ["is", "are", "am"], "answer": 0, "hint": "Singular subject uses 'is'." },
+  { "question": "I ___ not sleepy.", "options": ["is", "are", "am"], "answer": 2, "hint": "'I' uses 'am'." },
+  { "question": "We ___ not at home.", "options": ["is", "are", "am"], "answer": 1, "hint": "'We' uses 'are'." },
+  { "question": "It ___ cold outside.", "options": ["is", "are", "am"], "answer": 0, "hint": "'It' uses 'is'." },
+  { "question": "The girls ___ singing.", "options": ["is", "are", "am"], "answer": 1, "hint": "Plural subject uses 'are'." },
+  { "question": "He ___ not my brother.", "options": ["are", "am", "is"], "answer": 2, "hint": "'He' uses 'is'." },
+  { "question": "We ___ playing chess.", "options": ["is", "are", "am"], "answer": 1, "hint": "'We' uses 'are'." },
+  { "question": "My sister ___ not like carrots.", "options": ["do", "does", "did"], "answer": 1, "hint": "'She' uses 'does' for negatives." },
+  { "question": "The table ___ brown.", "options": ["is", "are", "am"], "answer": 0, "hint": "Singular subject uses 'is'." },
+  { "question": "The chairs ___ blue.", "options": ["is", "are", "am"], "answer": 1, "hint": "Plural subject uses 'are'." },
+  { "question": "You ___ not alone.", "options": ["is", "are", "am"], "answer": 1, "hint": "'You' uses 'are'." },
+  { "question": "She ___ always early.", "options": ["is", "are", "am"], "answer": 0, "hint": "'She' uses 'is'." },
+  { "question": "We ___ best friends.", "options": ["is", "are", "am"], "answer": 1, "hint": "'We' uses 'are'." },
+  { "question": "The cake ___ delicious.", "options": ["is", "are", "am"], "answer": 0, "hint": "Singular subject uses 'is'." },
+  { "question": "They ___ from India.", "options": ["is", "are", "am"], "answer": 1, "hint": "Plural subject uses 'are'." },
+  { "question": "He ___ not tired.", "options": ["is", "are", "am"], "answer": 0, "hint": "'He' uses 'is'." },
+  { "question": "My friends ___ coming over.", "options": ["is", "are", "am"], "answer": 1, "hint": "Plural subject uses 'are'." }
+
+      // ...add up to 50+ for production
+    ]
+  },
+  medium: {
+    articles: [
+      { question: "I have ___ idea.", options: ["a", "an", "the"], answer: 1, hint: "Use 'an' before vowel sounds." },
+      { question: "___ Nile is the longest river in Africa.", options: ["A", "An", "The"], answer: 2, hint: "Unique things take 'the'." },
+      { question: "He is ___ honest man.", options: ["a", "an", "the"], answer: 1, hint: "'Honest' starts with a vowel sound." },
+      { question: "She went to ___ university.", options: ["a", "an", "the"], answer: 0, hint: "'University' starts with a 'ju:' sound, a consonant." },
+      { question: "I saw ___ one-eyed man.", options: ["a", "an", "the"], answer: 1, hint: "Use before vowel sounds." },
+      { question: "___ Amazon is a large river.", options: ["A", "An", "The"], answer: 2, hint: "Unique things take 'the'." },
+      { question: "She is ___ MBA student.", options: ["a", "an", "the"], answer: 1, hint: "'MBA' starts with a vowel sound 'em'." },
+      { question: "I bought ___ umbrella and ___ raincoat.", options: ["an, a", "a, a", "an, the"], answer: 0, hint: "First is vowel, second is consonant." },
+      { question: "___ Taj Mahal is in India.", options: ["A", "An", "The"], answer: 2, hint: "Monuments take 'the'." },
+      { question: "She is ___ only child.", options: ["a", "an", "the"], answer: 2, hint: "Use for superlatives, ordinals." },
+      
+  { "question": "He is ___ honest man.", "options": ["a", "an", "the"], "answer": 1, "hint": "Use 'an' before vowel sounds, including 'h' that is silent." },
+  { "question": "She is ___ only child in the family.", "options": ["a", "an", "the"], "answer": 2, "hint": "Use 'the' with words like 'only', which are unique." },
+  { "question": "___ Nile is the longest river in Africa.", "options": ["A", "An", "The"], "answer": 2, "hint": "Use 'the' with unique/named rivers." },
+  { "question": "He wants to buy ___ umbrella.", "options": ["a", "an", "the"], "answer": 1, "hint": "Use 'an' before vowel sounds." },
+  { "question": "She is ___ university student.", "options": ["a", "an", "the"], "answer": 0, "hint": "Use 'a' before consonant sounds (university starts with 'ju:')." },
+  { "question": "___ teacher who taught me English is very kind.", "options": ["A", "An", "The"], "answer": 2, "hint": "Use 'the' when specifying a particular person." },
+  { "question": "I saw ___ eagle at the zoo.", "options": ["a", "an", "the"], "answer": 1, "hint": "Use 'an' before words starting with a vowel sound." },
+  { "question": "He is ___ European.", "options": ["a", "an", "the"], "answer": 0, "hint": "Use 'a' before consonant sounds (European starts with 'ju:')." },
+  { "question": "___ Taj Mahal is in India.", "options": ["A", "An", "The"], "answer": 2, "hint": "Use 'the' for famous monuments." },
+  { "question": "She has ___ dog and ___ cat.", "options": ["a, a", "a, the", "the, a"], "answer": 0, "hint": "Use 'a' for the first mention of non-specific things." },
+  { "question": "___ Alps are in Europe.", "options": ["A", "An", "The"], "answer": 2, "hint": "Use 'the' for mountain ranges." },
+  { "question": "He is ___ best player in the team.", "options": ["a", "an", "the"], "answer": 2, "hint": "Use 'the' with superlatives." },
+  { "question": "___ apple a day keeps the doctor away.", "options": ["A", "An", "The"], "answer": 1, "hint": "Use 'an' before vowel sounds." },
+  { "question": "She is ___ tallest girl in the class.", "options": ["a", "an", "the"], "answer": 2, "hint": "Use 'the' with superlatives." },
+  { "question": "He bought ___ house in ___ city.", "options": ["a, a", "a, the", "the, a"], "answer": 1, "hint": "Use 'a' for first mention, 'the' for previously mentioned or known noun." },
+  { "question": "___ Himalayas are the highest mountains.", "options": ["A", "An", "The"], "answer": 2, "hint": "Use 'the' for mountain ranges." },
+  { "question": "I visited ___ United States last year.", "options": ["a", "an", "the"], "answer": 2, "hint": "Use 'the' for countries with plural names or 'of' phrases." },
+  { "question": "She is ___ heir to the throne.", "options": ["a", "an", "the"], "answer": 1, "hint": "'Heir' starts with a silent 'h', so use 'an'." },
+  { "question": "___ Pacific Ocean is very large.", "options": ["A", "An", "The"], "answer": 2, "hint": "Use 'the' for oceans and seas." },
+  { "question": "He has ___ MBA degree.", "options": ["a", "an", "the"], "answer": 1, "hint": "Use 'an' before vowel sounds (MBA starts with 'em')." },
+  { "question": "___ sun rises in the east.", "options": ["A", "An", "The"], "answer": 2, "hint": "Use 'the' for unique objects." },
+  { "question": "She went to ___ hospital to see her friend.", "options": ["a", "an", "the"], "answer": 0, "hint": "Use 'a' for non-specific places." },
+  { "question": "___ Amazon is a huge river.", "options": ["A", "An", "The"], "answer": 2, "hint": "Use 'the' for names of rivers." },
+  { "question": "He is ___ engineer.", "options": ["a", "an", "the"], "answer": 1, "hint": "Use 'an' before vowel sounds." },
+  { "question": "___ earth revolves around the sun.", "options": ["A", "An", "The"], "answer": 2, "hint": "Use 'the' for unique planets." },
+  { "question": "___ Mount Everest is the highest peak.", "options": ["A", "An", "The"], "answer": 2, "hint": "Use 'the' for mountain names with 'Mount'." },
+  { "question": "This is ___ unique opportunity.", "options": ["a", "an", "the"], "answer": 0, "hint": "Use 'a' before 'ju:' sound (unique)." },
+  { "question": "He is ___ university professor.", "options": ["a", "an", "the"], "answer": 0, "hint": "Use 'a' before consonant sounds ('university' = 'ju:')." },
+  { "question": "___ Great Wall of China is famous.", "options": ["A", "An", "The"], "answer": 2, "hint": "Use 'the' for unique places/monuments." },
+  { "question": "___ moon looks beautiful tonight.", "options": ["A", "An", "The"], "answer": 2, "hint": "Use 'the' for unique objects." },
+  { "question": "She has ___ hour to spare.", "options": ["a", "an", "the"], "answer": 1, "hint": "'Hour' starts with a silent 'h' (vowel sound)." },
+  { "question": "He is ___ honest worker.", "options": ["a", "an", "the"], "answer": 1, "hint": "'Honest' starts with a vowel sound." },
+  { "question": "___ Statue of Liberty is in New York.", "options": ["A", "An", "The"], "answer": 2, "hint": "Use 'the' for monuments." },
+  { "question": "___ Ganges is a holy river.", "options": ["A", "An", "The"], "answer": 2, "hint": "Use 'the' for names of rivers." },
+  { "question": "I need ___ euro to buy this.", "options": ["a", "an", "the"], "answer": 0, "hint": "Use 'a' before 'ju:' sound (euro)." },
+  { "question": "He has ___ one-rupee coin.", "options": ["a", "an", "the"], "answer": 1, "hint": "Use 'an' before vowel sound (one = 'won')." },
+  { "question": "___ Himalayas are snow covered.", "options": ["A", "An", "The"], "answer": 2, "hint": "Use 'the' for mountain ranges." },
+  { "question": "___ Indian Ocean is to the south of India.", "options": ["A", "An", "The"], "answer": 2, "hint": "Use 'the' for oceans." },
+  { "question": "He is ___ MLA.", "options": ["a", "an", "the"], "answer": 1, "hint": "Use 'an' before vowel sounds (MLA = 'em')." },
+  { "question": "She saw ___ owl in the tree.", "options": ["a", "an", "the"], "answer": 1, "hint": "Use 'an' before vowel sound." },
+  { "question": "This is ___ unique idea.", "options": ["a", "an", "the"], "answer": 0, "hint": "'Unique' starts with 'ju:' sound." },
+  { "question": "___ Red Sea is between Africa and Asia.", "options": ["A", "An", "The"], "answer": 2, "hint": "Use 'the' for seas." },
+  { "question": "He is ___ SP in the police department.", "options": ["a", "an", "the"], "answer": 1, "hint": "Use 'an' before vowel sounds (SP = 'es')." },
+  { "question": "___ Qutub Minar is in Delhi.", "options": ["A", "An", "The"], "answer": 2, "hint": "Use 'the' for monuments." },
+  { "question": "___ earth is round.", "options": ["A", "An", "The"], "answer": 2, "hint": "Use 'the' for unique objects." },
+  { "question": "She is ___ honest girl.", "options": ["a", "an", "the"], "answer": 1, "hint": "'Honest' starts with a vowel sound." },
+  { "question": "___ Parliament House is in London.", "options": ["A", "An", "The"], "answer": 2, "hint": "Use 'the' for important buildings." },
+  { "question": "He is ___ MBA student.", "options": ["a", "an", "the"], "answer": 1, "hint": "'MBA' starts with 'em' sound." },
+  { "question": "___ Bible is a holy book.", "options": ["A", "An", "The"], "answer": 2, "hint": "Use 'the' for holy books." },
+  { "question": "She is ___ M.A. in English.", "options": ["a", "an", "the"], "answer": 1, "hint": "'M.A.' starts with a vowel sound." },
+  { "question": "___ President of India lives in Rashtrapati Bhavan.", "options": ["A", "An", "The"], "answer": 2, "hint": "Use 'the' for unique positions." },
+  { "question": "___ Gita is a sacred book.", "options": ["A", "An", "The"], "answer": 2, "hint": "Use 'the' for sacred books." },
+  { "question": "He is ___ best student in his class.", "options": ["a", "an", "the"], "answer": 2, "hint": "Use 'the' with superlatives." },
+  { "question": "___ Indian Ocean is to the east of Africa.", "options": ["A", "An", "The"], "answer": 2, "hint": "Use 'the' for oceans." },
+  { "question": "She is ___ only hope we have.", "options": ["a", "an", "the"], "answer": 2, "hint": "Use 'the' with unique nouns like 'only'." },
+  { "question": "___ Ganga is a holy river.", "options": ["A", "An", "The"], "answer": 2, "hint": "Use 'the' for river names." }
+
+      // ...add up to 50+ for production
+    ],
+    punctuation: [
+      { question: "Add punctuation:\nlets eat grandma", answer: "Let's eat, grandma.", hint: "Commas can save lives!" },
+      { question: "Add punctuation:\nit is raining outside", answer: "It is raining outside.", hint: "End with a period." },
+      { question: "Add punctuation:\noh no i forgot my keys", answer: "Oh no! I forgot my keys.", hint: "Exclamation and period." },
+      { question: "Add punctuation:\ndid you see that movie", answer: "Did you see that movie?", hint: "It's a question." },
+      { question: "Add punctuation:\ndear sir", answer: "Dear Sir,", hint: "Formal greeting ends with a comma." },
+      { question: "Add punctuation:\nhurry up", answer: "Hurry up!", hint: "Exclamation for urgency." },
+      { question: "Add punctuation:\nno thank you", answer: "No, thank you.", hint: "Comma separates phrases." },
+      { question: "Add punctuation:\nshe said i am tired", answer: "She said, \"I am tired.\"", hint: "Direct speech uses comma and quotes." },
+      { question: "Add punctuation:\nits raining isnt it", answer: "It's raining, isn't it?", hint: "Use comma for question tag." },
+      { question: "Add punctuation:\nyes I am coming", answer: "Yes, I am coming.", hint: "Comma after 'yes'." },
+      
+  { "question": "Add punctuation:\nlets eat grandma", "answer": "Let's eat, grandma.", "hint": "Start with a capital, use apostrophe for 'let's', add comma for address, and end with a period." },
+  { "question": "Add punctuation:\ndid you see the movie yesterday", "answer": "Did you see the movie yesterday?", "hint": "Start with a capital, end with a question mark." },
+  { "question": "Add punctuation:\nshe whispered be quiet", "answer": "She whispered, \"Be quiet.\"", "hint": "Start with a capital, use quotation marks for direct speech, period inside quotes." },
+  { "question": "Add punctuation:\nno thank you", "answer": "No, thank you.", "hint": "Start with a capital, comma after 'No', end with a period." },
+  { "question": "Add punctuation:\nit is raining outside", "answer": "It is raining outside.", "hint": "Start with a capital, end with a period." },
+  { "question": "Add punctuation:\noh no i forgot my keys", "answer": "Oh no! I forgot my keys.", "hint": "Start with a capital, exclamation mark after 'Oh no', period at the end." },
+  { "question": "Add punctuation:\nhey are you coming with us", "answer": "Hey, are you coming with us?", "hint": "Start with a capital, comma after 'Hey', end with a question mark." },
+  { "question": "Add punctuation:\nstop dont go there", "answer": "Stop! Don't go there.", "hint": "Start with a capital, exclamation after 'Stop', apostrophe in 'don't', period at the end." },
+  { "question": "Add punctuation:\nshe asked can you help me", "answer": "She asked, \"Can you help me?\"", "hint": "Start with a capital, comma for reporting speech, question mark inside quotes." },
+  { "question": "Add punctuation:\nwhat a beautiful place", "answer": "What a beautiful place!", "hint": "Start with a capital, end with an exclamation mark." },
+  { "question": "Add punctuation:\nyes I am ready", "answer": "Yes, I am ready.", "hint": "Start with a capital, comma after 'Yes', period at the end." },
+  { "question": "Add punctuation:\ndear sir", "answer": "Dear Sir,", "hint": "Start with a capital, comma at the end." },
+  { "question": "Add punctuation:\nits raining isnt it", "answer": "It's raining, isn't it?", "hint": "Start with a capital, apostrophes in 'it's' and 'isn't', comma before question tag, end with question mark." },
+  { "question": "Add punctuation:\nlets go to the park said anna", "answer": "\"Let's go to the park,\" said Anna.", "hint": "Start with a capital, use quotation marks for direct speech, comma before closing quotes, period at the end." },
+  { "question": "Add punctuation:\nmy favorite colors are red blue and green", "answer": "My favorite colors are red, blue, and green.", "hint": "Start with a capital, use commas in a list, period at the end." },
+  { "question": "Add punctuation:\ngood morning how are you", "answer": "Good morning! How are you?", "hint": "Start with a capital, exclamation mark, then capital and question mark." },
+  { "question": "Add punctuation:\nwait i have an idea", "answer": "Wait! I have an idea.", "hint": "Start with a capital, exclamation mark, period at the end." },
+  { "question": "Add punctuation:\nexcuse me can you help me", "answer": "Excuse me, can you help me?", "hint": "Start with a capital, comma after 'Excuse me', end with a question mark." },
+  { "question": "Add punctuation:\nwhat time is it", "answer": "What time is it?", "hint": "Start with a capital, end with a question mark." },
+  { "question": "Add punctuation:\nno I dont want any coffee", "answer": "No, I don't want any coffee.", "hint": "Start with a capital, comma after 'No', apostrophe in 'don't', period at the end." },
+  { "question": "Add punctuation:\nshe said I am tired", "answer": "She said, \"I am tired.\"", "hint": "Start with a capital, comma before quoted speech, period inside quotes." },
+  { "question": "Add punctuation:\nlets begin shall we", "answer": "Let's begin, shall we?", "hint": "Start with a capital, apostrophe in 'let's', comma before question tag, end with question mark." },
+  { "question": "Add punctuation:\nthe answer is yes", "answer": "The answer is yes.", "hint": "Start with a capital, period at the end." },
+  { "question": "Add punctuation:\nplease close the door", "answer": "Please close the door.", "hint": "Start with a capital, period at the end." },
+  { "question": "Add punctuation:\nhe likes apples oranges and bananas", "answer": "He likes apples, oranges, and bananas.", "hint": "Start with a capital, use commas in a list, period at the end." },
+  { "question": "Add punctuation:\nhello how are you", "answer": "Hello, how are you?", "hint": "Start with a capital, comma after 'Hello', end with question mark." },
+  { "question": "Add punctuation:\nwait said the teacher be quiet", "answer": "\"Wait!\" said the teacher. \"Be quiet.\"", "hint": "Start with a capital, use quotation marks, exclamation and period." },
+  { "question": "Add punctuation:\ni am fine thank you", "answer": "I am fine, thank you.", "hint": "Start with a capital, comma before 'thank you', period at the end." },
+  { "question": "Add punctuation:\nhello john", "answer": "Hello, John.", "hint": "Start with a capital, comma after 'Hello', period at the end." },
+  { "question": "Add punctuation:\nno I cant do that", "answer": "No, I can't do that.", "hint": "Start with a capital, comma after 'No', apostrophe in 'can't', period at the end." },
+  { "question": "Add punctuation:\nsurprise its your birthday", "answer": "Surprise! It's your birthday.", "hint": "Start with a capital, exclamation after 'Surprise', apostrophe in 'it's', period at the end." },
+  { "question": "Add punctuation:\nyes please", "answer": "Yes, please.", "hint": "Start with a capital, comma after 'Yes', period at the end." },
+  { "question": "Add punctuation:\noh no I forgot my bag", "answer": "Oh no! I forgot my bag.", "hint": "Start with a capital, exclamation mark, period at the end." },
+  { "question": "Add punctuation:\nno dont touch that", "answer": "No, don't touch that!", "hint": "Start with a capital, comma after 'No', apostrophe in 'don't', exclamation at the end." },
+  { "question": "Add punctuation:\nhello my name is Sam", "answer": "Hello, my name is Sam.", "hint": "Start with a capital, comma after 'Hello', period at the end." },
+  { "question": "Add punctuation:\nare you coming to the party", "answer": "Are you coming to the party?", "hint": "Start with a capital, question mark at the end." },
+  { "question": "Add punctuation:\ndont forget your keys", "answer": "Don't forget your keys.", "hint": "Start with a capital, apostrophe in 'don't', period at the end." },
+  { "question": "Add punctuation:\nyou did a great job", "answer": "You did a great job!", "hint": "Start with a capital, exclamation mark at the end." },
+  { "question": "Add punctuation:\nhe said I will go home now", "answer": "He said, \"I will go home now.\"", "hint": "Start with a capital, comma before quoted speech, period inside quotes." },
+  { "question": "Add punctuation:\nno thank you I am full", "answer": "No, thank you. I am full.", "hint": "Start with a capital, comma and period." },
+  { "question": "Add punctuation:\nwhat happened", "answer": "What happened?", "hint": "Start with a capital, question mark at the end." },
+  { "question": "Add punctuation:\nI will help you dont worry", "answer": "I will help you. Don't worry.", "hint": "Start with a capital, period, then capital and apostrophe." },
+  { "question": "Add punctuation:\nyes I can do that", "answer": "Yes, I can do that.", "hint": "Start with a capital, comma after 'Yes', period at the end." },
+  { "question": "Add punctuation:\nplease open the window", "answer": "Please open the window.", "hint": "Start with a capital, period at the end." },
+  { "question": "Add punctuation:\nlets go for a walk", "answer": "Let's go for a walk.", "hint": "Start with a capital, apostrophe in 'let's', period at the end." },
+  { "question": "Add punctuation:\nwhat are you doing", "answer": "What are you doing?", "hint": "Start with a capital, question mark at the end." },
+  { "question": "Add punctuation:\nno I havent seen him today", "answer": "No, I haven't seen him today.", "hint": "Start with a capital, comma after 'No', apostrophe in 'haven't', period at the end." },
+  { "question": "Add punctuation:\nI am so happy", "answer": "I am so happy!", "hint": "Start with a capital, exclamation mark at the end." },
+  { "question": "Add punctuation:\nhe asked where are you going", "answer": "He asked, \"Where are you going?\"", "hint": "Start with a capital, comma before quoted speech, question mark inside quotes." },
+  { "question": "Add punctuation:\nI cant believe it", "answer": "I can't believe it!", "hint": "Start with a capital, apostrophe in 'can't', exclamation at the end." },
+  { "question": "Add punctuation:\ncan you help me", "answer": "Can you help me?", "hint": "Start with a capital, question mark at the end." }
+
+      // ...add up to 50+ for production
+    ],
+    verb_tenses: [
+      { question: "By this time next year, I ____ (finish) my studies.", options: ["will finish", "will have finished", "finish"], answer: 1, hint: "Future perfect tense." },
+      { question: "He ____ (live) in Paris since 2010.", options: ["lives", "has lived", "is living"], answer: 1, hint: "Present perfect for 'since'." },
+      { question: "He ___ (work) here since 2015.", options: ["has worked", "worked", "works"], answer: 0, hint: "Since + present perfect." },
+      { question: "They ___ (finish) their homework before dinner.", options: ["had finished", "finish", "finishing"], answer: 0, hint: "Before another past action." },
+      { question: "I ___ (meet) him last week.", options: ["meet", "met", "have met"], answer: 1, hint: "Past simple for last week." },
+      { question: "She ___ (not/come) yet.", options: ["didn't come", "hasn't come", "doesn't come"], answer: 1, hint: "Use present perfect for 'yet'." },
+      { question: "We ___ (go) to Paris next month.", options: ["go", "are going", "went"], answer: 1, hint: "Planned future: present continuous." },
+      { question: "I ___ (know) her for many years.", options: ["know", "have known", "knew"], answer: 1, hint: "Present perfect for duration." },
+      { question: "When I saw her, she ___ (read) a book.", options: ["was reading", "read", "reads"], answer: 0, hint: "Past continuous." },
+      { question: "If it ___ (rain), we will stay home.", options: ["rains", "rain", "rained"], answer: 0, hint: "First conditional." },
+      
+  { "question": "He ___ (work) here since 2015.", "options": ["has worked", "worked", "works"], "answer": 0, "hint": "Present perfect for 'since' + a year." },
+  { "question": "She ___ (not come) yet.", "options": ["didn't come", "hasn't come", "doesn't come"], "answer": 1, "hint": "Present perfect for 'yet'." },
+  { "question": "By the time we arrived, they ___ (finish) dinner.", "options": ["finish", "had finished", "have finished"], "answer": 1, "hint": "Past perfect for before another past action." },
+  { "question": "We ___ (go) to Paris next month.", "options": ["go", "are going", "went"], "answer": 1, "hint": "Present continuous for planned future." },
+  { "question": "I ___ (see) this movie before.", "options": ["saw", "have seen", "seen"], "answer": 1, "hint": "Present perfect for unfinished time." },
+  { "question": "They ___ (finish) their homework before dinner.", "options": ["had finished", "finish", "finishing"], "answer": 0, "hint": "Past perfect for 'before' another past event." },
+  { "question": "She ___ (study) English for five years.", "options": ["studies", "has studied", "studied"], "answer": 1, "hint": "Present perfect for duration." },
+  { "question": "If I ___ (be) you, I would call her.", "options": ["am", "were", "was"], "answer": 1, "hint": "Second conditional uses 'were'." },
+  { "question": "We ___ (not/see) him since last year.", "options": ["haven't seen", "didn't see", "don't see"], "answer": 0, "hint": "Present perfect for duration." },
+  { "question": "When she arrived, he ___ (leave).", "options": ["left", "had left", "leaves"], "answer": 1, "hint": "Past perfect for an earlier past action." },
+  { "question": "___ you ever ___ (eat) sushi?", "options": ["Did you eat", "Do you eat", "Have you eaten"], "answer": 2, "hint": "Present perfect for experiences." },
+  { "question": "He ___ (write) five books so far.", "options": ["has written", "wrote", "writes"], "answer": 0, "hint": "Present perfect for unfinished time." },
+  { "question": "They ___ (play) football when it started to rain.", "options": ["played", "were playing", "play"], "answer": 1, "hint": "Past continuous for interrupted action." },
+  { "question": "While she ___ (walk) home, she met John.", "options": ["was walking", "walked", "walks"], "answer": 0, "hint": "Past continuous for background action." },
+  { "question": "I ___ (not/do) my homework yet.", "options": ["haven't done", "didn't do", "don't do"], "answer": 0, "hint": "Present perfect for 'yet'." },
+  { "question": "She ___ (just/finish) her breakfast.", "options": ["just finished", "has just finished", "is just finishing"], "answer": 1, "hint": "Present perfect with 'just'." },
+  { "question": "They ___ (wait) for an hour when the bus arrived.", "options": ["waited", "had waited", "have waited"], "answer": 1, "hint": "Past perfect for duration before another past event." },
+  { "question": "He ___ (sleep) when the phone rang.", "options": ["slept", "was sleeping", "is sleeping"], "answer": 1, "hint": "Past continuous for actions in progress." },
+  { "question": "If it ___ (rain), we will stay inside.", "options": ["rains", "rain", "rained"], "answer": 0, "hint": "First conditional uses present simple in 'if' clause." },
+  { "question": "How long ___ you ___ (know) him?", "options": ["do you know", "have you known", "did you know"], "answer": 1, "hint": "Present perfect for duration." },
+  { "question": "By next year, I ___ (graduate) from college.", "options": ["will have graduated", "will graduate", "graduated"], "answer": 0, "hint": "Future perfect for completed action in future." },
+  { "question": "She ___ (not/see) that movie yet.", "options": ["hasn't seen", "didn't see", "doesn't see"], "answer": 0, "hint": "Present perfect for 'yet'." },
+  { "question": "We ___ (live) here since 2010.", "options": ["lived", "have lived", "live"], "answer": 1, "hint": "Present perfect for duration." },
+  { "question": "He ___ (be) sick for two days.", "options": ["is", "was", "has been"], "answer": 2, "hint": "Present perfect for ongoing state." },
+  { "question": "When I was young, I ___ (go) swimming every day.", "options": ["go", "went", "was going"], "answer": 1, "hint": "Past simple for habitual action in the past." },
+  { "question": "She ___ (already/finish) her test.", "options": ["already finished", "has already finished", "is already finished"], "answer": 1, "hint": "Present perfect with 'already'." },
+  { "question": "If he ___ (study) more, he would pass.", "options": ["studied", "studies", "study"], "answer": 0, "hint": "Second conditional uses past simple in 'if' clause." },
+  { "question": "They ___ (wait) for us when we arrived.", "options": ["were waiting", "waited", "are waiting"], "answer": 0, "hint": "Past continuous for ongoing action in the past." },
+  { "question": "I ___ (not/see) him yesterday.", "options": ["have not seen", "did not see", "do not see"], "answer": 1, "hint": "Past simple for finished time." },
+  { "question": "She ___ (cook) dinner when I got home.", "options": ["cooked", "was cooking", "has cooked"], "answer": 1, "hint": "Past continuous for actions in progress." },
+  { "question": "We ___ (not/meet) before.", "options": ["haven't met", "didn't meet", "don't meet"], "answer": 0, "hint": "Present perfect for first-time experiences." },
+  { "question": "He ___ (break) his leg last year.", "options": ["broke", "has broken", "broken"], "answer": 0, "hint": "Past simple for finished time." },
+  { "question": "How long ago ___ you ___ (start) learning English?", "options": ["do you start", "did you start", "have you started"], "answer": 1, "hint": "Past simple for 'ago'." },
+  { "question": "She ___ (leave) before I arrived.", "options": ["left", "had left", "has left"], "answer": 1, "hint": "Past perfect for earlier past action." },
+  { "question": "By 8 o'clock, they ___ (eat) breakfast.", "options": ["will have eaten", "will eat", "have eaten"], "answer": 0, "hint": "Future perfect for completed action by a time." },
+  { "question": "He ___ (just/go) out.", "options": ["just goes", "has just gone", "is just going"], "answer": 1, "hint": "Present perfect with 'just'." },
+  { "question": "She ___ (work) here for ten years.", "options": ["worked", "has worked", "works"], "answer": 1, "hint": "Present perfect for duration." },
+  { "question": "We ___ (not/finish) our homework yet.", "options": ["haven't finished", "didn't finish", "don't finish"], "answer": 0, "hint": "Present perfect for 'yet'." },
+  { "question": "He ___ (repair) the car yesterday.", "options": ["repaired", "has repaired", "repairs"], "answer": 0, "hint": "Past simple for finished time." },
+  { "question": "They ___ (already/see) the film.", "options": ["have already seen", "already saw", "see"], "answer": 0, "hint": "Present perfect with 'already'." },
+  { "question": "When I got home, my mother ___ (cook) dinner.", "options": ["cooked", "was cooking", "has cooked"], "answer": 1, "hint": "Past continuous for actions in progress." },
+  { "question": "How long ___ you ___ (work) here?", "options": ["do you work", "have you worked", "did you work"], "answer": 1, "hint": "Present perfect for duration." },
+  { "question": "She ___ (not/see) him for ages.", "options": ["hasn't seen", "didn't see", "doesn't see"], "answer": 0, "hint": "Present perfect for a long time." },
+  { "question": "He ___ (not/go) to school yesterday.", "options": ["didn't go", "hasn't gone", "doesn't go"], "answer": 0, "hint": "Past simple for finished time." },
+  { "question": "I ___ (read) that book three times.", "options": ["read", "have read", "reads"], "answer": 1, "hint": "Present perfect for repeated actions." },
+  { "question": "They ___ (just/arrive).", "options": ["just arrived", "have just arrived", "are just arriving"], "answer": 1, "hint": "Present perfect with 'just'." },
+  { "question": "We ___ (move) here last year.", "options": ["moved", "have moved", "move"], "answer": 0, "hint": "Past simple for finished time." },
+  { "question": "She ___ (write) two letters so far.", "options": ["has written", "wrote", "writes"], "answer": 0, "hint": "Present perfect for unfinished time." },
+  { "question": "He ___ (lose) his keys yesterday.", "options": ["lost", "has lost", "loses"], "answer": 0, "hint": "Past simple for finished time." },
+  { "question": "I ___ (travel) to Japan last year.", "options": ["traveled", "have traveled", "travel"], "answer": 0, "hint": "Past simple for finished time." },
+  { "question": "We ___ (never/visit) Rome.", "options": ["never visit", "have never visited", "never visited"], "answer": 1, "hint": "Present perfect for experiences." }
+
+      // ...add up to 50+ for production
+    ],
+    prepositions: [
+      { question: "She is interested ___ music.", options: ["in", "on", "at"], answer: 0, hint: "Use 'in' with 'interested'." },
+      { question: "He will arrive ___ Monday.", options: ["in", "on", "at"], answer: 1, hint: "Use 'on' with days." },
+      { question: "They will meet ___ the library.", options: ["at", "in", "on"], answer: 0, hint: "Specific place: 'at'." },
+      { question: "I was born ___ 2000.", options: ["in", "on", "at"], answer: 0, hint: "Use 'in' for years." },
+      { question: "He is good ___ playing chess.", options: ["at", "in", "on"], answer: 0, hint: "'Good at' doing something." },
+      { question: "We arrived ___ the airport at 5 pm.", options: ["at", "in", "on"], answer: 0, hint: "'At' with specific locations." },
+      { question: "The book is ___ the bag.", options: ["in", "on", "at"], answer: 0, hint: "'In' for inside." },
+      { question: "He is famous ___ his paintings.", options: ["for", "about", "of"], answer: 0, hint: "'Famous for' something." },
+      { question: "She is afraid ___ spiders.", options: ["of", "from", "about"], answer: 0, hint: "'Afraid of'." },
+      { question: "The cat jumped ___ the table.", options: ["on", "in", "at"], answer: 0, hint: "'On' for surfaces." },
+  { "question": "She is interested ___ music.", "options": ["in", "on", "at"], "answer": 0, "hint": "Use 'in' with 'interested'." },
+  { "question": "He insisted ___ paying for dinner.", "options": ["in", "on", "at"], "answer": 1, "hint": "'Insist' is followed by 'on'." },
+  { "question": "We arrived ___ the airport at 6 p.m.", "options": ["at", "in", "on"], "answer": 0, "hint": "Use 'at' for specific places." },
+  { "question": "The cat jumped ___ the table.", "options": ["on", "in", "at"], "answer": 0, "hint": "'On' for surfaces." },
+  { "question": "He apologized ___ being late.", "options": ["for", "on", "to"], "answer": 0, "hint": "'Apologize for' is the correct phrase." },
+  { "question": "The book is ___ the bag.", "options": ["in", "on", "at"], "answer": 0, "hint": "'In' for inside." },
+  { "question": "I will meet you ___ Monday.", "options": ["in", "on", "at"], "answer": 1, "hint": "'On' for days of the week." },
+  { "question": "She is married ___ a doctor.", "options": ["to", "with", "at"], "answer": 0, "hint": "'Married to' is the correct phrase." },
+  { "question": "He is afraid ___ spiders.", "options": ["of", "for", "from"], "answer": 0, "hint": "'Afraid of' is the correct phrase." },
+  { "question": "They succeeded ___ solving the problem.", "options": ["in", "on", "at"], "answer": 0, "hint": "'Succeed in' is the correct phrase." },
+  { "question": "The teacher is angry ___ the students.", "options": ["with", "at", "for"], "answer": 0, "hint": "'Angry with' people." },
+  { "question": "He is good ___ mathematics.", "options": ["at", "in", "on"], "answer": 0, "hint": "'Good at' something." },
+  { "question": "The restaurant is famous ___ its pasta.", "options": ["for", "of", "to"], "answer": 0, "hint": "'Famous for' something." },
+  { "question": "She is fond ___ chocolate.", "options": ["of", "for", "with"], "answer": 0, "hint": "'Fond of' something." },
+  { "question": "I am looking forward ___ meeting you.", "options": ["to", "for", "at"], "answer": 0, "hint": "'Look forward to' is the correct phrase." },
+  { "question": "She is proud ___ her achievements.", "options": ["of", "with", "at"], "answer": 0, "hint": "'Proud of' something." },
+  { "question": "He is responsible ___ the project.", "options": ["for", "about", "to"], "answer": 0, "hint": "'Responsible for' something." },
+  { "question": "She is jealous ___ her sister.", "options": ["of", "with", "to"], "answer": 0, "hint": "'Jealous of' someone." },
+  { "question": "He is capable ___ doing it.", "options": ["of", "for", "to"], "answer": 0, "hint": "'Capable of' something." },
+  { "question": "She is tired ___ working.", "options": ["of", "from", "with"], "answer": 0, "hint": "'Tired of' something." },
+  { "question": "He is famous ___ his paintings.", "options": ["for", "by", "of"], "answer": 0, "hint": "'Famous for' something." },
+  { "question": "She is similar ___ her mother.", "options": ["to", "with", "for"], "answer": 0, "hint": "'Similar to' someone." },
+  { "question": "He is interested ___ photography.", "options": ["in", "on", "at"], "answer": 0, "hint": "'Interested in' something." },
+  { "question": "She is afraid ___ the dark.", "options": ["of", "for", "to"], "answer": 0, "hint": "'Afraid of' something." },
+  { "question": "They arrived ___ the party late.", "options": ["at", "in", "on"], "answer": 0, "hint": "'Arrive at' for events." },
+  { "question": "He is worried ___ his exams.", "options": ["about", "for", "with"], "answer": 0, "hint": "'Worried about' something." },
+  { "question": "She is bored ___ this movie.", "options": ["with", "of", "by"], "answer": 0, "hint": "'Bored with' something." },
+  { "question": "He is famous ___ his songs.", "options": ["for", "to", "with"], "answer": 0, "hint": "'Famous for' something." },
+  { "question": "They are used ___ getting up early.", "options": ["to", "for", "at"], "answer": 0, "hint": "'Used to' doing something." },
+  { "question": "She is excited ___ her trip.", "options": ["about", "for", "with"], "answer": 0, "hint": "'Excited about' something." },
+  { "question": "He apologized ___ the mistake.", "options": ["for", "to", "with"], "answer": 0, "hint": "'Apologize for' something." },
+  { "question": "She is famous ___ her beauty.", "options": ["for", "of", "to"], "answer": 0, "hint": "'Famous for' something." },
+  { "question": "He is afraid ___ heights.", "options": ["of", "for", "to"], "answer": 0, "hint": "'Afraid of' something." },
+  { "question": "They are interested ___ music.", "options": ["in", "on", "at"], "answer": 0, "hint": "'Interested in' something." },
+  { "question": "She is responsible ___ organizing the event.", "options": ["for", "of", "to"], "answer": 0, "hint": "'Responsible for' something." },
+  { "question": "He is tired ___ waiting.", "options": ["of", "with", "for"], "answer": 0, "hint": "'Tired of' something." },
+  { "question": "She is looking forward ___ the holidays.", "options": ["to", "for", "at"], "answer": 0, "hint": "'Look forward to' something." },
+  { "question": "He is good ___ playing chess.", "options": ["at", "in", "on"], "answer": 0, "hint": "'Good at' something." },
+  { "question": "The train arrived ___ the station.", "options": ["at", "on", "in"], "answer": 0, "hint": "'Arrive at' for stations." },
+  { "question": "We stayed ___ a hotel.", "options": ["in", "on", "at"], "answer": 0, "hint": "'Stay in' a hotel." },
+  { "question": "He succeeded ___ passing the exam.", "options": ["in", "on", "at"], "answer": 0, "hint": "'Succeed in' doing something." },
+  { "question": "She is proud ___ her achievements.", "options": ["of", "for", "to"], "answer": 0, "hint": "'Proud of' something." },
+  { "question": "He is jealous ___ her success.", "options": ["of", "to", "at"], "answer": 0, "hint": "'Jealous of' something." },
+  { "question": "She apologized ___ her mistake.", "options": ["for", "to", "of"], "answer": 0, "hint": "'Apologize for' something." },
+  { "question": "He is capable ___ doing the work.", "options": ["of", "in", "at"], "answer": 0, "hint": "'Capable of' something." },
+  { "question": "She is fond ___ music.", "options": ["of", "to", "for"], "answer": 0, "hint": "'Fond of' something." },
+  { "question": "He is used ___ the cold weather.", "options": ["to", "for", "at"], "answer": 0, "hint": "'Used to' something." },
+  { "question": "She is excited ___ the new job.", "options": ["about", "with", "to"], "answer": 0, "hint": "'Excited about' something." },
+  { "question": "He is worried ___ the test.", "options": ["about", "for", "to"], "answer": 0, "hint": "'Worried about' something." },
+  { "question": "She is bored ___ this TV show.", "options": ["with", "of", "by"], "answer": 0, "hint": "'Bored with' something." },
+  { "question": "He is famous ___ writing novels.", "options": ["for", "of", "to"], "answer": 0, "hint": "'Famous for' something." }
+
+      // ...add up to 50+ for production
+    ],
+    subject_verb: [
+      { question: "Neither of the boys ___ finished their work.", options: ["has", "have"], answer: 0, hint: "'Neither' is singular." },
+      { question: "Each of the players ___ a medal.", options: ["receive", "receives"], answer: 1, hint: "'Each' is singular." },
+      { question: "Either my father or my brothers ___ coming.", options: ["is", "are"], answer: 1, hint: "Verb agrees with nearer subject." },
+      { question: "Each of the students ___ a pen.", options: ["has", "have"], answer: 0, hint: "'Each' is singular." },
+      { question: "The news ___ interesting.", options: ["is", "are"], answer: 0, hint: "'News' is singular." },
+      { question: "Neither the teacher nor the students ___ in the class.", options: ["is", "are"], answer: 1, hint: "Verb follows closer subject." },
+      { question: "None of the boys ___ present.", options: ["was", "were"], answer: 0, hint: "'None' can be singular or plural, but with collective sense: singular." },
+      { question: "Everyone ___ invited.", options: ["was", "were"], answer: 0, hint: "'Everyone' is singular." },
+      { question: "The team ___ winning.", options: ["is", "are"], answer: 0, hint: "'Team' is singular." },
+      { question: "My friends ___ coming.", options: ["is", "are"], answer: 1, hint: "Plural subject." },
+  { "question": "Each of the students ___ a pen.", "options": ["has", "have"], "answer": 0, "hint": "'Each' is considered singular." },
+  { "question": "Neither of the boys ___ finished their work.", "options": ["has", "have"], "answer": 0, "hint": "'Neither' is singular." },
+  { "question": "The news ___ shocking.", "options": ["is", "are"], "answer": 0, "hint": "'News' is singular." },
+  { "question": "Both my brother and sister ___ doctors.", "options": ["is", "are"], "answer": 1, "hint": "Two people: plural verb." },
+  { "question": "The committee ___ making its decision.", "options": ["is", "are"], "answer": 0, "hint": "Committee as a unit is singular." },
+  { "question": "Either my mother or my friends ___ coming.", "options": ["is", "are"], "answer": 1, "hint": "Verb agrees with the closer subject." },
+  { "question": "The quality of the apples ___ not good.", "options": ["is", "are"], "answer": 0, "hint": "Verb agrees with 'quality' not 'apples'." },
+  { "question": "Ten years ___ a long time.", "options": ["is", "are"], "answer": 0, "hint": "Periods of time are singular." },
+  { "question": "A pair of shoes ___ on the floor.", "options": ["is", "are"], "answer": 0, "hint": "'A pair' is singular." },
+  { "question": "The police ___ investigating the case.", "options": ["is", "are"], "answer": 1, "hint": "'Police' is always plural." },
+  { "question": "Neither the manager nor the employees ___ willing to do the work.", "options": ["is", "are"], "answer": 1, "hint": "Verb agrees with nearest subject." },
+  { "question": "Mathematics ___ my favorite subject.", "options": ["is", "are"], "answer": 0, "hint": "Subjects ending in -ics are usually singular." },
+  { "question": "The number of students ___ increasing.", "options": ["is", "are"], "answer": 0, "hint": "'The number' is singular." },
+  { "question": "A number of students ___ present today.", "options": ["is", "are"], "answer": 1, "hint": "'A number of' means plural." },
+  { "question": "Either the boys or the girl ___ wrong.", "options": ["is", "are"], "answer": 0, "hint": "Verb agrees with the nearest subject." },
+  { "question": "None of the answers ___ correct.", "options": ["is", "are"], "answer": 1, "hint": "'None' with plural noun takes plural verb." },
+  { "question": "Bread and butter ___ my favorite breakfast.", "options": ["is", "are"], "answer": 0, "hint": "Treated as a single item." },
+  { "question": "The jury ___ divided in their opinions.", "options": ["was", "were"], "answer": 1, "hint": "Jury as individuals: plural." },
+  { "question": "Not only the teacher but also the students ___ tired.", "options": ["is", "are"], "answer": 1, "hint": "Verb agrees with nearest subject." },
+  { "question": "Either you or he ___ to blame.", "options": ["is", "are"], "answer": 0, "hint": "Verb agrees with nearest subject." },
+  { "question": "The team ___ playing well this season.", "options": ["is", "are"], "answer": 0, "hint": "Team as a unit: singular." },
+  { "question": "There ___ a cat and two dogs in the room.", "options": ["is", "are"], "answer": 1, "hint": "Verb agrees with plural noun after 'and'." },
+  { "question": "The scissors ___ on the table.", "options": ["is", "are"], "answer": 1, "hint": "'Scissors' is plural." },
+  { "question": "Fifty dollars ___ a lot of money.", "options": ["is", "are"], "answer": 0, "hint": "Amounts of money are singular." },
+  { "question": "Many a man ___ tried and failed.", "options": ["has", "have"], "answer": 0, "hint": "'Many a' is singular." },
+  { "question": "All the books ___ on the shelf.", "options": ["is", "are"], "answer": 1, "hint": "'Books' is plural." },
+  { "question": "Neither the boys nor the girl ___ present.", "options": ["is", "are"], "answer": 0, "hint": "Verb agrees with nearest subject." },
+  { "question": "His trousers ___ new.", "options": ["is", "are"], "answer": 1, "hint": "Trousers is always plural." },
+  { "question": "The majority ___ agreed to the proposal.", "options": ["has", "have"], "answer": 0, "hint": "'Majority' as a unit." },
+  { "question": "The majority of players ___ tired.", "options": ["is", "are"], "answer": 1, "hint": "Majority of plural noun: plural verb." },
+  { "question": "The staff ___ on strike.", "options": ["is", "are"], "answer": 1, "hint": "Staff as individuals: plural." },
+  { "question": "Each of the girls ___ given a prize.", "options": ["was", "were"], "answer": 0, "hint": "'Each' is singular." },
+  { "question": "There ___ a dog in the yard.", "options": ["is", "are"], "answer": 0, "hint": "Singular noun: singular verb." },
+  { "question": "There ___ many problems to solve.", "options": ["is", "are"], "answer": 1, "hint": "Plural noun after 'there': plural verb." },
+  { "question": "Either my father or my brothers ___ coming.", "options": ["is", "are"], "answer": 1, "hint": "Verb agrees with nearest subject." },
+  { "question": "Neither of the answers ___ correct.", "options": ["is", "are"], "answer": 0, "hint": "'Neither' is singular." },
+  { "question": "Much of the work ___ finished.", "options": ["is", "are"], "answer": 0, "hint": "Uncountable noun: singular verb." },
+  { "question": "Many students ___ participated.", "options": ["has", "have"], "answer": 1, "hint": "Plural noun: plural verb." },
+  { "question": "One of my friends ___ going abroad.", "options": ["is", "are"], "answer": 0, "hint": "'One of' is singular." },
+  { "question": "The data ___ not accurate.", "options": ["is", "are"], "answer": 1, "hint": "'Data' is plural in formal English." },
+  { "question": "My family ___ going on vacation.", "options": ["is", "are"], "answer": 0, "hint": "Family as a unit: singular." },
+  { "question": "All the information ___ available.", "options": ["is", "are"], "answer": 0, "hint": "'Information' is uncountable." },
+  { "question": "Neither the teacher nor the students ___ late.", "options": ["is", "are"], "answer": 1, "hint": "Verb agrees with nearest subject." },
+  { "question": "A lot of money ___ spent on the project.", "options": ["was", "were"], "answer": 0, "hint": "'Money' is uncountable." },
+  { "question": "The committee ___ divided in their opinion.", "options": ["is", "are"], "answer": 1, "hint": "Committee as individuals: plural." },
+  { "question": "Not only the boys but also the girl ___ happy.", "options": ["is", "are"], "answer": 0, "hint": "Verb agrees with nearest subject." },
+  { "question": "The audience ___ clapping their hands.", "options": ["was", "were"], "answer": 1, "hint": "Audience as individuals: plural." },
+  { "question": "There ___ a pencil and some pens on the desk.", "options": ["is", "are"], "answer": 1, "hint": "Compound subject with 'and': plural verb." },
+  { "question": "All of the cake ___ gone.", "options": ["has", "have"], "answer": 0, "hint": "Uncountable noun: singular verb." },
+  { "question": "The army ___ marching through the city.", "options": ["is", "are"], "answer": 0, "hint": "Army as a unit: singular." },
+  { "question": "Plenty of apples ___ available.", "options": ["is", "are"], "answer": 1, "hint": "Plural noun: plural verb." },
+  { "question": "The crowd ___ cheering loudly.", "options": ["is", "are"], "answer": 0, "hint": "Crowd as a unit: singular." },
+  { "question": "Twenty kilometers ___ a long distance to walk.", "options": ["is", "are"], "answer": 0, "hint": "Distance is singular." }
+
+      // ...add up to 50+ for production
+    ]
+  },
+  hard: {
+    articles: [
+      { question: "He plays ___ piano very well.", options: ["a", "an", "the", "no article"], answer: 2, hint: "Musical instruments use 'the'." },
+      { question: "___ wisdom is a valuable virtue.", options: ["A", "An", "The", "No article"], answer: 3, hint: "Abstract nouns don't take article." },
+      { question: "___ Everest is the highest mountain in the world.", options: ["A", "An", "The", "No article"], answer: 2, hint: "Mountains take 'the'." },
+      { question: "___ honesty is the best policy.", options: ["A", "An", "The", "No article"], answer: 3, hint: "Abstract nouns, general sense." },
+      { question: "He plays ___ violin.", options: ["a", "an", "the", "no article"], answer: 2, hint: "Musical instruments use 'the'." },
+      { question: "___ Mount Everest is in Nepal.", options: ["A", "An", "The", "No article"], answer: 2, hint: "Mountain names with 'Mount' take 'the'." },
+      { question: "___ gold is a precious metal.", options: ["A", "An", "The", "No article"], answer: 3, hint: "Materials in general sense." },
+      { question: "___ Pacific Ocean is vast.", options: ["A", "An", "The", "No article"], answer: 2, hint: "Oceans take 'the'." },
+      { question: "___ Alps are in Europe.", options: ["A", "An", "The", "No article"], answer: 2, hint: "Mountain ranges: 'the'." },
+      { question: "___ United States is a large country.", options: ["A", "An", "The", "No article"], answer: 2, hint: "Countries with plural or states: 'the'." },
+      
+  { "question": "___ honesty is the best policy.", "options": ["A", "An", "The", "No article"], "answer": 3, "hint": "General, abstract noun: no article." },
+  { "question": "___ Mount Everest is the highest mountain in the world.", "options": ["A", "An", "The", "No article"], "answer": 2, "hint": "Use 'the' for specific mountains with 'Mount.'" },
+  { "question": "___ gold is a precious metal.", "options": ["A", "An", "The", "No article"], "answer": 3, "hint": "Materials in general sense: no article." },
+  { "question": "He plays ___ violin.", "options": ["a", "an", "the", "no article"], "answer": 2, "hint": "Musical instruments use 'the'." },
+  { "question": "___ Pacific Ocean is vast.", "options": ["A", "An", "The", "No article"], "answer": 2, "hint": "Names of oceans need 'the'." },
+  { "question": "___ Alps are in Europe.", "options": ["A", "An", "The", "No article"], "answer": 2, "hint": "Use 'the' for mountain ranges." },
+  { "question": "She is ___ M.A. in English.", "options": ["a", "an", "the", "no article"], "answer": 1, "hint": "'M.A.' begins with a vowel sound." },
+  { "question": "___ Ganges is a sacred river.", "options": ["A", "An", "The", "No article"], "answer": 2, "hint": "Names of rivers use 'the'." },
+  { "question": "___ sun rises in the east.", "options": ["A", "An", "The", "No article"], "answer": 2, "hint": "Unique objects use 'the'." },
+  { "question": "___ water is necessary for life.", "options": ["A", "An", "The", "No article"], "answer": 3, "hint": "General, uncountable noun: no article." },
+  { "question": "___ English is spoken in many countries.", "options": ["A", "An", "The", "No article"], "answer": 3, "hint": "Languages in general: no article." },
+  { "question": "___ Smiths are coming to dinner.", "options": ["A", "An", "The", "No article"], "answer": 2, "hint": "Family names in plural: use 'the'." },
+  { "question": "___ Himalayas are snow-covered.", "options": ["A", "An", "The", "No article"], "answer": 2, "hint": "Mountain ranges use 'the'." },
+  { "question": "___ Nile flows through Egypt.", "options": ["A", "An", "The", "No article"], "answer": 2, "hint": "River names use 'the'." },
+  { "question": "___ honesty of the man was praised.", "options": ["A", "An", "The", "No article"], "answer": 2, "hint": "Specific reference: use 'the'." },
+  { "question": "___ Iron is a useful metal.", "options": ["A", "An", "The", "No article"], "answer": 3, "hint": "Metals in general need no article." },
+  { "question": "He is ___ only child in the family.", "options": ["a", "an", "the", "no article"], "answer": 2, "hint": "'Only' makes it unique: use 'the'." },
+  { "question": "___ apple a day keeps the doctor away.", "options": ["A", "An", "The", "No article"], "answer": 1, "hint": "'Apple' starts with a vowel sound." },
+  { "question": "___ Statue of Liberty is in New York.", "options": ["A", "An", "The", "No article"], "answer": 2, "hint": "Unique monuments use 'the'." },
+  { "question": "___ wisdom is valuable.", "options": ["A", "An", "The", "No article"], "answer": 3, "hint": "Abstract noun in general: no article." },
+  { "question": "___ earth revolves around the sun.", "options": ["A", "An", "The", "No article"], "answer": 2, "hint": "Unique objects: use 'the'." },
+  { "question": "___ French I learnt at school is forgotten.", "options": ["A", "An", "The", "No article"], "answer": 2, "hint": "'The' for specific reference to the language." },
+  { "question": "___ breakfast I had was delicious.", "options": ["A", "An", "The", "No article"], "answer": 2, "hint": "Specific breakfast: use 'the'." },
+  { "question": "___ air is fresh in the morning.", "options": ["A", "An", "The", "No article"], "answer": 2, "hint": "Specific air (in the morning): use 'the'." },
+  { "question": "___ knowledge is power.", "options": ["A", "An", "The", "No article"], "answer": 3, "hint": "Abstract noun in general: no article." },
+  { "question": "___ Prime Minister will address the nation.", "options": ["A", "An", "The", "No article"], "answer": 2, "hint": "Unique title: use 'the'." },
+  { "question": "___ bread is made from wheat.", "options": ["A", "An", "The", "No article"], "answer": 3, "hint": "General uncountable noun: no article." },
+  { "question": "___ Bible is a holy book.", "options": ["A", "An", "The", "No article"], "answer": 2, "hint": "Names of religious books: use 'the'." },
+  { "question": "___ tea is grown in India.", "options": ["A", "An", "The", "No article"], "answer": 3, "hint": "General uncountable noun: no article." },
+  { "question": "___ train to Mumbai leaves at 10.", "options": ["A", "An", "The", "No article"], "answer": 2, "hint": "Specific train: use 'the'." },
+  { "question": "___ rich should help the poor.", "options": ["A", "An", "The", "No article"], "answer": 2, "hint": "'The' for a whole group of people." },
+  { "question": "___ man is mortal.", "options": ["A", "An", "The", "No article"], "answer": 0, "hint": "'A' for any one, in general." },
+  { "question": "___ Everest is in Nepal.", "options": ["A", "An", "The", "No article"], "answer": 2, "hint": "Names of mountains use 'the'." },
+  { "question": "___ honesty of politicians is doubted.", "options": ["A", "An", "The", "No article"], "answer": 2, "hint": "Specific honesty: use 'the'." },
+  { "question": "He is ___ heir to the throne.", "options": ["a", "an", "the", "no article"], "answer": 1, "hint": "'Heir' starts with a vowel sound." },
+  { "question": "___ piano is a musical instrument.", "options": ["A", "An", "The", "No article"], "answer": 2, "hint": "Musical instruments: use 'the'." },
+  { "question": "___ Gita is a sacred book.", "options": ["A", "An", "The", "No article"], "answer": 2, "hint": "Names of religious books: use 'the'." },
+  { "question": "___ knowledge of history is essential.", "options": ["A", "An", "The", "No article"], "answer": 2, "hint": "Specific knowledge: use 'the'." },
+  { "question": "___ oxygen is necessary for life.", "options": ["A", "An", "The", "No article"], "answer": 3, "hint": "General substance: no article." },
+  { "question": "___ Indian Ocean is to the south of India.", "options": ["A", "An", "The", "No article"], "answer": 2, "hint": "Names of oceans: use 'the'." },
+  { "question": "___ information you gave was very helpful.", "options": ["A", "An", "The", "No article"], "answer": 2, "hint": "Specific information: use 'the'." },
+  { "question": "___ sugar in this jar is old.", "options": ["A", "An", "The", "No article"], "answer": 2, "hint": "Specific sugar: use 'the'." },
+  { "question": "___ sugar is bad for your teeth.", "options": ["A", "An", "The", "No article"], "answer": 3, "hint": "General sugar: no article." },
+  { "question": "___ oranges are rich in vitamin C.", "options": ["A", "An", "The", "No article"], "answer": 2, "hint": "Specific oranges: use 'the'." },
+  { "question": "___ oranges are imported from Spain.", "options": ["A", "An", "The", "No article"], "answer": 2, "hint": "Specific oranges: use 'the'." },
+  { "question": "___ oranges are my favorite fruit.", "options": ["A", "An", "The", "No article"], "answer": 3, "hint": "Oranges in general: no article." },
+  { "question": "___ water in this glass is cold.", "options": ["A", "An", "The", "No article"], "answer": 2, "hint": "Specific water: use 'the'." },
+  { "question": "___ water is colorless.", "options": ["A", "An", "The", "No article"], "answer": 3, "hint": "General water: no article." },
+  { "question": "___ Taj Mahal was built by Shah Jahan.", "options": ["A", "An", "The", "No article"], "answer": 2, "hint": "Unique monument: use 'the'." },
+  { "question": "___ United Kingdom is an island nation.", "options": ["A", "An", "The", "No article"], "answer": 2, "hint": "Names of countries with 'of' or plural: use 'the'." },
+  { "question": "___ Everest is the highest mountain.", "options": ["A", "An", "The", "No article"], "answer": 2, "hint": "Names of mountains: use 'the'." },
+  { "question": "___ gold in this ring is pure.", "options": ["A", "An", "The", "No article"], "answer": 2, "hint": "Specific gold: use 'the'." },
+  { "question": "___ gold is expensive.", "options": ["A", "An", "The", "No article"], "answer": 3, "hint": "Gold in general: no article." },
+  { "question": "___ Nile is the longest river.", "options": ["A", "An", "The", "No article"], "answer": 2, "hint": "Names of rivers: use 'the'." },
+  { "question": "___ air in this room is stuffy.", "options": ["A", "An", "The", "No article"], "answer": 2, "hint": "Specific air: use 'the'." },
+  { "question": "___ air is all around us.", "options": ["A", "An", "The", "No article"], "answer": 3, "hint": "General air: no article." },
+  { "question": "___ French spoken in Canada differs from that in France.", "options": ["A", "An", "The", "No article"], "answer": 2, "hint": "Specific type of French: use 'the'." }
+
+      // ...add up to 50+ for production
+    ],
+    punctuation: [
+      { question: "Add punctuation:\nmy favorite books are harry potter the hobbit and pride and prejudice", answer: "My favorite books are Harry Potter, The Hobbit, and Pride and Prejudice.", hint: "Use commas for lists and capitals for names." },
+      { question: "Add punctuation:\nwait dont go", answer: "Wait! Don't go.", hint: "Exclamation and apostrophe." },
+      { question: "Add punctuation:\nhe asked can you help me", answer: "He asked, \"Can you help me?\"", hint: "Use comma and quotes for direct speech." },
+      { question: "Add punctuation:\nno i do not want any coffee thank you", answer: "No, I do not want any coffee. Thank you.", hint: "Separate with commas and period." },
+      { question: "Add punctuation:\nalthough it was raining we went out", answer: "Although it was raining, we went out.", hint: "Comma after subordinate clause." },
+      { question: "Add punctuation:\nwait said the guard you cannot pass", answer: "\"Wait!\" said the guard. \"You cannot pass.\"", hint: "Use quotes and exclamation." },
+      { question: "Add punctuation:\nhe is a smart intelligent and hardworking student", answer: "He is a smart, intelligent, and hardworking student.", hint: "Use commas in a series." },
+      { question: "Add punctuation:\nshe whispered be quiet", answer: "She whispered, \"Be quiet.\"", hint: "Comma and quotes." },
+      { question: "Add punctuation:\nyou must finish this by tomorrow", answer: "You must finish this by tomorrow.", hint: "End with a full stop." },
+      { question: "Add punctuation:\ndid you know that she left", answer: "Did you know that she left?", hint: "Question mark." },
+      
+  { "question": "Add punctuation:\nwhere is my book", "answer": "Where is my book?", "hint": "Start with a capital, end with a question mark." },
+  { "question": "Add punctuation:\nplease come here", "answer": "Please come here.", "hint": "Start with a capital, end with a period." },
+  { "question": "Add punctuation:\nwatch out", "answer": "Watch out!", "hint": "Start with a capital, end with an exclamation mark." },
+  { "question": "Add punctuation:\nit is raining", "answer": "It is raining.", "hint": "Start with a capital, end with a period." },
+  { "question": "Add punctuation:\nopen the door", "answer": "Open the door.", "hint": "Start with a capital, end with a period." },
+  { "question": "Add punctuation:\ncan you help me", "answer": "Can you help me?", "hint": "Start with a capital, end with a question mark." },
+  { "question": "Add punctuation:\ngood morning", "answer": "Good morning.", "hint": "Start with a capital, end with a period." },
+  { "question": "Add punctuation:\nwhat is your name", "answer": "What is your name?", "hint": "Start with a capital, end with a question mark." },
+  { "question": "Add punctuation:\nstop", "answer": "Stop.", "hint": "Start with a capital, end with a period." },
+  { "question": "Add punctuation:\nhow old are you", "answer": "How old are you?", "hint": "Start with a capital, end with a question mark." },
+  { "question": "Add punctuation:\nhello my name is sara", "answer": "Hello, my name is Sara.", "hint": "Start with a capital, use a comma, end with a period." },
+  { "question": "Add punctuation:\nno thank you", "answer": "No, thank you.", "hint": "Start with a capital, use a comma, end with a period." },
+  { "question": "Add punctuation:\nyes i will go", "answer": "Yes, I will go.", "hint": "Start with a capital, use a comma, end with a period." },
+  { "question": "Add punctuation:\nhappy birthday", "answer": "Happy birthday!", "hint": "Start with a capital, end with an exclamation mark." },
+  { "question": "Add punctuation:\ni am fine", "answer": "I am fine.", "hint": "Start with a capital, end with a period." },
+  { "question": "Add punctuation:\nsee you soon", "answer": "See you soon.", "hint": "Start with a capital, end with a period." },
+  { "question": "Add punctuation:\nplease sit down", "answer": "Please sit down.", "hint": "Start with a capital, end with a period." },
+  { "question": "Add punctuation:\nwhat time is it", "answer": "What time is it?", "hint": "Start with a capital, end with a question mark." },
+  { "question": "Add punctuation:\ndont touch that", "answer": "Don't touch that!", "hint": "Start with a capital, use an apostrophe, end with an exclamation mark." },
+  { "question": "Add punctuation:\nwhere do you live", "answer": "Where do you live?", "hint": "Start with a capital, end with a question mark." },
+  { "question": "Add punctuation:\nit is cold today", "answer": "It is cold today.", "hint": "Start with a capital, end with a period." },
+  { "question": "Add punctuation:\ni love pizza", "answer": "I love pizza.", "hint": "Start with a capital, end with a period." },
+  { "question": "Add punctuation:\nlets go home", "answer": "Let's go home.", "hint": "Start with a capital, use an apostrophe, end with a period." },
+  { "question": "Add punctuation:\ndo you like music", "answer": "Do you like music?", "hint": "Start with a capital, end with a question mark." },
+  { "question": "Add punctuation:\ni have a dog", "answer": "I have a dog.", "hint": "Start with a capital, end with a period." },
+  { "question": "Add punctuation:\nhello", "answer": "Hello.", "hint": "Start with a capital, end with a period." },
+  { "question": "Add punctuation:\ni am hungry", "answer": "I am hungry.", "hint": "Start with a capital, end with a period." },
+  { "question": "Add punctuation:\nbe careful", "answer": "Be careful!", "hint": "Start with a capital, end with an exclamation mark." },
+  { "question": "Add punctuation:\ncan i have some water", "answer": "Can I have some water?", "hint": "Start with a capital, end with a question mark." },
+  { "question": "Add punctuation:\nturn off the light", "answer": "Turn off the light.", "hint": "Start with a capital, end with a period." },
+  { "question": "Add punctuation:\nwhat is that", "answer": "What is that?", "hint": "Start with a capital, end with a question mark." },
+  { "question": "Add punctuation:\nits my birthday", "answer": "It's my birthday.", "hint": "Start with a capital, use an apostrophe, end with a period." },
+  { "question": "Add punctuation:\nthe sky is blue", "answer": "The sky is blue.", "hint": "Start with a capital, end with a period." },
+  { "question": "Add punctuation:\nwhere are you going", "answer": "Where are you going?", "hint": "Start with a capital, end with a question mark." },
+  { "question": "Add punctuation:\nwhat a beautiful day", "answer": "What a beautiful day!", "hint": "Start with a capital, end with an exclamation mark." },
+  { "question": "Add punctuation:\nclose the window", "answer": "Close the window.", "hint": "Start with a capital, end with a period." },
+  { "question": "Add punctuation:\nmay i come in", "answer": "May I come in?", "hint": "Start with a capital, end with a question mark." },
+  { "question": "Add punctuation:\nyour bag is here", "answer": "Your bag is here.", "hint": "Start with a capital, end with a period." },
+  { "question": "Add punctuation:\nare you ready", "answer": "Are you ready?", "hint": "Start with a capital, end with a question mark." },
+  { "question": "Add punctuation:\nplease wait", "answer": "Please wait.", "hint": "Start with a capital, end with a period." },
+  { "question": "Add punctuation:\nlets start", "answer": "Let's start.", "hint": "Start with a capital, use an apostrophe, end with a period." },
+  { "question": "Add punctuation:\nhe is my friend", "answer": "He is my friend.", "hint": "Start with a capital, end with a period." },
+  { "question": "Add punctuation:\nhow are you feeling", "answer": "How are you feeling?", "hint": "Start with a capital, end with a question mark." },
+  { "question": "Add punctuation:\nhurry up", "answer": "Hurry up!", "hint": "Start with a capital, end with an exclamation mark." },
+  { "question": "Add punctuation:\nthats a good idea", "answer": "That's a good idea.", "hint": "Start with a capital, use an apostrophe, end with a period." },
+  { "question": "Add punctuation:\nthis is my house", "answer": "This is my house.", "hint": "Start with a capital, end with a period." },
+  { "question": "Add punctuation:\nwhat is for dinner", "answer": "What is for dinner?", "hint": "Start with a capital, end with a question mark." },
+  { "question": "Add punctuation:\nmy name is tom", "answer": "My name is Tom.", "hint": "Start with a capital, end with a period." },
+  { "question": "Add punctuation:\nsee you tomorrow", "answer": "See you tomorrow.", "hint": "Start with a capital, end with a period." },
+  { "question": "Add punctuation:\nyes please", "answer": "Yes, please.", "hint": "Start with a capital, use a comma, end with a period." },
+  { "question": "Add punctuation:\nwhat happened", "answer": "What happened?", "hint": "Start with a capital, end with a question mark." },
+  { "question": "Add punctuation:\nis it raining", "answer": "Is it raining?", "hint": "Start with a capital, end with a question mark." },
+  { "question": "Add punctuation:\ncome here", "answer": "Come here.", "hint": "Start with a capital, end with a period." },
+  { "question": "Add punctuation:\nlets play", "answer": "Let's play.", "hint": "Start with a capital, use an apostrophe, end with a period." }
+
+      // ...add up to 50+ for production
+    ],
+    verb_tenses: [
+      { question: "If he ____ (study) harder, he would have passed.", options: ["studied", "had studied", "studies"], answer: 1, hint: "Third conditional." },
+      { question: "She ____ (work) here for five years before she left.", options: ["has worked", "had worked", "worked"], answer: 1, hint: "Past perfect before another past action." },
+      { question: "If it ___ (rain), the match would be cancelled.", options: ["had rained", "rained", "has rained"], answer: 1, hint: "Second conditional." },
+      { question: "They ___ (live) in London since they got married.", options: ["live", "have lived", "lived"], answer: 1, hint: "Since + present perfect." },
+      { question: "By the time you arrive, I ___ (finish) my work.", options: ["will finish", "will have finished", "finished"], answer: 1, hint: "Future perfect." },
+      { question: "If he ___ (know) about it, he would have helped.", options: ["knew", "had known", "knows"], answer: 1, hint: "Third conditional." },
+      { question: "She ___ (read) the book before she saw the movie.", options: ["had read", "read", "was reading"], answer: 0, hint: "Past perfect." },
+      { question: "I wish I ___ (be) taller.", options: ["was", "were", "am"], answer: 1, hint: "Wish + past simple (were for I/he/she/it)." },
+      { question: "He said he ___ (go) to the party.", options: ["will go", "would go", "goes"], answer: 1, hint: "Reported speech." },
+      { question: "If I ___ (see) her, I would tell her.", options: ["saw", "see", "had seen"], answer: 0, hint: "Second conditional." },
+      
+  { "question": "By the time you arrive, I ___ (finish) my homework.", "options": ["will finish", "will have finished", "have finished", "finished"], "answer": 1, "hint": "Future perfect: 'will have' + past participle for completed action before a future point." },
+  { "question": "If she ___ (study) harder, she would have passed the exam.", "options": ["studies", "had studied", "studied", "has studied"], "answer": 1, "hint": "Third conditional: 'had' + past participle in the if-clause." },
+  { "question": "They ___ (wait) for over an hour before the bus finally arrived.", "options": ["waited", "had been waiting", "have waited", "were waiting"], "answer": 1, "hint": "Past perfect continuous for duration before a past event." },
+  { "question": "I wish I ___ (know) about the meeting yesterday.", "options": ["knew", "had known", "know", "have known"], "answer": 1, "hint": "Wish about the past: 'had' + past participle." },
+  { "question": "She acts as if she ___ (be) the boss.", "options": ["was", "were", "is", "has been"], "answer": 1, "hint": "Subjunctive mood after 'as if/as though': use 'were'." },
+  { "question": "Next month I ___ (work) here for ten years.", "options": ["will be working", "will have been working", "am working", "work"], "answer": 1, "hint": "Future perfect continuous for ongoing duration up to a future point." },
+  { "question": "If I ___ (see) him, I would have told him.", "options": ["have seen", "had seen", "saw", "see"], "answer": 1, "hint": "Third conditional: 'had' + past participle." },
+  { "question": "She ___ (live) in London before she moved to Paris.", "options": ["lived", "has lived", "had lived", "was living"], "answer": 2, "hint": "Past perfect for an action before another past action." },
+  { "question": "By the end of this year, they ___ (complete) the project.", "options": ["will complete", "will have completed", "completed", "have completed"], "answer": 1, "hint": "Future perfect for completed action before a future time." },
+  { "question": "If you ___ (tell) me earlier, I could have helped.", "options": ["told", "had told", "have told", "tell"], "answer": 1, "hint": "Third conditional form." },
+  { "question": "He said he ___ (already/finish) the report.", "options": ["already finished", "has already finished", "had already finished", "finished already"], "answer": 2, "hint": "Reported speech: use past perfect for completed action." },
+  { "question": "I ___ (wait) for you for two hours when you finally arrived.", "options": ["had waited", "was waiting", "have waited", "had been waiting"], "answer": 3, "hint": "Past perfect continuous for duration before a past event." },
+  { "question": "She ___ (work) here since 2005.", "options": ["has worked", "had worked", "worked", "was working"], "answer": 0, "hint": "Present perfect for ongoing action from the past to present." },
+  { "question": "If only I ___ (not/forget) my umbrella!", "options": ["didn't forget", "haven't forgotten", "hadn't forgotten", "wouldn't forget"], "answer": 2, "hint": "Wish/regret about the past uses past perfect." },
+  { "question": "He ___ (just/leave) when I arrived.", "options": ["just left", "had just left", "has just left", "was just leaving"], "answer": 1, "hint": "Past perfect for completed action before another past event." },
+  { "question": "She said she ___ (never/see) such a beautiful place before.", "options": ["never saw", "had never seen", "has never seen", "never seen"], "answer": 1, "hint": "Past perfect for earlier experience before another past event." },
+  { "question": "If you ___ (listen) to me, you wouldn't be in trouble now.", "options": ["listened", "had listened", "have listened", "listen"], "answer": 1, "hint": "Mixed conditional: past perfect in if-clause." },
+  { "question": "He ___ (study) for three hours when his friend called.", "options": ["studied", "was studying", "had studied", "had been studying"], "answer": 3, "hint": "Past perfect continuous for duration before a past event." },
+  { "question": "By next week, we ___ (finish) the assignment.", "options": ["will finish", "will have finished", "finish", "have finished"], "answer": 1, "hint": "Future perfect for completed action before a future time." },
+  { "question": "They ___ (already/leave) before I arrived.", "options": ["had already left", "already left", "have already left", "left already"], "answer": 0, "hint": "Past perfect for an action before another past action." },
+  { "question": "She ___ (not/see) him since last year.", "options": ["hasn't seen", "hadn't seen", "didn't see", "doesn't see"], "answer": 0, "hint": "Present perfect for duration up to now." },
+  { "question": "If I ___ (be) you, I would not do that.", "options": ["was", "were", "am", "had been"], "answer": 1, "hint": "Subjunctive mood in hypothetical situations: 'were'." },
+  { "question": "He ___ (work) for the company for 10 years when he retired.", "options": ["worked", "has worked", "had worked", "had been working"], "answer": 2, "hint": "Past perfect for duration before a past event." },
+  { "question": "I wish I ___ (can) fly.", "options": ["could", "can", "would", "will"], "answer": 0, "hint": "Wish about the present: use 'could'." },
+  { "question": "If it ___ (not rain), we would have gone to the park.", "options": ["did not rain", "has not rained", "had not rained", "was not raining"], "answer": 2, "hint": "Third conditional: 'had not' + past participle." },
+  { "question": "By the time we get there, the concert ___ (start).", "options": ["starts", "will start", "will have started", "start"], "answer": 2, "hint": "Future perfect for completed action before a future moment." },
+  { "question": "He acts as if he ___ (see) a ghost.", "options": ["saw", "had seen", "has seen", "see"], "answer": 1, "hint": "Subjunctive: after 'as if,' use past perfect for unreal past." },
+  { "question": "She ___ (read) the book by the time the class began.", "options": ["had read", "has read", "read", "was reading"], "answer": 0, "hint": "Past perfect before another past event." },
+  { "question": "If you ___ (call) me, I would have answered.", "options": ["called", "had called", "have called", "call"], "answer": 1, "hint": "Third conditional: 'had' + past participle in the if-clause." },
+  { "question": "He ___ (wait) for hours before she finally appeared.", "options": ["waited", "had been waiting", "has waited", "was waiting"], "answer": 1, "hint": "Past perfect continuous for duration until a past event." },
+  { "question": "If I ___ (know) it was your birthday, I would have bought a gift.", "options": ["know", "knew", "had known", "have known"], "answer": 2, "hint": "Third conditional: 'had' + past participle." },
+  { "question": "She ___ (be) very tired because she had been working all day.", "options": ["was", "is", "has been", "were"], "answer": 0, "hint": "Past simple for result of past perfect continuous." },
+  { "question": "By the end of the month, I ___ (save) enough money.", "options": ["will save", "will have saved", "have saved", "save"], "answer": 1, "hint": "Future perfect for completed action before a point in the future." },
+  { "question": "He ___ (not/finish) his work when we arrived.", "options": ["didn't finish", "hadn't finished", "hasn't finished", "wasn't finishing"], "answer": 1, "hint": "Past perfect for incomplete action before a past event." },
+  { "question": "If only I ___ (listen) to your advice!", "options": ["listened", "had listened", "have listened", "was listening"], "answer": 1, "hint": "Regret about the past: past perfect." },
+  { "question": "I ___ (just/leave) when she called.", "options": ["just left", "had just left", "have just left", "was just leaving"], "answer": 1, "hint": "Past perfect for completed action before another past event." },
+  { "question": "She ___ (live) in Paris for two years before moving to Rome.", "options": ["lived", "had lived", "has lived", "was living"], "answer": 1, "hint": "Past perfect for duration before another past event." },
+  { "question": "They ___ (not/meet) before the party.", "options": ["didn't meet", "hadn't met", "haven't met", "don't meet"], "answer": 1, "hint": "Past perfect negative before another event." },
+  { "question": "He ___ (not/see) her since she left the city.", "options": ["hasn't seen", "hadn't seen", "didn't see", "doesn't see"], "answer": 0, "hint": "Present perfect for duration up to now." },
+  { "question": "If I ___ (be) taller, I would have joined the team.", "options": ["was", "were", "am", "had been"], "answer": 1, "hint": "Subjunctive for unreal past: 'were'." },
+  { "question": "By 2026, scientists ___ (develop) new treatments.", "options": ["will develop", "will have developed", "have developed", "develop"], "answer": 1, "hint": "Future perfect for completed future action." },
+  { "question": "She ___ (never/see) snow before her trip to Canada.", "options": ["never saw", "had never seen", "has never seen", "never seen"], "answer": 1, "hint": "Past perfect for first experience before another past event." },
+  { "question": "If you ___ (pay) attention, you would understand.", "options": ["pay", "paid", "had paid", "have paid"], "answer": 2, "hint": "Mixed conditional: past perfect in if-clause." },
+  { "question": "He looked as if he ___ (cry).", "options": ["cried", "had cried", "has cried", "was crying"], "answer": 1, "hint": "Subjunctive: 'as if' + past perfect for unreal past." },
+  { "question": "They ___ (leave) when we arrived.", "options": ["left", "had left", "have left", "were leaving"], "answer": 1, "hint": "Past perfect for an action before another past action." },
+  { "question": "If I ___ (know) about the traffic, I would have left earlier.", "options": ["knew", "had known", "know", "have known"], "answer": 1, "hint": "Third conditional: 'had' + past participle." },
+  { "question": "We ___ (not/finish) dinner by the time the guests arrived.", "options": ["didn't finish", "hadn't finished", "haven't finished", "were not finishing"], "answer": 1, "hint": "Past perfect negative for incomplete action before a past event." },
+  { "question": "If you ___ (ask) me, I would have explained.", "options": ["asked", "had asked", "have asked", "ask"], "answer": 1, "hint": "Third conditional: 'had' + past participle." },
+  { "question": "By next year, she ___ (learn) to drive.", "options": ["will learn", "will have learned", "learns", "has learned"], "answer": 1, "hint": "Future perfect for completed action before a future time." },
+  { "question": "He ___ (just/arrive) when the meeting started.", "options": ["just arrived", "had just arrived", "has just arrived", "was just arriving"], "answer": 1, "hint": "Past perfect for completed action before another past event." },
+  { "question": "If she ___ (not/make) that mistake, we would have won.", "options": ["has not made", "had not made", "did not make", "was not making"], "answer": 1, "hint": "Third conditional negative: 'had not' + past participle." },
+  { "question": "After they ___ (eat), they went for a walk.", "options": ["ate", "had eaten", "have eaten", "eat"], "answer": 1, "hint": "Past perfect for completed action before another past event." }
+
+      // ...add up to 50+ for production
+    ],
+    prepositions: [
+      { question: "She is skilled ___ painting.", options: ["at", "in", "on"], answer: 0, hint: "'Skilled at' is the correct phrase." },
+      { question: "He succeeded ___ solving the puzzle.", options: ["on", "in", "at"], answer: 1, hint: "'Succeed in' is correct." },
+      { question: "He is married ___ a doctor.", options: ["with", "to", "by"], answer: 1, hint: "Use 'to' for marriage." },
+      { question: "She is capable ___ solving problems.", options: ["of", "to", "for"], answer: 0, hint: "'Capable of'." },
+      { question: "The book was written ___ Shakespeare.", options: ["by", "with", "to"], answer: 0, hint: "Passive voice agent." },
+      { question: "He insisted ___ paying.", options: ["at", "on", "about"], answer: 1, hint: "'Insist on'." },
+      { question: "I am looking forward ___ meeting you.", options: ["to", "for", "at"], answer: 0, hint: "'Look forward to'." },
+      { question: "She is involved ___ many activities.", options: ["in", "on", "with"], answer: 0, hint: "'Involved in'." },
+      { question: "He is famous ___ his paintings.", options: ["for", "about", "at"], answer: 0, hint: "'Famous for'." },
+      { question: "The car collided ___ a tree.", options: ["with", "to", "at"], answer: 0, hint: "'Collided with'." },
+      
+  { "question": "He was accused ___ stealing the money.", "options": ["of", "for", "to", "with"], "answer": 0, "hint": "'Accused of' is the correct phrase." },
+  { "question": "She is endowed ___ great intelligence.", "options": ["with", "of", "for", "in"], "answer": 0, "hint": "'Endowed with' means to possess." },
+  { "question": "His remarks are not relevant ___ the subject.", "options": ["to", "for", "with", "on"], "answer": 0, "hint": "'Relevant to' is the correct collocation." },
+  { "question": "He was absorbed ___ the book.", "options": ["in", "on", "at", "with"], "answer": 0, "hint": "'Absorbed in' means deeply interested." },
+  { "question": "She is proficient ___ French.", "options": ["in", "at", "with", "on"], "answer": 1, "hint": "'Proficient at' something." },
+  { "question": "He was indifferent ___ their complaints.", "options": ["to", "with", "about", "at"], "answer": 0, "hint": "'Indifferent to' something." },
+  { "question": "He was intent ___ finishing the task.", "options": ["on", "in", "at", "over"], "answer": 0, "hint": "'Intent on' is correct." },
+  { "question": "She was not aware ___ the rules.", "options": ["of", "for", "in", "about"], "answer": 0, "hint": "'Aware of' something." },
+  { "question": "He was annoyed ___ his brother.", "options": ["with", "at", "by", "for"], "answer": 0, "hint": "'Annoyed with' people." },
+  { "question": "He is eligible ___ the post.", "options": ["for", "to", "in", "with"], "answer": 0, "hint": "'Eligible for' something." },
+  { "question": "She is addicted ___ chocolate.", "options": ["to", "with", "on", "at"], "answer": 0, "hint": "'Addicted to' something." },
+  { "question": "He is averse ___ smoking.", "options": ["to", "from", "at", "with"], "answer": 0, "hint": "'Averse to' something." },
+  { "question": "He is incapable ___ lying.", "options": ["of", "to", "for", "with"], "answer": 0, "hint": "'Incapable of' something." },
+  { "question": "He was deprived ___ his rights.", "options": ["of", "from", "with", "by"], "answer": 0, "hint": "'Deprived of' something." },
+  { "question": "He was vexed ___ his failure.", "options": ["at", "with", "by", "for"], "answer": 0, "hint": "'Vexed at' a situation." },
+  { "question": "She was delighted ___ the news.", "options": ["at", "with", "by", "of"], "answer": 0, "hint": "'Delighted at' something." },
+  { "question": "He was disgusted ___ their behaviour.", "options": ["at", "with", "by", "of"], "answer": 1, "hint": "'Disgusted with' people." },
+  { "question": "He was astonished ___ her courage.", "options": ["at", "by", "with", "on"], "answer": 0, "hint": "'Astonished at' something." },
+  { "question": "He is envious ___ his friend's success.", "options": ["of", "to", "with", "for"], "answer": 0, "hint": "'Envious of' something." },
+  { "question": "He is prejudiced ___ foreigners.", "options": ["against", "with", "for", "to"], "answer": 0, "hint": "'Prejudiced against' someone." },
+  { "question": "He is notorious ___ cheating.", "options": ["for", "of", "to", "with"], "answer": 0, "hint": "'Notorious for' something." },
+  { "question": "He is conscious ___ his appearance.", "options": ["of", "about", "to", "with"], "answer": 0, "hint": "'Conscious of' something." },
+  { "question": "She is blind ___ his faults.", "options": ["to", "of", "with", "about"], "answer": 0, "hint": "'Blind to' something." },
+  { "question": "He is accustomed ___ hard work.", "options": ["to", "with", "for", "at"], "answer": 0, "hint": "'Accustomed to' something." },
+  { "question": "He is compliant ___ the rules.", "options": ["with", "to", "for", "in"], "answer": 0, "hint": "'Compliant with' regulations." },
+  { "question": "He is immune ___ criticism.", "options": ["to", "from", "of", "about"], "answer": 0, "hint": "'Immune to' something." },
+  { "question": "She is liable ___ pay a fine.", "options": ["to", "for", "at", "with"], "answer": 0, "hint": "'Liable to' do something." },
+  { "question": "He is shy ___ strangers.", "options": ["of", "with", "to", "about"], "answer": 0, "hint": "'Shy of' someone." },
+  { "question": "He is susceptible ___ colds.", "options": ["to", "with", "of", "at"], "answer": 0, "hint": "'Susceptible to' something." },
+  { "question": "He is oblivious ___ his surroundings.", "options": ["of", "to", "with", "about"], "answer": 1, "hint": "'Oblivious to' something." },
+  { "question": "She is intent ___ winning the match.", "options": ["on", "in", "at", "with"], "answer": 0, "hint": "'Intent on' something." },
+  { "question": "He is partial ___ sweets.", "options": ["to", "with", "for", "at"], "answer": 0, "hint": "'Partial to' something." },
+  { "question": "He is opposed ___ this plan.", "options": ["to", "for", "with", "at"], "answer": 0, "hint": "'Opposed to' something." },
+  { "question": "She is resigned ___ her fate.", "options": ["to", "with", "for", "at"], "answer": 0, "hint": "'Resigned to' something." },
+  { "question": "He is ignorant ___ the facts.", "options": ["of", "about", "to", "with"], "answer": 0, "hint": "'Ignorant of' something." },
+  { "question": "He is indifferent ___ praise or blame.", "options": ["to", "with", "of", "for"], "answer": 0, "hint": "'Indifferent to' something." },
+  { "question": "He is notorious ___ his crimes.", "options": ["for", "of", "with", "about"], "answer": 0, "hint": "'Notorious for' something." },
+  { "question": "He is proficient ___ mathematics.", "options": ["in", "at", "with", "on"], "answer": 1, "hint": "'Proficient at' something." },
+  { "question": "He is reconciled ___ his situation.", "options": ["to", "with", "in", "at"], "answer": 0, "hint": "'Reconciled to' something." },
+  { "question": "She is keen ___ classical music.", "options": ["on", "of", "in", "at"], "answer": 0, "hint": "'Keen on' something." },
+  { "question": "He is obsessed ___ video games.", "options": ["with", "by", "about", "of"], "answer": 0, "hint": "'Obsessed with' something." },
+  { "question": "He is answerable ___ his actions.", "options": ["for", "to", "of", "with"], "answer": 0, "hint": "'Answerable for' something." },
+  { "question": "He is hostile ___ new ideas.", "options": ["to", "for", "with", "at"], "answer": 0, "hint": "'Hostile to' something." },
+  { "question": "He is adept ___ solving problems.", "options": ["at", "in", "on", "with"], "answer": 0, "hint": "'Adept at' something." },
+  { "question": "She is amazed ___ his progress.", "options": ["at", "by", "with", "of"], "answer": 0, "hint": "'Amazed at' something." },
+  { "question": "He is notorious ___ breaking rules.", "options": ["for", "to", "on", "of"], "answer": 0, "hint": "'Notorious for' something." },
+  { "question": "He is affiliated ___ the university.", "options": ["with", "to", "for", "at"], "answer": 0, "hint": "'Affiliated with' something." },
+  { "question": "She is apprehensive ___ the exam.", "options": ["about", "of", "for", "with"], "answer": 0, "hint": "'Apprehensive about' something." },
+  { "question": "He is eligible ___ scholarship.", "options": ["for", "to", "of", "with"], "answer": 0, "hint": "'Eligible for' something." },
+  { "question": "She is engrossed ___ her work.", "options": ["in", "on", "with", "at"], "answer": 0, "hint": "'Engrossed in' something." },
+  { "question": "He is notorious ___ his behaviour.", "options": ["for", "with", "about", "to"], "answer": 0, "hint": "'Notorious for' something." },
+  { "question": "He is reminiscent ___ his father.", "options": ["of", "to", "for", "with"], "answer": 0, "hint": "'Reminiscent of' someone." },
+  { "question": "She is synonymous ___ quality.", "options": ["with", "for", "of", "to"], "answer": 0, "hint": "'Synonymous with' something." }
+
+      // ...add up to 50+ for production
+    ],
+    subject_verb: [
+      { question: "Neither the manager nor the employees ___ willing to do the extra work.", options: ["is", "are"], answer: 1, hint: "Verb agrees with the nearer subject." },
+      { question: "The quality of the apples ___ not good.", options: ["is", "are"], answer: 0, hint: "Verb agrees with 'quality'." },
+      { question: "Either you or he ___ to blame.", options: ["is", "are"], answer: 0, hint: "Verb agrees with nearer subject." },
+      { question: "The committee ___ divided in its opinion.", options: ["is", "are"], answer: 1, hint: "Collective noun, plural sense." },
+      { question: "Ten years ___ a long time.", options: ["is", "are"], answer: 0, hint: "Time expression, singular." },
+      { question: "The number of students ___ increasing.", options: ["is", "are"], answer: 0, hint: "'The number' is singular." },
+      { question: "A lot of people ___ present.", options: ["is", "are"], answer: 1, hint: "'People' is plural." },
+      { question: "The police ___ investigating the case.", options: ["is", "are"], answer: 1, hint: "'Police' is plural." },
+      { question: "Bread and butter ___ my breakfast.", options: ["is", "are"], answer: 0, hint: "Treated as a single item." },
+      { question: "Each of them ___ responsible.", options: ["is", "are"], answer: 0, hint: "'Each' is singular." },
+      
+  { "question": "Neither of the solutions ___ acceptable.", "options": ["is", "are"], "answer": 0, "hint": "'Neither' is singular; use 'is'." },
+  { "question": "The committee ___ divided in their opinions.", "options": ["is", "are"], "answer": 1, "hint": "When acting as individuals, use plural 'are'." },
+  { "question": "Each of the students ___ responsible for submitting their assignment.", "options": ["is", "are"], "answer": 0, "hint": "'Each' takes a singular verb." },
+  { "question": "Ten dollars ___ not enough to buy the book.", "options": ["is", "are"], "answer": 0, "hint": "Amounts of money are treated as singular." },
+  { "question": "Not only the teacher but also the students ___ present.", "options": ["is", "are"], "answer": 1, "hint": "Verb agrees with the nearest subject." },
+  { "question": "The number of applicants ___ increasing every year.", "options": ["is", "are"], "answer": 0, "hint": "'The number of' takes singular." },
+  { "question": "A number of students ___ absent today.", "options": ["is", "are"], "answer": 1, "hint": "'A number of' takes plural." },
+  { "question": "Neither the manager nor the assistants ___ available.", "options": ["is", "are"], "answer": 1, "hint": "Verb agrees with the nearest subject." },
+  { "question": "Bread and butter ___ what he eats for breakfast.", "options": ["is", "are"], "answer": 0, "hint": "Considered as one item, use singular." },
+  { "question": "The data ___ conclusive.", "options": ["is", "are"], "answer": 1, "hint": "Formal English treats 'data' as plural." },
+  { "question": "The jury ___ unanimous in its verdict.", "options": ["was", "were"], "answer": 0, "hint": "Jury acting as a unit: singular." },
+  { "question": "The jury ___ arguing among themselves.", "options": ["was", "were"], "answer": 1, "hint": "Jury acting as individuals: plural." },
+  { "question": "Either the players or the coach ___ responsible for the loss.", "options": ["is", "are"], "answer": 0, "hint": "Verb agrees with the nearest subject." },
+  { "question": "Each of the candidates ___ given a chance to speak.", "options": ["was", "were"], "answer": 0, "hint": "'Each' takes singular." },
+  { "question": "The scissors ___ missing.", "options": ["is", "are"], "answer": 1, "hint": "Scissors is always plural." },
+  { "question": "The news ___ spreading quickly.", "options": ["is", "are"], "answer": 0, "hint": "'News' is singular." },
+  { "question": "Neither the principal nor the teachers ___ satisfied.", "options": ["is", "are"], "answer": 1, "hint": "Verb agrees with the nearest subject." },
+  { "question": "Many a student ___ failed the exam.", "options": ["has", "have"], "answer": 0, "hint": "'Many a' takes singular." },
+  { "question": "His trousers ___ new.", "options": ["is", "are"], "answer": 1, "hint": "'Trousers' is plural." },
+  { "question": "Mathematics ___ an interesting subject.", "options": ["is", "are"], "answer": 0, "hint": "Certain subjects are singular even if ending in 's'." },
+  { "question": "The majority of the team ___ present.", "options": ["is", "are"], "answer": 0, "hint": "'Majority' with collective noun usually singular." },
+  { "question": "The majority of the players ___ present.", "options": ["is", "are"], "answer": 1, "hint": "Plural noun after 'majority' uses plural verb." },
+  { "question": "Fifty percent of the work ___ done.", "options": ["is", "are"], "answer": 0, "hint": "Work is uncountable, use singular." },
+  { "question": "Fifty percent of the students ___ passed.", "options": ["has", "have"], "answer": 1, "hint": "Students is plural." },
+  { "question": "All the information ___ correct.", "options": ["is", "are"], "answer": 0, "hint": "'Information' is uncountable." },
+  { "question": "All the books ___ on the table.", "options": ["is", "are"], "answer": 1, "hint": "Books is plural." },
+  { "question": "The staff ___ in agreement.", "options": ["is", "are"], "answer": 0, "hint": "Staff as a unit: singular." },
+  { "question": "The staff ___ arguing among themselves.", "options": ["is", "are"], "answer": 1, "hint": "Staff as individuals: plural." },
+  { "question": "Every boy and girl ___ awarded a prize.", "options": ["was", "were"], "answer": 0, "hint": "'Every' makes it singular." },
+  { "question": "Neither of the answers ___ correct.", "options": ["is", "are"], "answer": 0, "hint": "'Neither' is singular." },
+  { "question": "None of the water ___ wasted.", "options": ["was", "were"], "answer": 0, "hint": "Water is uncountable." },
+  { "question": "None of the students ___ late.", "options": ["was", "were"], "answer": 1, "hint": "Students is plural." },
+  { "question": "One of the girls ___ missing.", "options": ["is", "are"], "answer": 0, "hint": "'One of' makes it singular." },
+  { "question": "The United States ___ a large country.", "options": ["is", "are"], "answer": 0, "hint": "Countries with plural names are singular." },
+  { "question": "Each of the books ___ been read.", "options": ["has", "have"], "answer": 0, "hint": "'Each' is singular." },
+  { "question": "Either the dogs or the cat ___ making noise.", "options": ["is", "are"], "answer": 0, "hint": "Verb agrees with nearest subject." },
+  { "question": "Either the cat or the dogs ___ barking.", "options": ["is", "are"], "answer": 1, "hint": "Verb agrees with nearest subject." },
+  { "question": "The police ___ investigating the case.", "options": ["is", "are"], "answer": 1, "hint": "'Police' is always plural." },
+  { "question": "Twenty kilometers ___ a long distance.", "options": ["is", "are"], "answer": 0, "hint": "Distance is singular." },
+  { "question": "Neither my friends nor my father ___ coming today.", "options": ["is", "are"], "answer": 0, "hint": "Verb agrees with nearest subject." },
+  { "question": "A bouquet of roses ___ on the table.", "options": ["is", "are"], "answer": 0, "hint": "Bouquet is singular." },
+  { "question": "His means ___ sufficient.", "options": ["is", "are"], "answer": 1, "hint": "'Means' (resources) is plural." },
+  { "question": "The public ___ divided in its opinion.", "options": ["is", "are"], "answer": 1, "hint": "When acting as individuals: plural." },
+  { "question": "The team ___ playing well.", "options": ["is", "are"], "answer": 0, "hint": "Team as a unit: singular." },
+  { "question": "The team ___ arguing among themselves.", "options": ["is", "are"], "answer": 1, "hint": "Team as individuals: plural." },
+  { "question": "All that glitters ___ not gold.", "options": ["is", "are"], "answer": 0, "hint": "'All that' is singular." },
+  { "question": "The pair of shoes ___ new.", "options": ["is", "are"], "answer": 0, "hint": "'Pair' is singular." },
+  { "question": "The cattle ___ grazing in the field.", "options": ["is", "are"], "answer": 1, "hint": "'Cattle' is always plural." },
+  { "question": "The criteria ___ strict.", "options": ["is", "are"], "answer": 1, "hint": "'Criteria' is plural." },
+  { "question": "The phenomenon ___ interesting.", "options": ["is", "are"], "answer": 0, "hint": "'Phenomenon' is singular; plural is 'phenomena'." },
+  { "question": "The media ___ biased.", "options": ["is", "are"], "answer": 1, "hint": "'Media' is plural in formal English." },
+  { "question": "The furniture ___ new.", "options": ["is", "are"], "answer": 0, "hint": "'Furniture' is uncountable, use singular." }
+
+      // ...add up to 50+ for production
+    ]
+  }
+};
+
+const TEST_TYPES = [
+  {key: "articles", label: "Articles"},
+  {key: "punctuation", label: "Punctuation"},
+  {key: "verb_tenses", label: "Verb Tenses"},
+  {key: "prepositions", label: "Prepositions"},
+  {key: "subject_verb", label: "Subject-Verb Agreement"}
+];
+
+let selectedDifficulty = null;
+let selectedTypes = [];
+let currentQuestions = [];
+let currentIndex = 0;
+let userScore = 0;
+let userAnswers = [];
+let questionOrder = [];
+let shuffleQuestions = true;
+
+function shuffle(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+}
+function capitalize(str) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+document.getElementById('start-test-btn').onclick = function() {
+  const diffRadio = document.querySelector('input[name="difficulty"]:checked');
+  if (!diffRadio) {
+    alert("Please select a difficulty level.");
+    return;
+  }
+  selectedDifficulty = diffRadio.value;
+  selectedTypes = [];
+  document.querySelectorAll('.test-types input[type="checkbox"]:checked').forEach(cb => {
+    selectedTypes.push(cb.value);
+  });
+  if (selectedTypes.length === 0) {
+    alert("Please select at least one test type.");
+    return;
+  }
+  prepareQuestions();
+  showTestPage();
+};
+
+function prepareQuestions() {
+  currentQuestions = [];
+  selectedTypes.forEach(type => {
+    const qSet = QUESTION_BANK[selectedDifficulty][type] || [];
+    currentQuestions = currentQuestions.concat(qSet.map(q => ({...q, type})));
+  });
+  if (shuffleQuestions) shuffle(currentQuestions);
+  questionOrder = currentQuestions.map((_, i) => i);
+  currentIndex = 0;
+  userScore = 0;
+  userAnswers = [];
+}
+
+function showTestPage() {
+  document.getElementById('home-page').style.display = 'none';
+  document.getElementById('result-page').style.display = 'none';
+  document.getElementById('test-page').style.display = '';
+  showQuestion();
+}
+function backToHome() {
+  document.getElementById('home-page').style.display = '';
+  document.getElementById('test-page').style.display = 'none';
+  document.getElementById('result-page').style.display = 'none';
+  document.querySelectorAll('input[name="difficulty"]').forEach(r => r.checked = false);
+  document.querySelectorAll('.test-types input[type="checkbox"]').forEach(cb => cb.checked = false);
+}
+
+function showQuestion() {
+  const qNum = currentIndex + 1;
+  const qTotal = currentQuestions.length;
+  document.getElementById('progress-info').textContent = `Question ${qNum} of ${qTotal}`;
+  const q = currentQuestions[currentIndex];
+  let html = `<div class="question">${q.question}</div><form id="answer-form"><div class="answers">`;
+  if (q.type === "punctuation") {
+    html += `<input type="text" name="answer" style="width:98%; font-size:1.1em; padding:0.5rem; border-radius:var(--radius); border:1px solid #c3cce3;">`;
+  } else if (q.options) {
+    q.options.forEach((opt, i) => {
+      html += `<label><input type="radio" name="answer" value="${i}"> ${opt}</label>`;
+    });
+  } else {
+    html += `<input type="text" name="answer" style="width:98%; font-size:1.1em; padding:0.5rem; border-radius:var(--radius); border:1px solid #c3cce3;">`;
+  }
+  html += `</div></form>`;
+  html += `<div class="hint" id="hint-block">${q.hint}</div>`;
+  document.getElementById('test-main').innerHTML = html;
+
+  const controls = document.getElementById('test-controls');
+  controls.innerHTML = `
+    <button id="submit-btn">Submit</button>
+    <button id="hint-btn" type="button">Hint</button>
+    <button id="next-btn" type="button" disabled>Next</button>
+  `;
+
+  document.getElementById('hint-btn').onclick = function() {
+    document.getElementById('hint-block').style.display = 'block';
+    this.disabled = true;
+  };
+  document.getElementById('submit-btn').onclick = submitAnswer;
+  document.getElementById('next-btn').onclick = nextQuestion;
+}
+
+function submitAnswer(e) {
+  e && e.preventDefault && e.preventDefault();
+  const q = currentQuestions[currentIndex];
+  let userAns = "";
+  let wasEmpty = false;
+  if (q.options) {
+    const selected = document.querySelector('input[name="answer"]:checked');
+    if (!selected) {
+      userAns = ""; // treat as empty
+      wasEmpty = true;
+    } else {
+      userAns = parseInt(selected.value);
+    }
+  } else {
+    userAns = document.querySelector('input[name="answer"]').value.trim();
+    if (!userAns) {
+      wasEmpty = true;
+    }
+  }
+  let isCorrect = false;
+  let normalizedUserAns = (typeof userAns === "string") ? userAns.replace(/\s+/g, ' ').toLowerCase() : userAns;
+  if (q.options) {
+    isCorrect = userAns === q.answer;
+  } else {
+    let correctAns = (q.answer || "").replace(/\s+/g, ' ').toLowerCase();
+    isCorrect = normalizedUserAns === correctAns;
+  }
+  userAnswers[currentIndex] = {user: userAns, correct: isCorrect};
+  if (isCorrect) userScore++;
+  let feedback = document.createElement('div');
+  feedback.className = 'feedback ' + (isCorrect ? 'correct' : 'incorrect');
+  if (wasEmpty) {
+    feedback.innerHTML = `<b>No answer given.</b> Correct answer: ${q.options ? `<b>${q.options[q.answer]}</b>` : `<b>${q.answer}</b>`}`;
+  } else {
+    feedback.innerHTML = isCorrect ? "Correct!" : ("Incorrect. " + (q.options ? `Correct answer: <b>${q.options[q.answer]}</b>` : `Correct answer: <b>${q.answer}</b>`));
+  }
+  document.getElementById('test-main').appendChild(feedback);
+  let form = document.getElementById('answer-form');
+  const inputs = form.querySelectorAll('input');
+  inputs.forEach(inp => inp.disabled = true);
+  document.getElementById('submit-btn').disabled = true;
+  document.getElementById('next-btn').disabled = false;
+  document.getElementById('hint-btn').disabled = true;
+}
+
+function nextQuestion() {
+  if (currentIndex < currentQuestions.length - 1) {
+    currentIndex++;
+    showQuestion();
+  } else {
+    showResult();
+  }
+}
+
+function showResult() {
+  document.getElementById('test-page').style.display = 'none';
+  document.getElementById('result-page').style.display = '';
+  document.getElementById('final-score').innerHTML =
+    `You scored <span style="color:var(--success);">${userScore}</span> out of <span>${currentQuestions.length}</span>!<br><br>
+    ${userScore === currentQuestions.length ? "Perfect! 🌟" : userScore > currentQuestions.length/2 ? "Great job! 🎉" : "Keep practicing! 💪"}`;
+}
+
+backToHome();
+</script>
+</body>
+</html>
